@@ -35,14 +35,7 @@ export { default as SubscriberOfferModal } from './screens/SubscriberOfferModal'
 // KYC Screens - MOVED TO features/verifications/kyc
 // Import from '@/features/verifications/kyc' for new code
 // Re-export for backward compatibility (deprecated)
-export {
-  KYCIntroScreen,
-  KYCDocumentTypeScreen,
-  KYCDocumentCaptureScreen,
-  KYCSelfieScreen,
-  KYCReviewScreen,
-  KYCPendingScreen,
-} from '../verifications/kyc';
+export { KYCIntroScreen, KYCPendingScreen } from '../verifications/kyc';
 
 // Components
 export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';

@@ -1,7 +1,7 @@
 /**
  * WalletScreen - LVND Coin ve Titan Protocol Görünümü
  */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 import { usePayments } from '@/hooks/usePayments';
 import { BlurView } from 'expo-blur';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -27,6 +27,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import { securePaymentService, type KYCStatus } from '@/services';
 
 const TitanFlowBadge = ({ amount }: { amount: number }) => {
   const pulse = useSharedValue(1);
@@ -71,10 +72,48 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
   );
 };
 
+const KYC_STATUS_CONFIG: Record<
+  KYCStatus['status'],
+  {
+    label: string;
+    icon: keyof typeof MaterialCommunityIcons.glyphMap;
+    color: string;
+  }
+> = {
+  not_started: {
+    label: 'Kimlik Doğrulama Gerekli',
+    icon: 'alert-circle-outline',
+    color: COLORS.warning,
+  },
+  pending: {
+    label: 'Doğrulama İnceleniyor',
+    icon: 'progress-clock',
+    color: COLORS.primary,
+  },
+  in_review: {
+    label: 'Doğrulama İnceleniyor',
+    icon: 'progress-clock',
+    color: COLORS.primary,
+  },
+  verified: {
+    label: 'Kimlik Doğrulandı',
+    icon: 'check-decagram',
+    color: COLORS.success,
+  },
+  rejected: {
+    label: 'Doğrulama Başarısız',
+    icon: 'close-circle-outline',
+    color: COLORS.error,
+  },
+};
+
 const WalletScreen = () => {
   const { balance, refreshBalance, balanceLoading } = usePayments();
   const navigation = useNavigation<any>();
   const isLoading = balanceLoading;
+  const [kycStatus, setKycStatus] =
+    useState<KYCStatus['status']>('not_started');
+  const [kycLoading, setKycLoading] = useState(false);
 
   // Realtime subscription for live coin balance updates
   useEffect(() => {
@@ -117,7 +156,45 @@ const WalletScreen = () => {
     refreshBalance();
   }, [refreshBalance]);
 
+  const refreshKycStatus = useCallback(async () => {
+    try {
+      setKycLoading(true);
+      const result = await securePaymentService.getKYCStatus();
+      setKycStatus(result.status);
+    } catch (error) {
+      logger.warn('Failed to refresh KYC status', { error });
+    } finally {
+      setKycLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshKycStatus();
+    }, [refreshKycStatus]),
+  );
+
+  const handleKycPress = () => {
+    if (kycStatus === 'verified') {
+      return;
+    }
+
+    if (kycStatus === 'pending' || kycStatus === 'in_review') {
+      navigation.navigate('KYCPending', {
+        status: kycStatus,
+        returnTo: 'Withdraw',
+      });
+      return;
+    }
+
+    navigation.navigate('IdentityVerification', { returnTo: 'Withdraw' });
+  };
+
   const handleWithdraw = () => {
+    if (kycStatus !== 'verified') {
+      handleKycPress();
+      return;
+    }
     navigation.navigate('Withdraw');
   };
 
@@ -191,6 +268,23 @@ const WalletScreen = () => {
           </BlurView>
 
           <View style={styles.actionsContainer}>
+            <TouchableOpacity
+              onPress={handleKycPress}
+              style={styles.kycStatusRow}
+              disabled={kycLoading}
+            >
+              <MaterialCommunityIcons
+                name={KYC_STATUS_CONFIG[kycStatus].icon}
+                size={18}
+                color={KYC_STATUS_CONFIG[kycStatus].color}
+              />
+              <Text style={styles.kycStatusText}>
+                {KYC_STATUS_CONFIG[kycStatus].label}
+              </Text>
+              {kycStatus !== 'verified' && (
+                <Text style={styles.kycActionText}>Kimliğini Doğrula</Text>
+              )}
+            </TouchableOpacity>
             {/* Para Çekme (Sadece Admin onaylı ve Teşekkür Videolu kullanıcılara) */}
             <TouchableOpacity
               onPress={handleWithdraw}
@@ -317,6 +411,26 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     marginTop: 24,
+    gap: 12,
+  },
+  kycStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  kycStatusText: {
+    flex: 1,
+    color: COLORS.text.primary,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  kycActionText: {
+    color: COLORS.brand.primary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   withdrawLink: {
     flexDirection: 'row',

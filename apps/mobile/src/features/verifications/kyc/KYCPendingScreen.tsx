@@ -13,7 +13,12 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import {
+  useNavigation,
+  CommonActions,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -28,6 +33,7 @@ import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 /**
  * Animated processing ring component (vault lock visualization)
@@ -114,16 +120,79 @@ const ProcessingVaultRing: React.FC = () => {
 
 const KYCPendingScreen: React.FC = () => {
   const navigation = useNavigation();
+  const route = useRoute<RouteProp<RootStackParamList, 'KYCPending'>>();
   const insets = useSafeAreaInsets();
 
-  const handleDone = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'Discover' }],
-      }),
-    );
-  };
+  const status = route.params?.status ?? 'pending';
+  const returnTo = route.params?.returnTo;
+
+  const statusCopy = {
+    pending: {
+      title: 'Belgelerin İnceleniyor',
+      subtitle:
+        'iDenfy, kimliğini doğruluyor. Bu işlem genellikle birkaç dakika sürer.',
+      button: "Keşfet'e Dön",
+      action: () =>
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Discover' }],
+          }),
+        ),
+    },
+    in_review: {
+      title: 'Doğrulama Devam Ediyor',
+      subtitle:
+        'Kimliğin iDenfy tarafından inceleniyor. Sonuçlandığında bildirim alacaksın.',
+      button: "Keşfet'e Dön",
+      action: () =>
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Discover' }],
+          }),
+        ),
+    },
+    verified: {
+      title: 'Kimliğin Onaylandı',
+      subtitle:
+        'Doğrulama tamamlandı. Artık para çekme dahil tüm işlemleri kullanabilirsin.',
+      button: returnTo === 'Withdraw' ? 'Para Çek' : 'Devam Et',
+      action: () => {
+        if (returnTo) {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: returnTo }],
+            }),
+          );
+          return;
+        }
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Discover' }],
+          }),
+        );
+      },
+    },
+    rejected: {
+      title: 'Doğrulama Tamamlanamadı',
+      subtitle:
+        'Kimlik doğrulaması başarısız oldu. Lütfen tekrar deneyin veya destekle iletişime geçin.',
+      button: 'Tekrar Dene',
+      action: () => navigation.navigate('IdentityVerification'),
+    },
+    not_started: {
+      title: 'Kimlik Doğrulama Gerekli',
+      subtitle:
+        'Para çekebilmek için kimlik doğrulamasını tamamlaman gerekiyor.',
+      button: 'Doğrulamaya Başla',
+      action: () => navigation.navigate('IdentityVerification'),
+    },
+  } as const;
+
+  const handleDone = () => statusCopy[status]?.action();
 
   return (
     <View style={styles.container}>
@@ -132,11 +201,8 @@ const KYCPendingScreen: React.FC = () => {
         <ProcessingVaultRing />
 
         {/* Title */}
-        <Text style={styles.title}>Belgelerin İnceleniyor</Text>
-        <Text style={styles.subtitle}>
-          Yapay zeka asistanımız kimliğini doğruluyor.{'\n'}
-          Bu işlem genellikle birkaç dakika sürer.
-        </Text>
+        <Text style={styles.title}>{statusCopy[status]?.title}</Text>
+        <Text style={styles.subtitle}>{statusCopy[status]?.subtitle}</Text>
 
         {/* Info Card */}
         <GlassCard
@@ -195,7 +261,7 @@ const KYCPendingScreen: React.FC = () => {
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Güvenlik</Text>
                 <Text style={styles.infoValue}>
-                  Verilen 256-bit şifreleme ile korunuyor
+                  Veriler iDenfy tarafından 256-bit şifreleme ile korunur
                 </Text>
               </View>
             </View>
@@ -206,7 +272,7 @@ const KYCPendingScreen: React.FC = () => {
       {/* Footer */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
         <Button
-          title="Keşfet'e Dön"
+          title={statusCopy[status]?.button}
           variant="secondary"
           onPress={handleDone}
           size="lg"

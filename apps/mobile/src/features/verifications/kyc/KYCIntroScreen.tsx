@@ -1,15 +1,20 @@
 // KYC Intro Screen - Awwwards standard "Güven Seremonisi" experience
 // Featuring silky glass effects and neon accents
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
@@ -27,12 +32,13 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
-import { INITIAL_VERIFICATION_DATA } from './constants';
+import { securePaymentService } from '@/services';
+import { useToast } from '@/context/ToastContext';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
-type NavigationProp = StackNavigationProp<{
-  KYCDocumentType: { data: typeof INITIAL_VERIFICATION_DATA };
-}>;
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+type RouteParams = RouteProp<RootStackParamList, 'IdentityVerification'>;
 
 // Benefit data with neon theme
 const BENEFITS = [
@@ -61,7 +67,10 @@ const BENEFITS = [
 
 const KYCIntroScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<RouteParams>();
+  const { showToast } = useToast();
   const insets = useSafeAreaInsets();
+  const [isStarting, setIsStarting] = useState(false);
 
   // Breathing glow animation
   const glowPulse = useSharedValue(0);
@@ -93,10 +102,25 @@ const KYCIntroScreen: React.FC = () => {
     opacity: interpolate(glowPulse.value, [0, 1], [0.6, 0.9]),
   }));
 
-  const handleStart = () => {
-    navigation.navigate('KYCDocumentType', {
-      data: INITIAL_VERIFICATION_DATA,
-    });
+  const handleStart = async () => {
+    try {
+      setIsStarting(true);
+      const { verificationUrl } =
+        await securePaymentService.startKYCVerification();
+
+      if (verificationUrl) {
+        await Linking.openURL(verificationUrl);
+      }
+
+      navigation.navigate('KYCPending', {
+        status: 'pending',
+        returnTo: route.params?.returnTo,
+      });
+    } catch (error) {
+      showToast('KYC başlatılamadı. Lütfen tekrar deneyin.');
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   return (
@@ -131,8 +155,9 @@ const KYCIntroScreen: React.FC = () => {
             <Text style={styles.overline}>SEÇKİN TOPLULUK</Text>
             <Text style={styles.title}>Güven Seremonisine{'\n'}Hoş Geldin</Text>
             <Text style={styles.subtitle}>
-              Lovendo'da güvenli bir deneyim için kimliğini doğrulayarak ipeksi
-              bir ağın parçası ol.
+              Lovendo'da güvenli bir deneyim için kimliğini doğrulaman gerekir.
+              Doğrulama adımları iDenfy'nin kendi ekranlarında yürütülür ve
+              sonuç bize webhook ile iletilir.
             </Text>
           </View>
 
@@ -202,6 +227,7 @@ const KYCIntroScreen: React.FC = () => {
             onPress={handleStart}
             size="lg"
             style={styles.startButton}
+            loading={isStarting}
           />
           <TouchableOpacity
             onPress={() => navigation.goBack()}

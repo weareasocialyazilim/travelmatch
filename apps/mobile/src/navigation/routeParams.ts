@@ -5,7 +5,6 @@
  */
 
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import type { VerificationData as KYCVerificationData } from '../features/verifications/kyc/types';
 import type { SuccessType } from '../features/payments/types/success.types';
 import type { Moment, User, SelectedGiver } from '../types';
 
@@ -223,13 +222,19 @@ export type RootStackParamList = {
   HiddenItems: undefined;
   ArchivedChats: undefined;
 
-  // Identity Verification (modular KYC flow)
-  IdentityVerification: undefined;
-  KYCDocumentType: { data: KYCVerificationData };
-  KYCDocumentCapture: { data: KYCVerificationData };
-  KYCSelfie: { data: KYCVerificationData };
-  KYCReview: { data: KYCVerificationData };
-  KYCPending: undefined;
+  // Identity Verification (iDenfy flow)
+  IdentityVerification: { returnTo?: string } | undefined;
+  KYCPending:
+    | {
+        status?:
+          | 'not_started'
+          | 'pending'
+          | 'in_review'
+          | 'verified'
+          | 'rejected';
+        returnTo?: string;
+      }
+    | undefined;
 
   // Social & Invite
   InviteFriends: undefined;

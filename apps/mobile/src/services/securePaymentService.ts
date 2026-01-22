@@ -26,11 +26,17 @@ import {
   PaymentMetadataSchema,
   type PaymentMetadata as _PaymentMetadata,
 } from '../schemas/payment.schema';
+import type {
+  PaymentIntent,
+  PaymentMethod,
+  TransactionType,
+} from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
 
 // Re-export types for backward compatibility
 export type { WalletBalance } from './walletService';
 export type { Transaction, TransactionFilters } from './transactionService';
+export type { PaymentIntent, PaymentMethod, TransactionType };
 
 // ============================================
 // PAYMENT TYPES (Consolidated from paymentService.ts)
@@ -39,6 +45,27 @@ export type { Transaction, TransactionFilters } from './transactionService';
 export type PaymentStatus = 'pending' | 'completed';
 
 export interface Payment {
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  date: string;
+  description: string;
+  referenceId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BankAccount {
+  id: string;
+  bankName: string;
+  accountType: 'checking' | 'savings';
+  last4: string;
+  isDefault: boolean;
+  isVerified: boolean;
+}
+
+export interface LegacyTransaction {
+  id: string;
+  type: TransactionType;
   amount: number;
   currency: string;
   status: PaymentStatus;
@@ -147,7 +174,7 @@ export function getEscrowExplanation(
 }
 
 export interface KYCStatus {
-  status: 'pending' | 'in_review' | 'verified' | 'rejected';
+  status: 'not_started' | 'pending' | 'in_review' | 'verified' | 'rejected';
   verified: boolean;
   verifiedAt?: string;
 }
@@ -570,8 +597,8 @@ class SecurePaymentService {
         id: `pi_${Date.now()}`,
         amount,
         currency: 'LVND',
-        status: 'requires_payment_method',
-        clientSecret: `secret_${Date.now()}`,
+        status: 'pending',
+        created_at: new Date().toISOString(),
       };
 
       return paymentIntent;
@@ -984,9 +1011,25 @@ class SecurePaymentService {
         verified_at?: string | null;
       } | null;
 
+      const rawStatus = (row?.kyc_status || 'not_started') as string;
+      const statusMap: Record<string, KYCStatus['status']> = {
+        not_started: 'not_started',
+        unverified: 'not_started',
+        none: 'not_started',
+        pending: 'pending',
+        reviewing: 'in_review',
+        in_review: 'in_review',
+        verified: 'verified',
+        Verified: 'verified',
+        rejected: 'rejected',
+        denied: 'rejected',
+        suspected: 'rejected',
+      };
+      const status = statusMap[rawStatus] || 'not_started';
+
       return {
-        status: (row?.kyc_status || 'pending') as KYCStatus['status'],
-        verified: row?.verified || false,
+        status,
+        verified: status === 'verified' || row?.verified || false,
         verifiedAt: row?.verified_at || undefined,
       };
     } catch (error) {
@@ -996,21 +1039,46 @@ class SecurePaymentService {
   }
 
   /**
-   * Submit KYC documents
+   * Start KYC verification (iDenfy session)
+   */
+  async startKYCVerification(): Promise<{
+    status: KYCStatus['status'];
+    verificationUrl?: string;
+    authToken?: string;
+  }> {
+    try {
+      const { data, error } =
+        await supabase.functions.invoke('get-idenfy-token');
+
+      if (error) throw error;
+
+      return {
+        status: 'pending',
+        verificationUrl: data?.verificationUrl,
+        authToken: data?.authToken,
+      };
+    } catch (error) {
+      logger.error('Failed to start KYC verification', { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Submit KYC documents (deprecated - handled by iDenfy SDK)
    */
   async submitKYC(
     documents: Record<string, string>,
   ): Promise<{ success: boolean; status: 'pending' | 'in_review' }> {
     try {
-      const { data, error } = await supabase.functions.invoke('verify-kyc', {
-        body: { documents },
+      logger.warn('submitKYC is deprecated and handled by iDenfy', {
+        documents: Object.keys(documents || {}),
       });
 
-      if (error) throw error;
+      await this.startKYCVerification();
 
       return {
-        success: data?.success || false,
-        status: (data?.status as 'pending' | 'in_review') || 'pending',
+        success: true,
+        status: 'pending',
       };
     } catch (error) {
       logger.error('Failed to submit KYC', { error });

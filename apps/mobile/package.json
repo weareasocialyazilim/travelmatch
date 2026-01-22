@@ -25,7 +25,7 @@
     "type-check": "tsc --noEmit",
     "sb:start": "sb-rn-get-stories && pnpm exec expo start",
     "sb:generate": "sb-rn-get-stories",
-    "check:nav": "ts-node scripts/check-navigation-sync.ts",
+    "check:nav": "tsx scripts/check-navigation-sync.ts",
     "validate": "pnpm run type-check && pnpm run lint && pnpm run check:nav && pnpm run test:ci",
     "clean": "rm -rf node_modules .expo dist coverage",
     "prebuild": "pnpm exec expo prebuild",

@@ -36,7 +36,7 @@ export interface UserProfile {
 
   // Verification
   isVerified: boolean;
-  kycStatus: 'unverified' | 'pending' | 'verified' | 'rejected';
+  kycStatus: 'not_started' | 'pending' | 'in_review' | 'verified' | 'rejected';
 
   // Stats
   rating: number;
@@ -107,7 +107,13 @@ type DBUserRowLike = Partial<{
   languages: string[] | null;
   interests: string[] | null;
   verified: boolean | null;
-  kyc_status: 'unverified' | 'pending' | 'verified' | 'rejected' | null;
+  kyc_status:
+    | 'not_started'
+    | 'pending'
+    | 'in_review'
+    | 'verified'
+    | 'rejected'
+    | null;
   rating: number | null;
   review_count: number | null;
   created_at: string | null;
@@ -252,7 +258,7 @@ export const userService = {
       languages: (profile.languages as string[]) || [],
       interests: (profile.interests as string[]) || [],
       isVerified: profile.verified || false,
-      kycStatus: 'unverified',
+      kycStatus: 'not_started',
       rating: profile.rating || 0,
       reviewCount: profile.review_count || 0,
       momentCount: 0,
@@ -299,30 +305,32 @@ export const userService = {
     }
 
     // Map database fields to UserProfile interface
+    const profileData = profile as Record<string, any>;
+
     const mappedProfile: UserProfile = {
-      id: profile.id,
+      id: profileData.id,
       email: '',
-      name: profile.full_name || 'User',
-      avatar: profile.avatar_url || '',
-      bio: profile.bio || undefined,
-      location: profile.location
-        ? typeof profile.location === 'string'
-          ? { city: profile.location, country: '' }
-          : (profile.location as { city: string; country: string })
+      name: profileData.full_name || 'User',
+      avatar: profileData.avatar_url || '',
+      bio: profileData.bio || undefined,
+      location: profileData.location
+        ? typeof profileData.location === 'string'
+          ? { city: profileData.location, country: '' }
+          : (profileData.location as { city: string; country: string })
         : undefined,
-      languages: (profile.languages as string[]) || [],
-      interests: (profile.interests as string[]) || [],
-      isVerified: profile.verified || false,
-      kycStatus: 'unverified',
-      rating: profile.rating || 0,
-      reviewCount: profile.review_count || 0,
+      languages: (profileData.languages as string[]) || [],
+      interests: (profileData.interests as string[]) || [],
+      isVerified: profileData.verified || false,
+      kycStatus: 'not_started',
+      rating: profileData.rating || 0,
+      reviewCount: profileData.review_count || 0,
       momentCount: 0,
       giftsSent: 0,
       giftsReceived: 0,
       coinsBalance: 0,
       pendingBalance: 0,
-      createdAt: profile.created_at || '',
-      lastActiveAt: profile.last_seen_at || '',
+      createdAt: profileData.created_at || '',
+      lastActiveAt: profileData.last_seen_at || '',
     };
 
     return { user: mappedProfile };
@@ -373,7 +381,7 @@ export const userService = {
       languages: (profile.languages as string[]) || [],
       interests: (profile.interests as string[]) || [],
       isVerified: profile.verified || false,
-      kycStatus: 'unverified',
+      kycStatus: 'not_started',
       rating: profile.rating || 0,
       reviewCount: profile.review_count || 0,
       momentCount: 0,
@@ -728,10 +736,11 @@ export const userService = {
         isVerified: Boolean(u.verified),
         kycStatus:
           (u.kyc_status as
-            | 'unverified'
+            | 'not_started'
             | 'pending'
+            | 'in_review'
             | 'verified'
-            | 'rejected') || 'unverified',
+            | 'rejected') || 'not_started',
         rating: Number(u.rating) || 0,
         reviewCount: Number(u.review_count) || 0,
         momentCount: 0,
@@ -776,10 +785,11 @@ export const userService = {
         isVerified: Boolean(u.verified),
         kycStatus:
           (u.kyc_status as
-            | 'unverified'
+            | 'not_started'
             | 'pending'
+            | 'in_review'
             | 'verified'
-            | 'rejected') || 'unverified',
+            | 'rejected') || 'not_started',
         rating: Number(u.rating) || 0,
         reviewCount: Number(u.review_count) || 0,
         momentCount: 0,
@@ -886,7 +896,7 @@ export const userService = {
         hasInstagram: stats?.has_instagram ?? false,
         hasTwitter: stats?.has_twitter ?? false,
         hasWebsite: stats?.has_website ?? false,
-        kycStatus: stats?.kyc_status ?? 'unverified',
+        kycStatus: stats?.kyc_status ?? 'not_started',
       },
     };
   },

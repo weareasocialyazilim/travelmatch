@@ -116,11 +116,14 @@ export const getTrustNotesForUser = async (
   offset: number = 0,
 ): Promise<TrustNote[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_user_trust_notes', {
-      p_user_id: userId,
-      p_limit: limit,
-      p_offset: offset,
-    });
+    const { data, error } = await (supabase as any).rpc(
+      'get_user_trust_notes',
+      {
+        p_user_id: userId,
+        p_limit: limit,
+        p_offset: offset,
+      },
+    );
 
     if (error) throw error;
 
@@ -160,9 +163,12 @@ export const getTrustNotesForUser = async (
  */
 export const getTrustNoteCount = async (userId: string): Promise<number> => {
   try {
-    const { data, error } = await supabase.rpc('get_user_trust_note_count', {
-      p_user_id: userId,
-    });
+    const { data, error } = await (supabase as any).rpc(
+      'get_user_trust_note_count',
+      {
+        p_user_id: userId,
+      },
+    );
 
     if (error) throw error;
 
@@ -185,11 +191,14 @@ export const getRecentTrustNotes = async (
   limit: number = 3,
 ): Promise<TrustNote[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_user_trust_notes', {
-      p_user_id: userId,
-      p_limit: limit,
-      p_offset: 0,
-    });
+    const { data, error } = await (supabase as any).rpc(
+      'get_user_trust_notes',
+      {
+        p_user_id: userId,
+        p_limit: limit,
+        p_offset: 0,
+      },
+    );
 
     if (error) throw error;
 

@@ -873,9 +873,8 @@ describe('PaymentService', () => {
       expect(result).toMatchObject({
         amount: 1000,
         currency: 'LVND',
-        status: 'requires_payment_method',
+        status: 'pending',
       });
-      expect(result.clientSecret).toBeDefined();
     });
   });
 });

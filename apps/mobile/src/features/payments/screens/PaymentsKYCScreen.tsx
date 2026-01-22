@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
+import { Button } from '@/components/ui/Button';
 
 interface InfoItem {
   id: string;
@@ -92,7 +93,8 @@ export default function PaymentsKYCScreen({
         <Text style={styles.disclaimer}>
           Lovendo, finansal güvenliğinizi en üst düzeyde korur. Satın almalar
           App Store / Google Play IAP üzerinden yapılır; PayTR yalnızca para
-          çekme (withdrawal) süreçlerinde kullanılır.
+          çekme (withdrawal) süreçlerinde kullanılır. Kimlik doğrulama süreci
+          iDenfy'nin kendi ekranlarında yürütülür.
         </Text>
 
         {/* Info Items List */}
@@ -106,6 +108,15 @@ export default function PaymentsKYCScreen({
               </View>
             </View>
           ))}
+        </View>
+
+        <View style={styles.ctaContainer}>
+          <Button
+            title="Kimliğini Doğrula"
+            variant="primary"
+            onPress={() => navigation.navigate('IdentityVerification')}
+            size="lg"
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -164,6 +175,9 @@ const styles = StyleSheet.create({
   },
   itemsList: {
     gap: 16,
+  },
+  ctaContainer: {
+    marginTop: 28,
   },
   item: {
     flexDirection: 'row',

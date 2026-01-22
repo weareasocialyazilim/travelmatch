@@ -119,7 +119,7 @@ describe('Auth Flow Integration', () => {
     languages: ['en'],
     interests: ['travel', 'food'],
     isVerified: false,
-    kycStatus: 'unverified' as const,
+    kycStatus: 'not_started' as const,
     rating: 5,
     reviewCount: 0,
     momentCount: 0,

@@ -218,10 +218,6 @@ import {
   SubscriberOfferModal,
   // KYC Screens
   KYCIntroScreen,
-  KYCDocumentTypeScreen,
-  KYCDocumentCaptureScreen,
-  KYCSelfieScreen,
-  KYCReviewScreen,
   KYCPendingScreen,
 } from '../features/payments';
 
@@ -705,16 +701,6 @@ const AppNavigator = () => {
               name="IdentityVerification"
               component={KYCIntroScreen}
             />
-            <Stack.Screen
-              name="KYCDocumentType"
-              component={KYCDocumentTypeScreen}
-            />
-            <Stack.Screen
-              name="KYCDocumentCapture"
-              component={KYCDocumentCaptureScreen}
-            />
-            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
-            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
             <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
             {/* Social & Invite */}

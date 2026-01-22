@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { walletService } from '@/services/walletService';
+import { walletService, securePaymentService } from '@/services';
 import { logger } from '@/utils/logger';
 
 // ============================================
@@ -64,7 +64,6 @@ export interface UseWithdrawReturn {
 export function useWithdraw(): UseWithdrawReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const withdraw = useCallback(
     async (amount: number, bankAccountId: string) => {
       try {
@@ -72,8 +71,7 @@ export function useWithdraw(): UseWithdrawReturn {
         setError(null);
         await walletService.requestWithdrawal({ amount, bankAccountId });
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Withdrawal failed'));
-        throw err;
+        setError(err instanceof Error ? err : new Error('Withdraw failed'));
       } finally {
         setLoading(false);
       }
@@ -89,7 +87,7 @@ export function useWithdraw(): UseWithdrawReturn {
 // ============================================
 
 export interface UseKYCStatusReturn {
-  status: 'pending' | 'verified' | 'rejected' | 'not_started';
+  status: 'pending' | 'verified' | 'rejected' | 'not_started' | 'in_review';
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
@@ -97,7 +95,7 @@ export interface UseKYCStatusReturn {
 
 export function useKYCStatus(): UseKYCStatusReturn {
   const [status, setStatus] = useState<
-    'pending' | 'verified' | 'rejected' | 'not_started'
+    'pending' | 'verified' | 'rejected' | 'not_started' | 'in_review'
   >('not_started');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -105,8 +103,8 @@ export function useKYCStatus(): UseKYCStatusReturn {
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
-      // KYC status would come from user profile
-      setStatus('not_started');
+      const result = await securePaymentService.getKYCStatus();
+      setStatus(result.status);
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error('Failed to fetch KYC status'),
@@ -130,7 +128,7 @@ export function useSubmitKYC() {
   const submit = useCallback(async (_data: any) => {
     try {
       setLoading(true);
-      // Submit KYC documents
+      await securePaymentService.startKYCVerification();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('KYC submission failed'));
       throw err;

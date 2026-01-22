@@ -18,7 +18,7 @@ export interface User {
   bio: string | null;
   location: string | null;
   verified: boolean;
-  kyc_status: 'none' | 'pending' | 'verified' | 'rejected';
+  kyc_status: 'not_started' | 'pending' | 'in_review' | 'verified' | 'rejected';
   balance: number;
   rating: number;
   review_count: number;
