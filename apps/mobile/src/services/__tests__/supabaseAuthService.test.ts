@@ -93,7 +93,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signUpWithEmail', () => {
     it('should successfully sign up with valid credentials', async () => {
-      auth.signUp.mockResolvedValue({
+      mockAuth.signUp.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -103,7 +103,7 @@ describe('supabaseAuthService', () => {
       expect(result.user).toEqual(mockUser);
       expect(result.session).toEqual(mockSession);
       expect(result.error).toBeNull();
-      expect(auth.signUp).toHaveBeenCalledWith({
+      expect(mockAuth.signUp).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'Password123!',
         options: {
@@ -116,7 +116,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should sign up with metadata', async () => {
-      auth.signUp.mockResolvedValue({
+      mockAuth.signUp.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -127,7 +127,7 @@ describe('supabaseAuthService', () => {
       };
       await signUpWithEmail('test@example.com', 'Password123!', metadata);
 
-      expect(auth.signUp).toHaveBeenCalledWith({
+      expect(mockAuth.signUp).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'Password123!',
         options: {
@@ -137,7 +137,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign up errors', async () => {
-      auth.signUp.mockResolvedValue({
+      mockAuth.signUp.mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
@@ -155,7 +155,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions during sign up', async () => {
       const exception = new Error('Network error');
-      auth.signUp.mockRejectedValue(exception);
+      mockAuth.signUp.mockRejectedValue(exception);
 
       const result = await signUpWithEmail('test@example.com', 'Password123!');
 
@@ -189,7 +189,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithEmail', () => {
     it('should successfully sign in with valid credentials', async () => {
-      auth.signInWithPassword.mockResolvedValue({
+      mockAuth.signInWithPassword.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -199,7 +199,7 @@ describe('supabaseAuthService', () => {
       expect(result.user).toEqual(mockUser);
       expect(result.session).toEqual(mockSession);
       expect(result.error).toBeNull();
-      expect(auth.signInWithPassword).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'Password123!',
       });
@@ -209,7 +209,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle invalid credentials', async () => {
-      auth.signInWithPassword.mockResolvedValue({
+      mockAuth.signInWithPassword.mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
@@ -227,7 +227,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle network errors during sign in', async () => {
       const networkError = new Error('Network request failed');
-      auth.signInWithPassword.mockRejectedValue(networkError);
+      mockAuth.signInWithPassword.mockRejectedValue(networkError);
 
       const result = await signInWithEmail('test@example.com', 'Password123!');
 
@@ -256,7 +256,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithOAuth', () => {
     it('should generate OAuth URL for Google', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      mockAuth.signInWithOAuth.mockResolvedValue({
         data: { url: 'https://google.com/oauth', provider: 'google' },
         error: null,
       });
@@ -265,7 +265,7 @@ describe('supabaseAuthService', () => {
 
       expect(result.url).toBe('https://google.com/oauth');
       expect(result.error).toBeNull();
-      expect(auth.signInWithOAuth).toHaveBeenCalledWith(
+      expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith(
         expect.objectContaining({
           provider: 'google',
           options: expect.objectContaining({
@@ -281,7 +281,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should generate OAuth URL for Apple', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      mockAuth.signInWithOAuth.mockResolvedValue({
         data: { url: 'https://apple.com/oauth', provider: 'apple' },
         error: null,
       });
@@ -289,7 +289,7 @@ describe('supabaseAuthService', () => {
       const result = await signInWithOAuth('apple');
 
       expect(result.url).toBe('https://apple.com/oauth');
-      expect(auth.signInWithOAuth).toHaveBeenCalledWith(
+      expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith(
         expect.objectContaining({
           provider: 'apple',
           options: expect.objectContaining({
@@ -301,7 +301,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle OAuth errors', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      mockAuth.signInWithOAuth.mockResolvedValue({
         data: { url: null, provider: null },
         error: mockAuthError,
       });
@@ -318,7 +318,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle OAuth exceptions', async () => {
       const exception = new Error('OAuth provider unavailable');
-      auth.signInWithOAuth.mockRejectedValue(exception);
+      mockAuth.signInWithOAuth.mockRejectedValue(exception);
 
       const result = await signInWithOAuth('facebook');
 
@@ -332,17 +332,17 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signOut', () => {
     it('should successfully sign out', async () => {
-      auth.signOut.mockResolvedValue({ error: null });
+      mockAuth.signOut.mockResolvedValue({ error: null });
 
       const result = await signOut();
 
       expect(result.error).toBeNull();
-      expect(auth.signOut).toHaveBeenCalled();
+      expect(mockAuth.signOut).toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith('[Auth] Sign out successful');
     });
 
     it('should handle sign out errors', async () => {
-      auth.signOut.mockResolvedValue({ error: mockAuthError });
+      mockAuth.signOut.mockResolvedValue({ error: mockAuthError });
 
       const result = await signOut();
 
@@ -355,7 +355,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle sign out exceptions', async () => {
       const exception = new Error('Sign out failed');
-      auth.signOut.mockRejectedValue(exception);
+      mockAuth.signOut.mockRejectedValue(exception);
 
       const result = await signOut();
 
@@ -372,7 +372,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('getSession', () => {
     it('should retrieve current session', async () => {
-      auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -381,11 +381,11 @@ describe('supabaseAuthService', () => {
 
       expect(result.session).toEqual(mockSession);
       expect(result.error).toBeNull();
-      expect(auth.getSession).toHaveBeenCalled();
+      expect(mockAuth.getSession).toHaveBeenCalled();
     });
 
     it('should handle missing session', async () => {
-      auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: null },
         error: null,
       });
@@ -397,7 +397,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle session errors', async () => {
-      auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: null },
         error: mockAuthError,
       });
@@ -411,7 +411,7 @@ describe('supabaseAuthService', () => {
 
   describe('getCurrentUser', () => {
     it('should retrieve current user', async () => {
-      auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -419,11 +419,11 @@ describe('supabaseAuthService', () => {
       const user = await getCurrentUser();
 
       expect(user).toEqual(mockUser);
-      expect(auth.getUser).toHaveBeenCalled();
+      expect(mockAuth.getUser).toHaveBeenCalled();
     });
 
     it('should return null when no user is authenticated', async () => {
-      auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -434,7 +434,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle errors and return null', async () => {
-      auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -450,7 +450,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions and return null', async () => {
       const exception = new Error('User fetch failed');
-      auth.getUser.mockRejectedValue(exception);
+      mockAuth.getUser.mockRejectedValue(exception);
 
       const user = await getCurrentUser();
 
@@ -467,12 +467,12 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('resetPassword', () => {
     it('should send password reset email successfully', async () => {
-      auth.resetPasswordForEmail.mockResolvedValue({ error: null });
+      mockAuth.resetPasswordForEmail.mockResolvedValue({ error: null });
 
       const result = await resetPassword('test@example.com');
 
       expect(result.error).toBeNull();
-      expect(auth.resetPasswordForEmail).toHaveBeenCalledWith(
+      expect(mockAuth.resetPasswordForEmail).toHaveBeenCalledWith(
         'test@example.com',
         {
           redirectTo: 'lovendo://auth/reset-password',
@@ -485,7 +485,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle reset password errors', async () => {
-      auth.resetPasswordForEmail.mockResolvedValue({
+      mockAuth.resetPasswordForEmail.mockResolvedValue({
         error: mockAuthError,
       });
 
@@ -500,7 +500,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle reset password exceptions', async () => {
       const exception = new Error('Email service unavailable');
-      auth.resetPasswordForEmail.mockRejectedValue(exception);
+      mockAuth.resetPasswordForEmail.mockRejectedValue(exception);
 
       const result = await resetPassword('test@example.com');
 
@@ -522,7 +522,7 @@ describe('supabaseAuthService', () => {
 
   describe('updatePassword', () => {
     it('should successfully update password', async () => {
-      auth.updateUser.mockResolvedValue({
+      mockAuth.updateUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -530,7 +530,7 @@ describe('supabaseAuthService', () => {
       const result = await updatePassword('NewPassword123!');
 
       expect(result.error).toBeNull();
-      expect(auth.updateUser).toHaveBeenCalledWith({
+      expect(mockAuth.updateUser).toHaveBeenCalledWith({
         password: 'NewPassword123!',
       });
       expect(logger.info).toHaveBeenCalledWith(
@@ -539,7 +539,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle update password errors', async () => {
-      auth.updateUser.mockResolvedValue({
+      mockAuth.updateUser.mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -555,7 +555,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle update password exceptions', async () => {
       const exception = new Error('Password update failed');
-      auth.updateUser.mockRejectedValue(exception);
+      mockAuth.updateUser.mockRejectedValue(exception);
 
       const result = await updatePassword('NewPassword123!');
 
@@ -572,7 +572,7 @@ describe('supabaseAuthService', () => {
         ...mockUser,
         user_metadata: { name: 'John Updated' },
       };
-      auth.updateUser.mockResolvedValue({
+      mockAuth.updateUser.mockResolvedValue({
         data: { user: updatedUser },
         error: null,
       });
@@ -581,7 +581,7 @@ describe('supabaseAuthService', () => {
 
       expect(result.user).toEqual(updatedUser);
       expect(result.error).toBeNull();
-      expect(auth.updateUser).toHaveBeenCalledWith({
+      expect(mockAuth.updateUser).toHaveBeenCalledWith({
         data: { name: 'John Updated' },
       });
       expect(logger.info).toHaveBeenCalledWith(
@@ -590,20 +590,20 @@ describe('supabaseAuthService', () => {
     });
 
     it('should update avatar URL', async () => {
-      auth.updateUser.mockResolvedValue({
+      mockAuth.updateUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
       await updateProfile({ avatar_url: 'https://example.com/new-avatar.jpg' });
 
-      expect(auth.updateUser).toHaveBeenCalledWith({
+      expect(mockAuth.updateUser).toHaveBeenCalledWith({
         data: { avatar_url: 'https://example.com/new-avatar.jpg' },
       });
     });
 
     it('should handle profile update errors', async () => {
-      auth.updateUser.mockResolvedValue({
+      mockAuth.updateUser.mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -616,7 +616,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle profile update exceptions', async () => {
       const exception = new Error('Profile update failed');
-      auth.updateUser.mockRejectedValue(exception);
+      mockAuth.updateUser.mockRejectedValue(exception);
 
       const result = await updateProfile({ name: 'John' });
 
@@ -635,8 +635,8 @@ describe('supabaseAuthService', () => {
     });
 
     it('should successfully delete account and sign out', async () => {
-      // Mock auth.getUser (used in deleteAccount)
-      auth.getUser.mockResolvedValue({
+      // Mock mockAuth.getUser (used in deleteAccount)
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -646,25 +646,25 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: null });
+      mockSupabase.from = mockFrom;
+      mockAuth.signOut.mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
       expect(result.error).toBeNull();
-      expect(supabase.from).toHaveBeenCalledWith('users');
+      expect(mockSupabase.from).toHaveBeenCalledWith('users');
       expect(mockUpdate).toHaveBeenCalledWith({
         deleted_at: expect.any(String),
       });
       expect(mockEq).toHaveBeenCalledWith('id', mockUser.id);
-      expect(auth.signOut).toHaveBeenCalled();
+      expect(mockAuth.signOut).toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith(
         '[Auth] Account deletion initiated',
       );
     });
 
     it('should sign out even if database update fails', async () => {
-      auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -675,13 +675,13 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: null });
+      mockSupabase.from = mockFrom;
+      mockAuth.signOut.mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
       expect(result.error).toBeNull();
-      expect(auth.signOut).toHaveBeenCalled();
+      expect(mockAuth.signOut).toHaveBeenCalled();
       expect(logger.error).toHaveBeenCalledWith(
         '[Auth] Delete account DB error:',
         expect.any(Error),
@@ -689,7 +689,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign out errors during account deletion', async () => {
-      auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -698,8 +698,8 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: mockAuthError });
+      mockSupabase.from = mockFrom;
+      mockAuth.signOut.mockResolvedValue({ error: mockAuthError });
 
       const result = await deleteAccount();
 

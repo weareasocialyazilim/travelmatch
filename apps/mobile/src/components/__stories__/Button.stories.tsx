@@ -34,8 +34,8 @@ const Button: React.FC<ButtonProps> = ({
       large: styles.large,
     };
     const base = [styles.button, sizeStyles[size]];
-    if (fullWidth) base.push(styles.fullWidth);
-    if (disabled) base.push(styles.disabled);
+    if (fullWidth) base.push(styles.fullWidth as any);
+    if (disabled) base.push(styles.disabled as any);
 
     switch (variant) {
       case 'primary':

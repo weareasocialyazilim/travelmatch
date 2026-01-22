@@ -365,7 +365,7 @@ describe('PaymentService - Payment Cancellation', () => {
 
       mockTransactionsService.update.mockResolvedValue({
         data: null,
-        error: { message: 'Cleanup failed' },
+        error: { name: 'Error', message: 'Cleanup failed' },
       });
 
       await paymentService.processPayment({

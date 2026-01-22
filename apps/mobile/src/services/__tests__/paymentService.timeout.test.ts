@@ -294,6 +294,21 @@ describe('PaymentService - Timeout Edge Cases', () => {
 
       // Mock wallet balance
       mockSupabase.from.mockImplementation(((tableName: string) => {
+        if (tableName === 'wallets') {
+          return {
+            upsert: jest.fn().mockResolvedValue({ data: null, error: null }),
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: { balance: 500, currency: 'LVND' },
+                    error: null,
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
         if (tableName === 'users') {
           return {
             select: jest.fn().mockReturnValue({
@@ -524,7 +539,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
       });
 
       mockTransactionsService.create
-        .mockReturnValueOnce(slowPromise) // First call: slow
+        .mockReturnValueOnce(slowPromise as any) // First call: slow
         .mockResolvedValueOnce({
           // Second call: fast
           data: {

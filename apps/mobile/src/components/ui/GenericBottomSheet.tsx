@@ -363,6 +363,7 @@ export interface ConfirmationBottomSheetProps {
   cancelText?: string;
   confirmDestructive?: boolean;
   loading?: boolean;
+  testID?: string;
 }
 
 export const ConfirmationBottomSheet: React.FC<

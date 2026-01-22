@@ -420,7 +420,7 @@ describe('MessageService', () => {
       const mockUnsubscribe = jest.fn();
 
       mockMessagesService.subscribeToConversation.mockReturnValue(
-        mockUnsubscribe,
+        mockUnsubscribe as any,
       );
 
       const unsubscribe = messageService.subscribeToConversation(

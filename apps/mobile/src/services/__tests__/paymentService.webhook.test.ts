@@ -40,7 +40,9 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 const mockSupabase = supabase as any;
-const mockTransactionsService = transactionsService;
+const mockTransactionsService = transactionsService as unknown as jest.Mocked<
+  typeof transactionsService
+>;
 const mockLogger = logger;
 
 // Simulated webhook handler (would be in Edge Function in production)

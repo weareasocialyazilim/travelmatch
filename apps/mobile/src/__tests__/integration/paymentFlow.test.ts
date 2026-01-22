@@ -112,20 +112,48 @@ describe('Payment Flow Integration', () => {
       const finalBalance = initialBalance - paymentAmount;
 
       // Step 1: Get initial balance
+      let mockWallets = [
+        {
+          balance: initialBalance,
+          coins_balance: initialBalance,
+          currency: 'TRY',
+        },
+        {
+          balance: initialBalance,
+          coins_balance: initialBalance,
+          currency: 'LVND',
+        },
+      ];
+
       const mockFromChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({
-          data: {
-            balance: initialBalance,
-            coins_balance: initialBalance,
-            pending_balance: 0,
-            currency: 'LVND',
-          },
-          error: null,
-        }),
+        then: (resolve: any) => resolve({ data: mockWallets, error: null }),
+        single: jest
+          .fn()
+          .mockImplementation(() =>
+            Promise.resolve({ data: mockWallets[0], error: null }),
+          ),
       };
-      mockSupabase.from.mockReturnValue(mockFromChain);
+
+      mockSupabase.from.mockImplementation((tableName: string) => {
+        if (tableName === 'wallets') {
+          return mockFromChain;
+        }
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: {
+              balance: initialBalance,
+              coins_balance: initialBalance,
+              pending_balance: 0,
+              currency: 'LVND',
+            },
+            error: null,
+          }),
+        };
+      });
 
       const balanceBefore = await paymentService.getBalance();
       expect(balanceBefore.available).toBe(initialBalance);
@@ -142,6 +170,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T10:00:00Z',
         metadata: { momentId: 'moment-456' },
         moment_id: 'moment-456',
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -172,10 +201,18 @@ describe('Payment Flow Integration', () => {
       });
 
       // Step 3: Verify updated balance (simulate balance update)
-      mockFromChain.single.mockResolvedValue({
-        data: { balance: finalBalance, currency: 'LVND' },
-        error: null,
-      });
+      mockWallets = [
+        {
+          balance: finalBalance,
+          coins_balance: finalBalance,
+          currency: 'TRY',
+        },
+        {
+          balance: finalBalance,
+          coins_balance: finalBalance,
+          currency: 'LVND',
+        },
+      ];
 
       const balanceAfter = await paymentService.getBalance();
       expect(balanceAfter.available).toBe(finalBalance);
@@ -268,6 +305,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T11:00:00Z',
         metadata: {},
         moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -323,13 +361,11 @@ describe('Payment Flow Integration', () => {
       // Mock successful fetch for withdrawal
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            settlementId: 'txn-withdraw-789',
-            fiat_amount: 200,
-            status: 'success',
-          }),
+        json: jest.fn().mockResolvedValue({
+          settlementId: 'txn-withdraw-789',
+          fiat_amount: 200,
+          status: 'success',
+        }),
       });
 
       const initialBalance = 500;
@@ -340,6 +376,22 @@ describe('Payment Flow Integration', () => {
       // Create mock that routes by table
       mockSupabase.from = jest.fn((table: string) => {
         switch (table) {
+          case 'wallets':
+            return createChainMock({
+              data: [
+                {
+                  balance: currentBalance,
+                  coins_balance: currentBalance,
+                  currency: 'TRY',
+                },
+                {
+                  balance: initialBalance,
+                  coins_balance: initialBalance,
+                  currency: 'LVND',
+                },
+              ],
+              error: null,
+            });
           case 'gifts':
             return createChainMock({ data: [], error: null });
           case 'users':
@@ -380,6 +432,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T12:00:00Z',
         metadata: {},
         moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -478,6 +531,7 @@ describe('Payment Flow Integration', () => {
             created_at: '2024-01-15T13:00:00Z',
             metadata: {},
             moment_id: null,
+            escrow_status: null,
           },
           error: null,
         });
@@ -519,6 +573,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-15T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         {
           id: 'txn-2',
@@ -531,6 +586,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-14T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         {
           id: 'txn-3',
@@ -543,6 +599,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-13T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
       ];
 
@@ -626,13 +683,11 @@ describe('Payment Flow Integration', () => {
       // Mock successful fetch for withdrawal
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            settlementId: 'sett-multi',
-            fiat_amount: 50,
-            status: 'success',
-          }),
+        json: jest.fn().mockResolvedValue({
+          settlementId: 'sett-multi',
+          fiat_amount: 50,
+          status: 'success',
+        }),
       });
 
       let currentBalance = 1000;
@@ -640,6 +695,22 @@ describe('Payment Flow Integration', () => {
       // Create mock that routes by table
       mockSupabase.from = jest.fn((table: string) => {
         switch (table) {
+          case 'wallets':
+            return createChainMock({
+              data: [
+                {
+                  balance: currentBalance,
+                  coins_balance: currentBalance,
+                  currency: 'TRY',
+                },
+                {
+                  balance: currentBalance,
+                  coins_balance: currentBalance,
+                  currency: 'LVND',
+                },
+              ],
+              error: null,
+            });
           case 'gifts':
             return createChainMock({ data: [], error: null });
           case 'users':
@@ -681,6 +752,7 @@ describe('Payment Flow Integration', () => {
           description: 'Payment 1',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         error: null,
       });
@@ -713,6 +785,7 @@ describe('Payment Flow Integration', () => {
           description: 'Withdrawal',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         error: null,
       });
@@ -743,6 +816,7 @@ describe('Payment Flow Integration', () => {
             description: 'Concurrent txn',
             metadata: {},
             moment_id: null,
+            escrow_status: null,
             status: 'completed',
             type: 'payment',
             currency: 'USD',

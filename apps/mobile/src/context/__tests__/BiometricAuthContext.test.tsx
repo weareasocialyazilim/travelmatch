@@ -57,7 +57,7 @@ describe('BiometricAuthContext', () => {
     jest.clearAllMocks();
 
     // Setup default mock implementations
-    mockBiometricAuth.initialize.mockResolvedValue(undefined);
+    mockBiometricAuth.initialize.mockResolvedValue(undefined as any);
     mockBiometricAuth.getCapabilities.mockResolvedValue({
       isAvailable: true,
       isEnrolled: true,
@@ -68,16 +68,16 @@ describe('BiometricAuthContext', () => {
     mockBiometricAuth.isEnabled.mockResolvedValue(false);
     mockBiometricAuth.hasCredentials.mockResolvedValue(false);
     mockBiometricAuth.enable.mockResolvedValue(true);
-    mockBiometricAuth.disable.mockResolvedValue(undefined);
+    mockBiometricAuth.disable.mockResolvedValue(undefined as any);
     mockBiometricAuth.authenticate.mockResolvedValue({ success: true });
     mockBiometricAuth.authenticateForAppLaunch.mockResolvedValue(true);
     mockBiometricAuth.authenticateForSensitiveAction.mockResolvedValue(true);
-    mockBiometricAuth.saveCredentials.mockResolvedValue(undefined);
+    mockBiometricAuth.saveCredentials.mockResolvedValue(undefined as any);
     mockBiometricAuth.getCredentials.mockResolvedValue({
       email: 'test@test.com',
       password: 'pass123',
     });
-    mockBiometricAuth.clearCredentials.mockResolvedValue(undefined);
+    mockBiometricAuth.clearCredentials.mockResolvedValue(undefined as any);
   });
 
   describe('Initialization', () => {
@@ -189,7 +189,7 @@ describe('BiometricAuthContext', () => {
 
     it('should disable biometric authentication', async () => {
       mockBiometricAuth.isEnabled.mockResolvedValue(true);
-      mockBiometricAuth.disable.mockResolvedValue(undefined);
+      mockBiometricAuth.disable.mockResolvedValue(undefined as any);
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
 
@@ -302,7 +302,7 @@ describe('BiometricAuthContext', () => {
 
   describe('Credentials Management', () => {
     it('should save credentials', async () => {
-      mockBiometricAuth.saveCredentials.mockResolvedValue(undefined);
+      mockBiometricAuth.saveCredentials.mockResolvedValue(undefined as any);
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
 
@@ -350,7 +350,7 @@ describe('BiometricAuthContext', () => {
 
     it('should clear credentials', async () => {
       mockBiometricAuth.hasCredentials.mockResolvedValue(true);
-      mockBiometricAuth.clearCredentials.mockResolvedValue(undefined);
+      mockBiometricAuth.clearCredentials.mockResolvedValue(undefined as any);
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
 

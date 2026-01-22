@@ -168,7 +168,7 @@ describe('Optimistic UI Updates', () => {
 
       // UI should show liked state immediately
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual({ id: '456', liked: true, likes: 6 });
+      expect(data as any).toEqual({ id: '456', liked: true, likes: 6 });
 
       // Action should be queued
       expect(result.current.isQueued).toBe(true);
@@ -212,7 +212,7 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual([
+      expect(data as any).toEqual([
         { id: '1', liked: true, likes: 11 },
         { id: '2', liked: false, likes: 20 },
         { id: '3', liked: true, likes: 31 },
@@ -253,7 +253,7 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual({
+      expect(data as any).toEqual({
         id: '123',
         stats: {
           moments: 101,
@@ -305,7 +305,7 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual(originalData);
+      expect(data as any).toEqual(originalData);
       expect(onError).toHaveBeenCalledWith(expect.any(Error));
     });
 
@@ -353,7 +353,7 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual(originalProfile);
+      expect(data as any).toEqual(originalProfile);
     });
 
     it('should rollback list mutations on failure', async () => {
@@ -396,7 +396,7 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data).toEqual(originalMoments);
+      expect(data as any).toEqual(originalMoments);
     });
 
     it('should handle partial rollback for batch updates', async () => {
@@ -462,8 +462,8 @@ describe('Optimistic UI Updates', () => {
       });
 
       const data = cacheService.getQueryData(cacheKey);
-      expect(data[0].status).toBe('completed');
-      expect(data[1].status).toBe('pending');
+      expect((data as any)[0].status).toBe('completed');
+      expect((data as any)[1].status).toBe('pending');
     });
   });
 
@@ -566,7 +566,9 @@ describe('Optimistic UI Updates', () => {
             ) as unknown as Array<Record<string, unknown>> | undefined;
             if (currentData) {
               const updated = currentData.map((item) =>
-                item.id === data.id ? { ...item, liked: data.liked } : item,
+                item.id === (data as any).id
+                  ? { ...item, liked: (data as any).liked }
+                  : item,
               );
               cacheService.setQueryData(cacheKey, updated);
             }
@@ -585,9 +587,9 @@ describe('Optimistic UI Updates', () => {
       const data = cacheService.getQueryData(cacheKey) as unknown as Array<
         Record<string, unknown>
       >;
-      expect(data[0].liked).toBe(false);
-      expect(data[1].liked).toBe(true);
-      expect(data[2].liked).toBe(false);
+      expect((data as any)[0].liked).toBe(false);
+      expect((data as any)[1].liked).toBe(true);
+      expect((data as any)[2].liked).toBe(false);
     });
 
     it('should not invalidate unrelated cache', async () => {

@@ -38,7 +38,6 @@ describe('MomentInfo', () => {
 
     it('should render with all props', () => {
       const category: MomentCategory = {
-        id: '1',
         label: 'Adventure',
         emoji: '🏔️',
       };
@@ -75,7 +74,10 @@ describe('MomentInfo', () => {
 
   describe('Category Display', () => {
     it('should render category pill with emoji and label', () => {
-      const category: MomentCategory = { id: '1', label: 'Food', emoji: '🍕' };
+      const category: MomentCategory = {
+        label: 'Food',
+        emoji: '🍕',
+      };
 
       const { getByText } = render(
         <MomentInfo title="Pizza Night" category={category} />,
@@ -95,12 +97,10 @@ describe('MomentInfo', () => {
 
     it('should render different category emojis', () => {
       const category1: MomentCategory = {
-        id: '1',
         label: 'Culture',
         emoji: '🎭',
       };
       const category2: MomentCategory = {
-        id: '2',
         label: 'Sports',
         emoji: '⚽',
       };
@@ -120,7 +120,6 @@ describe('MomentInfo', () => {
 
     it('should render category with long label', () => {
       const category: MomentCategory = {
-        id: '1',
         label: 'Educational Workshop',
         emoji: '📚',
       };
@@ -329,7 +328,10 @@ describe('MomentInfo', () => {
 
   describe('Meta Info Row', () => {
     it('should render all meta info elements', () => {
-      const category: MomentCategory = { id: '1', label: 'Music', emoji: '🎵' };
+      const category: MomentCategory = {
+        label: 'Music',
+        emoji: '🎵',
+      };
       const location: MomentLocation = {
         name: 'Concert Hall',
         city: 'Berlin',
@@ -415,8 +417,14 @@ describe('MomentInfo', () => {
     });
 
     it('should re-render when category changes', () => {
-      const category1: MomentCategory = { id: '1', label: 'Art', emoji: '🎨' };
-      const category2: MomentCategory = { id: '2', label: 'Tech', emoji: '💻' };
+      const category1: MomentCategory = {
+        label: 'Art',
+        emoji: '🎨',
+      };
+      const category2: MomentCategory = {
+        label: 'Tech',
+        emoji: '💻',
+      };
 
       const { rerender, getByText, queryByText } = render(
         <MomentInfo title="Event" category={category1} />,
@@ -432,13 +440,11 @@ describe('MomentInfo', () => {
 
     it('should re-render when location changes', () => {
       const location1: MomentLocation = {
-        id: '1',
         name: 'Place A',
         city: 'City A',
         country: 'Country A',
       };
       const location2: MomentLocation = {
-        id: '2',
         name: 'Place B',
         city: 'City B',
         country: 'Country B',
@@ -545,7 +551,6 @@ describe('MomentInfo', () => {
   describe('Real-World Scenarios', () => {
     it('should render complete moment info', () => {
       const category: MomentCategory = {
-        id: '1',
         label: 'Coffee & Chat',
         emoji: '☕',
       };
@@ -594,7 +599,6 @@ describe('MomentInfo', () => {
 
     it('should render adventure moment', () => {
       const category: MomentCategory = {
-        id: '2',
         label: 'Hiking',
         emoji: '🥾',
       };
