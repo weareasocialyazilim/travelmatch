@@ -16,7 +16,7 @@
  * function PaymentFlow() {
  *   const { savePendingPayment, clearPendingPayment } = usePaymentResume();
  *
- *   // Before navigating to PayTR WebView
+ *   // Before navigating to purchase flow
  *   await savePendingPayment({
  *     merchantOid: 'order_123',
  *     amount: 99.99,

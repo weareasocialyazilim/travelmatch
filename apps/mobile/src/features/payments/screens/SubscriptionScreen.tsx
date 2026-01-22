@@ -17,10 +17,13 @@ import { PLANS } from '../constants/plans';
 import { VALUES } from '@/constants/values';
 import { subscriptionsService } from '@/services/supabase';
 import { logger } from '@/utils/logger';
+import { formatCurrency } from '@/utils/currencyFormatter';
+import { showAlert } from '@/stores/modalStore';
 import type { SubscriptionPlan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { ComponentProps } from 'react';
+import type { CurrencyCode } from '@/constants/currencies';
 
 type IconName = ComponentProps<typeof Icon>['name'];
 
@@ -46,6 +49,10 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const [selectedPlan, setSelectedPlan] = useState<string>('first_class');
   const [plans, setPlans] = useState<SubscriptionPlan[]>(PLANS);
   const [loading, setLoading] = useState(false);
+  const allowedPlanIds = React.useMemo(
+    () => new Set(PLANS.map((plan) => plan.id)),
+    [],
+  );
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -54,30 +61,47 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         const { data, error } = await subscriptionsService.getPlans();
         if (!error && data && data.length > 0) {
           // Map API plans to SubscriptionPlan structure
-          const mappedPlans: SubscriptionPlan[] = data.map((apiPlan: any) => {
-            // Find matching static plan for features/limits
-            const staticPlan = PLANS.find((p) => p.id === apiPlan.id);
-            return {
-              id: apiPlan.id,
-              name: apiPlan.name,
-              tagline: staticPlan?.tagline || apiPlan.description || '',
-              price: Number(apiPlan.price) || 0,
-              currency: apiPlan.currency || 'USD',
-              interval: apiPlan.interval || 'month',
-              features: apiPlan.features || staticPlan?.features || [],
-              limits: staticPlan?.limits || {
-                momentsPerMonth: 3,
-                messagesPerDay: 20,
-                giftsPerMonth: 1,
-                savedMoments: 10,
-                photoPerMoment: 5,
-              },
-              popular: apiPlan.is_popular || false,
-              icon: apiPlan.icon || staticPlan?.icon || 'star-four-points',
-              color: apiPlan.color || staticPlan?.color || COLORS.brand.primary,
-            };
-          });
-          setPlans(mappedPlans);
+          const mappedPlans: SubscriptionPlan[] = data
+            .map((apiPlan: any) => {
+              // Find matching static plan for features/limits
+              const staticPlan = PLANS.find((p) => p.id === apiPlan.id);
+              const apiFeatures = Array.isArray(apiPlan.features)
+                ? apiPlan.features
+                    .map((feature: any) => {
+                      if (typeof feature === 'string') {
+                        return { text: feature, included: true };
+                      }
+                      return {
+                        text: feature?.text || feature?.title || '',
+                        included: feature?.included ?? true,
+                      };
+                    })
+                    .filter((feature: any) => feature.text)
+                : undefined;
+              return {
+                id: apiPlan.id,
+                name: apiPlan.name,
+                tagline: staticPlan?.tagline || apiPlan.description || '',
+                price: Number(apiPlan.price) || 0,
+                currency: apiPlan.currency || 'USD',
+                interval: apiPlan.interval || 'month',
+                features: apiFeatures || staticPlan?.features || [],
+                limits: staticPlan?.limits || {
+                  momentsPerMonth: 3,
+                  messagesPerDay: 20,
+                  giftsPerMonth: 1,
+                  savedMoments: 10,
+                  photoPerMoment: 5,
+                },
+                popular: apiPlan.is_popular || false,
+                icon: apiPlan.icon || staticPlan?.icon || 'star-four-points',
+                color:
+                  apiPlan.color || staticPlan?.color || COLORS.brand.primary,
+              };
+            })
+            .filter((plan) => allowedPlanIds.has(plan.id));
+
+          setPlans(mappedPlans.length > 0 ? mappedPlans : PLANS);
         } else {
           // Fallback to static plans if API fails
           logger.debug('Using static plans (API returned empty or error)');
@@ -103,11 +127,10 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       return;
     }
 
-    // Navigate to checkout with selected plan
-    navigation.navigate('Checkout', {
-      momentId: planId, // Use momentId for plan identifier
-      title: plan.name,
-      amount: plan.price,
+    showAlert({
+      title: 'Üyelik satın alma',
+      message: 'Üyelik satın alma akışı şu anda kapalı. Yakında aktif olacak.',
+      buttons: [{ text: 'Tamam' }],
     });
   };
 
@@ -115,6 +138,11 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const isSelected = selectedPlan === plan.id;
     const planColor = plan.color || COLORS.brand.primary;
     const isFree = plan.price === 0;
+    const priceLabel = isFree
+      ? 'Ücretsiz'
+      : formatCurrency(plan.price, plan.currency as CurrencyCode);
+    const intervalLabel =
+      plan.interval === 'year' ? '/yıl' : plan.interval ? '/ay' : '';
 
     return (
       <TouchableOpacity
@@ -129,7 +157,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       >
         {plan.popular && (
           <View style={[styles.popularBadge, { backgroundColor: planColor }]}>
-            <Text style={styles.popularText}>MOST POPULAR</Text>
+            <Text style={styles.popularText}>EN POPÜLER</Text>
           </View>
         )}
 
@@ -145,9 +173,10 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <Text style={styles.planTagline}>{plan.tagline}</Text>
 
         <View style={styles.priceContainer}>
-          <Text style={styles.currency}>$</Text>
-          <Text style={styles.price}>{plan.price}</Text>
-          <Text style={styles.interval}>/month</Text>
+          <Text style={styles.priceText}>{priceLabel}</Text>
+          {!!intervalLabel && (
+            <Text style={styles.interval}>{intervalLabel}</Text>
+          )}
         </View>
 
         <View style={styles.featuresContainer}>
@@ -192,7 +221,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               end={{ x: 1, y: 0 }}
             >
               <Text style={styles.subscribeText}>
-                {isSelected ? 'Get ' + plan.name : 'Select Plan'}
+                {isSelected ? `${plan.name} Seçili` : 'Planı Seç'}
               </Text>
             </LinearGradient>
           )}
@@ -418,6 +447,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: LAYOUT.padding / 2,
   },
+  priceText: {
+    color: COLORS.text.onLight,
+    fontSize: 34,
+    fontWeight: '800',
+  },
   planCard: {
     backgroundColor: COLORS.utility.white,
     borderColor: COLORS.border.default,
@@ -456,15 +490,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
   },
-  price: {
-    color: COLORS.text.onLight,
-    fontSize: 48,
-    fontWeight: '800',
-  },
   priceContainer: {
     alignItems: 'flex-start',
     flexDirection: 'row',
     marginBottom: LAYOUT.padding / 2,
+    gap: 6,
   },
   scrollContent: {
     paddingBottom: LAYOUT.padding * 4,

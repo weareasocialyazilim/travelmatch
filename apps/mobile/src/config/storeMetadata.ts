@@ -156,7 +156,7 @@ export const STORE_METADATA = {
         type: 'Payment Info',
         purpose: 'Purchases',
         shared: true,
-        processor: 'PayTR',
+        processor: 'Apple/Google IAP',
       },
       { type: 'Messages', purpose: 'App Functionality', shared: false },
     ],
@@ -167,7 +167,7 @@ export const STORE_METADATA = {
       'Independent security review',
     ],
     thirdPartyServices: [
-      { name: 'PayTR', purpose: 'Payment processing' },
+      { name: 'PayTR', purpose: 'Withdrawal processing' },
       { name: 'Supabase', purpose: 'Database and authentication' },
       { name: 'Mapbox', purpose: 'Maps and location' },
       { name: 'Sentry', purpose: 'Error tracking' },

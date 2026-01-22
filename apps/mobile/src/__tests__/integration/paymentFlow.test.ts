@@ -262,30 +262,9 @@ describe('Payment Flow Integration', () => {
     });
   });
 
-  describe('Scenario 2: Add Payment Method and Make Payment', () => {
-    it('should add card → verify it exists → use for payment', async () => {
-      // Setup mocks for functions.invoke (addCard)
-      (mockSupabase as any).functions = {
-        invoke: jest.fn().mockResolvedValue({
-          data: {
-            id: 'card_new123',
-            brand: 'visa',
-            last4: '4242',
-            exp_month: 12,
-            exp_year: 2030,
-            is_default: true,
-          },
-          error: null,
-        }),
-      };
-
-      // Step 1: Add payment card (async!)
-      const addedCard = await paymentService.addCard('tok_visa');
-      expect(addedCard.card.last4).toBe('4242');
-      expect(addedCard.card.brand).toBe('visa');
-      const cardId = addedCard.card.id;
-
-      // Step 2: Setup mock for getPaymentMethods
+  describe('Scenario 2: Use Payment Method and Make Payment', () => {
+    it('should load bank account → verify it exists → use for payment', async () => {
+      // Step 1: Setup mock for getPaymentMethods
       const mockFromChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
@@ -297,20 +276,25 @@ describe('Payment Flow Integration', () => {
         eq: jest.fn().mockResolvedValue({
           data: [
             {
-              id: cardId,
-              type: 'card',
-              brand: 'visa',
+              id: 'bank_new123',
+              bank_name: 'Lovendo Bank',
+              account_type: 'checking',
               last_four: '4242',
-              exp_month: 12,
-              exp_year: 2030,
               is_default: true,
+              is_verified: true,
             },
           ],
           error: null,
         }),
       }));
 
-      // Step 3: Use card for payment
+      const { bankAccounts } = await paymentService.getPaymentMethods();
+      const [bankAccount] = bankAccounts;
+      expect(bankAccount.last4).toBe('4242');
+      expect(bankAccount.bankName).toBe('Lovendo Bank');
+      const cardId = bankAccount.id;
+
+      // Step 2: Use bank account for payment
       const mockTransaction = {
         id: 'txn-456',
         user_id: mockUser.id,
@@ -318,7 +302,7 @@ describe('Payment Flow Integration', () => {
         currency: 'LVND',
         type: 'payment',
         status: 'completed',
-        description: 'Payment with new card',
+        description: 'Payment with bank account',
         created_at: '2024-01-15T11:00:00Z',
         metadata: {},
         moment_id: null,
@@ -334,7 +318,7 @@ describe('Payment Flow Integration', () => {
         amount: 75,
         currency: 'LVND',
         paymentMethodId: cardId,
-        description: 'Payment with new card',
+        description: 'Payment with bank account',
       });
 
       expect(paymentResult.transaction.status).toBe('completed');

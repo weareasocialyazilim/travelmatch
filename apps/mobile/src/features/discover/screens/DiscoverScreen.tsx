@@ -33,6 +33,7 @@ import {
 import { logger } from '@/utils/logger';
 import { FlashList } from '@shopify/flash-list';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -84,6 +85,7 @@ const { height } = Dimensions.get('window');
 const DiscoverScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const insets = useSafeAreaInsets();
   const flashListRef = useRef<FlashList<Moment>>(null);
   const { user, isGuest } = useAuth();
 
@@ -795,9 +797,11 @@ const DiscoverScreen = () => {
   );
 
   // Render header component for FlatList - MOVED BEFORE EARLY RETURNS (Rules of Hooks)
+  const headerSpacing = useMemo(() => insets.top + 68, [insets.top]);
+
   const renderHeader = useCallback(
     () => (
-      <View style={styles.headerSection}>
+      <View style={[styles.headerSection, { paddingTop: headerSpacing }]}>
         {/* Stories Section */}
         <StoriesRow
           stories={stories}
@@ -819,6 +823,7 @@ const DiscoverScreen = () => {
       handleCreateStoryPress,
       currentTier,
       handleSubscriptionUpgrade,
+      headerSpacing,
     ],
   );
 
@@ -1015,12 +1020,12 @@ const DiscoverScreen = () => {
 const styles = StyleSheet.create({
   // Header Section with Stories
   headerSection: {
-    marginVertical: 12,
+    marginVertical: 8,
   },
 
   // Feed Content - Premium spacing
   feedContent: {
-    paddingTop: 40,
+    paddingTop: 8,
     paddingBottom: 100, // Space for FloatingDock
   },
 

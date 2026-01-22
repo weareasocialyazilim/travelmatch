@@ -258,8 +258,6 @@ export type RootStackParamList = {
     | undefined;
 
   // Payment Methods
-  PaymentMethods: undefined;
-  AddCard: undefined;
 
   // Checkout
   Checkout:
@@ -332,21 +330,11 @@ export type RootStackParamList = {
   SessionExpired: undefined;
   PaymentFailed: { transactionId?: string; error?: string };
 
-  // PayTR WebView for secure payment
-  PayTRWebView: {
-    iframeToken: string;
-    merchantOid: string;
-    amount: number;
-    currency: 'TRY' | 'EUR' | 'USD';
-    giftId?: string;
-    isTestMode?: boolean;
-  };
-
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;
 
-  // NEW: Gift Success Screen (PayTR Güvenceli)
+  // NEW: Gift Success Screen
   GiftSuccess: {
     giftId: string;
     momentId: string;

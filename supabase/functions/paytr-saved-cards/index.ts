@@ -2,19 +2,60 @@ import { Logger } from '..//_shared/logger.ts';
 const logger = new Logger();
 
 /**
- * PayTR Saved Cards Management
+ * ⚠️ DEPRECATED - APPLE IAP COMPLIANCE ⚠️
+ * 
+ * This PayTR Saved Cards Edge Function is DISABLED.
+ * Credit card management is not allowed under Apple/Google IAP rules.
+ * All purchases must go through RevenueCat/IAP.
+ * PayTR is now ONLY used for withdrawals (paytr-withdraw function).
  *
- * Manages saved card tokens for quick payments.
- * Provides list, delete, and set default functionality.
- *
- * GET /paytr-saved-cards - List user's saved cards
- * DELETE /paytr-saved-cards?cardId=xxx - Delete a saved card
- * PUT /paytr-saved-cards - Set default card
+ * This function returns 410 Gone to indicate it's no longer available.
  */
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createSupabaseClients, requireAuth } from '../_shared/supabase.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+
+serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  logger.warn('DEPRECATED: paytr-saved-cards called but is disabled for Apple IAP compliance');
+
+  // Return empty array for GET (backward compatibility), 410 for others
+  if (req.method === 'GET') {
+    return new Response(
+      JSON.stringify([]),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    );
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: 'Kart yönetimi özelliği artık kullanılamıyor.',
+      code: 'FEATURE_DEPRECATED',
+    }),
+    {
+      status: 410,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    },
+  );
+});
+
+/*
+ * ============================================================================
+ * ARCHIVED CODE - Original implementation kept for reference
+ * DO NOT UNCOMMENT - Apple/Google will reject the app
+ * ============================================================================
+
+import { createSupabaseClients, requireAuth } from '../_shared/supabase.ts';
 
 // =============================================================================
 // TYPES

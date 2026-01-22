@@ -84,6 +84,8 @@ jobs:
         run: |
           echo "Setting Edge Function secrets from Infisical..."
           # Secrets are already imported from Infisical in previous step
+          # NOTE: PayTR is used ONLY for withdrawals (Apple IAP compliance)
+          # All purchases go through RevenueCat/IAP
           supabase secrets set \
             PAYTR_MERCHANT_ID="$PAYTR_MERCHANT_ID" \
             PAYTR_MERCHANT_KEY="$PAYTR_MERCHANT_KEY" \

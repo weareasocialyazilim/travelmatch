@@ -1,5 +1,12 @@
 # 09_PAYMENT_CONSTITUTION.md (Lovendo Finansal Anayasası)
 
+> ⚠️ **IAP Uyumluluk Notu (Bağlayıcı)**
+>
+> - **Kullanıcıdan kullanıcıya para/coin transferi devre dışıdır.**
+> - **Kredi kartı / web ödeme akışları kaldırılmıştır.**
+> - **Tüm satın almalar RevenueCat/IAP üzerinden yapılır.**
+> - **PayTR yalnızca para çekme (withdrawal) için kullanılır.**
+
 **Amaç ve Kapsam**
 
 Bu doküman, Lovendo platformundaki tüm değer transferi, ödeme, coin, escrow, komisyon, limit ve KYC
@@ -28,7 +35,7 @@ Bu dokümanda yazan kurallar:
 
 - Coin, Lovendo içindeki tek değer transferi aracıdır.
 - Coin, uygulama içi satın alma (IAP) veya platform içi kazanım ile elde edilir.
-- Coin, kullanıcılar arasında aktarılabilir; ancak nakde çevrilemez.
+- Coin transferleri (kullanıcılar arası) şu an devre dışıdır.
 
 ### 2.2 Coin Bakiyeleri
 
@@ -42,6 +49,8 @@ Bu iki bakiye birbirinden ayrıdır ve birlikte kullanılmaz.
 ## 3. Değer Transferi Türleri
 
 ### 3.1 Direct Transfer (Escrow’suz)
+
+**Not:** Kullanıcılar arası transfer akışları şu an devre dışıdır.
 
 Aşağıdaki koşullarda doğrudan transfer mümkündür:
 

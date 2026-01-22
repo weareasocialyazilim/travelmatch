@@ -1,5 +1,12 @@
 # Domain Model (RALPH): Lovendo
 
+> ⚠️ **IAP Uyumluluk Notu**
+>
+> - Kullanıcıdan kullanıcıya para/coin transferi devre dışıdır.
+> - Kredi kartı / web ödeme akışları kaldırılmıştır.
+> - Tüm satın almalar RevenueCat/IAP üzerinden yapılır.
+> - PayTR yalnızca para çekme (withdrawal) için kullanılır.
+
 ## 1. Sözlük (Glossary)
 
 - Account: Tekil kullanıcı hesabı. Aynı hesap hem user hem creator aksiyonlarını yapabilir. Rol,

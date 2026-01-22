@@ -17,6 +17,7 @@ import {
   RefreshControl,
   Share,
 } from 'react-native';
+import { SPACING } from '@/constants/spacing';
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -380,6 +381,7 @@ const ProfileScreen: React.FC = () => {
             )}
             actionLabel={t('profile.loginNow', 'Giriş Yap')}
             onAction={() => showLoginPrompt({ action: 'default' })}
+            style={styles.loginRequiredEmptyState}
           />
         </View>
       </LiquidScreenWrapper>
@@ -696,6 +698,9 @@ const styles = StyleSheet.create({
   emptyCard: {
     paddingVertical: 32,
     borderColor: PROFILE_COLORS.glass.border,
+  },
+  loginRequiredEmptyState: {
+    paddingBottom: SPACING.bottomNavHeight,
   },
 
   bottomSpacer: {

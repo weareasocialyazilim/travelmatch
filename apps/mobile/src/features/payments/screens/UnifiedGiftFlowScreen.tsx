@@ -3,8 +3,8 @@
  *
  * Bu ekran kullanıcıların:
  * - Bir moment'a katılmak için host'a ödeme yapmasını sağlar
- * - PayTR güvenli ödeme entegrasyonu ile çalışır
- * - Escrow sistemi ile güvenli transfer yapar
+ * - IAP coin satın alma akışı ile çalışır
+ * - Kullanıcılar arası direkt ödeme yoktur
  *
  * NOT: Bu "arkadaşa hediye" değil, moment'a katılım ödemesidir.
  */
@@ -82,24 +82,20 @@ const UnifiedGiftFlowScreen: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      // Navigate to PayTR WebView for secure payment
-      navigation.navigate('PayTRWebView', {
-        iframeToken: `moment_${momentId}_${Date.now()}`,
-        merchantOid: `moment_payment_${momentId}`,
-        amount: requestedAmount || 0,
-        currency: (requestedCurrency as 'TRY' | 'EUR' | 'USD') || 'TRY',
-        giftId: momentId,
-      });
+      // APPLE IAP COMPLIANT: Redirect to Coin Store for LVND purchase
+      // Moments are paid with pre-purchased LVND coins, not direct credit card
+      navigation.navigate('CoinStore');
+      // After user has coins, they can return and complete the moment join
     } catch (error) {
-      logger.error('UnifiedGiftFlow', 'Payment navigation failed', { error });
+      logger.error('UnifiedGiftFlow', 'Navigation failed', { error });
       HapticManager.error();
       navigation.navigate('PaymentFailed', {
-        error: 'Ödeme işlemi başlatılamadı. Lütfen tekrar deneyin.',
+        error: 'İşlem başlatılamadı. Lütfen tekrar deneyin.',
       });
     } finally {
       setIsProcessing(false);
     }
-  }, [momentId, requestedAmount, requestedCurrency, navigation]);
+  }, [navigation]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

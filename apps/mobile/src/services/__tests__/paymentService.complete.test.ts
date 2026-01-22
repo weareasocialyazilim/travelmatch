@@ -349,71 +349,11 @@ describe('PaymentService', () => {
   });
 
   describe('getPaymentMethods', () => {
-    it('should return saved cards and bank accounts', async () => {
+    it('should return saved bank accounts', async () => {
       const result = await paymentService.getPaymentMethods();
 
-      expect(result).toHaveProperty('cards');
       expect(result).toHaveProperty('bankAccounts');
-      expect(Array.isArray(result.cards)).toBe(true);
       expect(Array.isArray(result.bankAccounts)).toBe(true);
-    });
-  });
-
-  describe('addCard', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      // Setup proper mock for functions.invoke
-      mockSupabase.functions = {
-        invoke: jest.fn().mockResolvedValue({
-          data: {
-            id: 'card_test123',
-            brand: 'visa',
-            last4: '4242',
-            exp_month: 12,
-            exp_year: 2030,
-            is_default: true,
-          },
-          error: null,
-        }),
-      };
-    });
-
-    it('should add new payment card', async () => {
-      const tokenId = 'tok_visa';
-
-      const result = await paymentService.addCard(tokenId);
-
-      expect(result.card).toHaveProperty('id');
-      expect(result.card).toHaveProperty('brand');
-      expect(result.card).toHaveProperty('last4');
-      expect(result.card.isDefault).toBeDefined();
-    });
-
-    it('should set first card as default', async () => {
-      const result = await paymentService.addCard('tok_visa');
-
-      expect(result.card.isDefault).toBe(true);
-    });
-  });
-
-  describe('removeCard', () => {
-    beforeEach(() => {
-      // Setup mock for from().update().eq().eq()
-      mockSupabase.from.mockReturnValue({
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ data: null, error: null }),
-          }),
-        }),
-      });
-    });
-
-    it('should remove payment card', async () => {
-      const cardId = 'card_123';
-
-      const result = await paymentService.removeCard(cardId);
-
-      expect(result.success).toBe(true);
     });
   });
 
@@ -936,24 +876,6 @@ describe('PaymentService', () => {
         status: 'requires_payment_method',
       });
       expect(result.clientSecret).toBeDefined();
-      expect(result.momentId).toBe('moment-123');
-    });
-  });
-
-  describe('confirmPayment', () => {
-    it('should confirm payment intent', async () => {
-      const result = await paymentService.confirmPayment(
-        'pi_123',
-        'pm_card_123',
-      );
-
-      expect(result.success).toBe(true);
-    });
-
-    it('should confirm payment without payment method', async () => {
-      const result = await paymentService.confirmPayment('pi_123');
-
-      expect(result.success).toBe(true);
     });
   });
 });

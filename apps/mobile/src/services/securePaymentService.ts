@@ -4,7 +4,7 @@
  * Master Payment Service for Lovendo - consolidates all payment operations.
  * Delegates to specialized services for single-responsibility:
  *
- * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
+ * - PayTRProvider: REMOVED (Apple IAP compliance)
  * - walletService: Balance queries, withdrawals
  * - escrowService: Titan Protocol escrow logic
  * - transactionService: Transaction history
@@ -20,14 +20,6 @@ import { transactionsService as dbTransactionsService } from './supabaseDbServic
 import { invalidateAllPaymentCache } from './cacheInvalidationService';
 import { walletService } from './walletService';
 import { transactionService } from './transactionService';
-import {
-  paytrProvider,
-  type PayTRPaymentResponse,
-  type CreatePaymentParams,
-  type SavedCard,
-  type CardTokenizeParams,
-  type CardTokenizeResult,
-} from './payment/PayTRProvider';
 import { ErrorHandler } from '../utils/errorHandler';
 import type { Database, Json } from '../types/database.types';
 import {
@@ -39,60 +31,14 @@ import { VALUES } from '../constants/values';
 // Re-export types for backward compatibility
 export type { WalletBalance } from './walletService';
 export type { Transaction, TransactionFilters } from './transactionService';
-export type {
-  PayTRPaymentResponse,
-  CreatePaymentParams,
-  SavedCard,
-} from './payment/PayTRProvider';
 
 // ============================================
 // PAYMENT TYPES (Consolidated from paymentService.ts)
 // ============================================
 
-export type PaymentStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'refunded'
-  | 'cancelled';
+export type PaymentStatus = 'pending' | 'completed';
 
-export type PaymentMethod =
-  | 'card'
-  | 'bank_account'
-  | 'apple_pay'
-  | 'google_pay'
-  | 'wallet';
-
-export type TransactionType =
-  | 'gift_sent'
-  | 'gift_received'
-  | 'withdrawal'
-  | 'deposit'
-  | 'refund'
-  | 'fee';
-
-export interface PaymentCard {
-  id: string;
-  brand: 'visa' | 'mastercard' | 'amex' | 'discover';
-  last4: string;
-  expiryMonth: number;
-  expiryYear: number;
-  isDefault: boolean;
-}
-
-export interface BankAccount {
-  id: string;
-  bankName: string;
-  accountType: 'checking' | 'savings';
-  last4: string;
-  isDefault: boolean;
-  isVerified: boolean;
-}
-
-export interface LegacyTransaction {
-  id: string;
-  type: TransactionType;
+export interface Payment {
   amount: number;
   currency: string;
   status: PaymentStatus;
@@ -100,21 +46,6 @@ export interface LegacyTransaction {
   description: string;
   referenceId?: string;
   metadata?: Record<string, unknown>;
-}
-
-export interface PaymentIntent {
-  id: string;
-  paymentIntentId?: string;
-  amount: number;
-  currency: string;
-  status:
-    | PaymentStatus
-    | 'requires_payment_method'
-    | 'requires_confirmation'
-    | 'succeeded'
-    | 'cancelled';
-  clientSecret?: string;
-  momentId?: string;
 }
 
 // ============================================
@@ -173,10 +104,6 @@ interface EscrowOperationResponse {
 // ESCROW UTILITY FUNCTIONS
 // ============================================
 
-/**
- * Titan Protocol Escrow Matrix:
- * - $0-$30: Direct payment (no escrow)
- * - $30-$100: Optional escrow (user chooses)
 /**
  * Titan Protocol Escrow Matrix (COIN BASED):
  * - 0-300 Coins: Direct payment (no escrow)
@@ -239,39 +166,6 @@ export interface Subscription {
 // ============================================
 
 class SecurePaymentService {
-  // ============================================
-  // PAYTR OPERATIONS (Delegated to PayTRProvider)
-  // ============================================
-
-  /**
-   * PayTR Direct Payment Methods REMOVED for Apple Compliance
-   * We now use In-App Purchases (via RevenueCat) for buying coins.
-   * PayTR is ONLY used deeply in the backend for Payouts (Withdrawals).
-   */
-
-  /**
-   * Replaces direct PayTR payments with virtual currency transfer
-   */
-  async getSavedCards(): Promise<SavedCard[]> {
-    return paytrProvider.getSavedCards();
-  }
-
-  async createPayment(
-    params: CreatePaymentParams,
-  ): Promise<PayTRPaymentResponse> {
-    return paytrProvider.createPayment(params);
-  }
-
-  async deleteSavedCard(cardToken: string): Promise<void> {
-    return paytrProvider.deleteSavedCard(cardToken);
-  }
-
-  async tokenizeAndSaveCard(
-    params: CardTokenizeParams,
-  ): Promise<CardTokenizeResult> {
-    return paytrProvider.tokenizeAndSaveCard(params);
-  }
-
   async transferLVND(params: {
     amount: number;
     recipientId: string;
@@ -485,59 +379,16 @@ class SecurePaymentService {
   }
 
   /**
-   * Get saved payment methods from database
+   * Get bank accounts from database
    */
   async getPaymentMethods(): Promise<{
-    cards: PaymentCard[];
     bankAccounts: BankAccount[];
   }> {
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return { cards: [], bankAccounts: [] };
-
-      const { data: paymentMethods, error } = await supabase
-        .from('payment_methods')
-        .select(
-          'id, type, provider, last_four, brand, exp_month, exp_year, is_default, is_active, metadata',
-        )
-        .eq('user_id', user.id)
-        .eq('is_active', true);
-
-      if (error) {
-        logger.error('Get payment methods error:', error);
-        if (error.code === 'PGRST205') {
-          return { cards: [], bankAccounts: [] };
-        }
-        throw error;
-      }
-
-      type PaymentMethodRow = {
-        id: string;
-        type: string;
-        provider: string;
-        last_four: string;
-        brand: string;
-        exp_month: number;
-        exp_year: number;
-        is_default: boolean;
-        is_active: boolean;
-        metadata: unknown;
-      };
-
-      const cards: PaymentCard[] = (
-        (paymentMethods || []) as PaymentMethodRow[]
-      )
-        .filter((pm) => pm.type === 'card')
-        .map((pm) => ({
-          id: pm.id,
-          brand: (pm.brand as PaymentCard['brand']) || 'visa',
-          last4: pm.last_four || '****',
-          expiryMonth: pm.exp_month || 12,
-          expiryYear: pm.exp_year || 2030,
-          isDefault: pm.is_default || false,
-        }));
+      if (!user) return { bankAccounts: [] };
 
       const { data: bankData, error: bankError } = await supabase
         .from('bank_accounts')
@@ -572,75 +423,11 @@ class SecurePaymentService {
         isVerified: ba.is_verified || false,
       }));
 
-      return { cards, bankAccounts };
+      return { bankAccounts };
     } catch (error) {
       const standardized = ErrorHandler.handle(error, 'getPaymentMethods');
       logger.error('Get payment methods error:', standardized);
-      return { cards: [], bankAccounts: [] };
-    }
-  }
-
-  /**
-   * Add a new card via PayTR token
-   */
-  async addCard(tokenId: string): Promise<{ card: PaymentCard }> {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke(
-        'add-payment-method',
-        {
-          body: { tokenId, type: 'card' },
-        },
-      );
-
-      if (error) throw error;
-
-      const card: PaymentCard = {
-        id: data.id,
-        brand: data.brand || 'visa',
-        last4: data.last4 || '****',
-        expiryMonth: data.exp_month || 12,
-        expiryYear: data.exp_year || 2030,
-        isDefault: data.is_default || false,
-      };
-
-      logger.info('Card added successfully', { cardId: card.id });
-      return { card };
-    } catch (error) {
-      const standardized = ErrorHandler.handle(error, 'addCard');
-      logger.error('Add card error:', standardized);
-      throw error;
-    }
-  }
-
-  /**
-   * Remove a card
-   */
-  async removeCard(cardId: string): Promise<{ success: boolean }> {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { error } = await supabase
-        .from('payment_methods')
-        .update({ is_active: false })
-        .eq('id', cardId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      logger.info('Card removed', { cardId });
-      return { success: true };
-    } catch (error) {
-      const standardized = ErrorHandler.handle(error, 'removeCard');
-      logger.error('Remove card error:', standardized);
-      throw error;
+      return { bankAccounts: [] };
     }
   }
 
@@ -785,30 +572,12 @@ class SecurePaymentService {
         currency: 'LVND',
         status: 'requires_payment_method',
         clientSecret: `secret_${Date.now()}`,
-        momentId,
       };
 
       return paymentIntent;
     } catch (error) {
       const standardized = ErrorHandler.handle(error, 'createPaymentIntent');
       logger.error('Create payment intent error:', standardized);
-      throw error;
-    }
-  }
-
-  /**
-   * Confirm payment
-   */
-  async confirmPayment(
-    paymentIntentId: string,
-    _paymentMethodId?: string,
-  ): Promise<{ success: boolean }> {
-    try {
-      logger.info('Payment confirmed:', { paymentIntentId });
-      return { success: true };
-    } catch (error) {
-      const standardized = ErrorHandler.handle(error, 'confirmPayment');
-      logger.error('Confirm payment error:', standardized);
       throw error;
     }
   }

@@ -40,7 +40,7 @@ const INFO_ITEMS: InfoItem[] = [
     id: '4',
     title: 'Güvenli Ödemeler',
     description:
-      'Kart bilgileriniz bizde saklanmaz. Tüm işlemler PCI-DSS uyumlu PayTR altyapısı üzerinden gerçekleştirilir.',
+      'Satın almalar yalnızca Apple/Google IAP ile yapılır. Kart bilgisi toplanmaz.',
   },
   {
     id: '5',
@@ -86,13 +86,13 @@ export default function PaymentsKYCScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Main Title */}
-        <Text style={styles.mainTitle}>Ödemeler, Escrow ve Doğrulama</Text>
+        <Text style={styles.mainTitle}>Ödemeler ve Doğrulama</Text>
 
         {/* Trust Badge */}
         <Text style={styles.disclaimer}>
-          Lovendo, finansal güvenliğinizi en üst düzeyde korur. PayTR altyapısı
-          ile PCI-DSS uyumlu, BDDK lisanslı güvenli ödeme sistemi
-          kullanılmaktadır.
+          Lovendo, finansal güvenliğinizi en üst düzeyde korur. Satın almalar
+          App Store / Google Play IAP üzerinden yapılır; PayTR yalnızca para
+          çekme (withdrawal) süreçlerinde kullanılır.
         </Text>
 
         {/* Info Items List */}

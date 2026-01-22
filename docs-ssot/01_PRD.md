@@ -1,5 +1,12 @@
 # PRD: Lovendo (Experience-Only, No Cash, No Shipping)
 
+> ⚠️ **IAP Uyumluluk Notu**
+>
+> - Kullanıcıdan kullanıcıya para/coin transferi devre dışıdır.
+> - Kredi kartı / web ödeme akışları kaldırılmıştır.
+> - Tüm satın almalar RevenueCat/IAP üzerinden yapılır.
+> - PayTR yalnızca para çekme (withdrawal) için kullanılır.
+
 ## 1. Amaç ve Vizyon
 
 Lovendo; insanların gerçek hayatta, belirli bir şehirde gerçekleşen deneyimleri (experience)

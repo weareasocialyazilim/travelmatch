@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HapticManager } from '@/services/HapticManager';
+import { SPACING } from '@/constants/spacing';
 import { ErrorState, EmptyState } from '@/components';
 import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
@@ -306,6 +307,7 @@ const MessagesScreen: React.FC = () => {
             )}
             actionLabel={t('messages.loginNow', 'Giriş Yap')}
             onAction={() => showLoginPrompt({ action: 'chat' })}
+            style={styles.loginRequiredEmptyState}
           />
         </View>
       </SafeAreaView>
@@ -538,6 +540,9 @@ const styles = StyleSheet.create({
   },
   emptyStateContainer: {
     paddingTop: 80,
+  },
+  loginRequiredEmptyState: {
+    paddingBottom: SPACING.bottomNavHeight,
   },
 });
 

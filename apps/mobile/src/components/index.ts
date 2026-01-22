@@ -53,8 +53,6 @@ export { CurrencySelectionBottomSheet } from '@/features/payments/components';
 // Wallet Components - Taşındı: features/wallet/components
 export {
   AddBankAccountBottomSheet,
-  AddCardBottomSheet,
-  RemoveCardModal,
   WithdrawConfirmationModal,
   PendingTransactionsModal,
 } from '@/features/wallet/components';

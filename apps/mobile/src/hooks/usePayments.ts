@@ -1,8 +1,7 @@
 /**
  * usePayments Hook
  *
- * Manages all payment-related operations including wallet balance,
- * transactions, payment methods (cards and bank accounts), and withdrawals.
+ * Manages wallet balance, transactions, bank accounts, and withdrawals.
  *
  * @module hooks/usePayments
  *
@@ -11,13 +10,8 @@
  * const {
  *   balance,
  *   transactions,
- *   cards,
- *   addCard,
  *   requestWithdrawal,
  * } = usePayments();
- *
- * // Add a new card
- * const newCard = await addCard('tok_visa');
  *
  * // Request a withdrawal
  * const withdrawal = await requestWithdrawal(100, 'ba_123');
@@ -34,12 +28,10 @@ import {
 import { logger } from '../utils/logger';
 import { ErrorHandler, retryWithErrorHandling } from '../utils/errorHandler';
 import type {
-  PaymentCard,
   BankAccount,
   WalletBalance,
   TransactionType,
   PaymentStatus,
-  PaymentIntent,
   WithdrawalLimits,
 } from '../services/securePaymentService';
 
@@ -71,20 +63,12 @@ interface UsePaymentsReturn {
   /** Whether more transactions are available */
   hasMoreTransactions: boolean;
 
-  /** List of saved payment cards */
-  cards: PaymentCard[];
   /** List of saved bank accounts */
   bankAccounts: BankAccount[];
   /** Whether payment methods are loading */
   paymentMethodsLoading: boolean;
   /** Refresh all payment methods */
   refreshPaymentMethods: () => Promise<void>;
-  /** Add a new card using PayTR token */
-  addCard: (tokenId: string) => Promise<PaymentCard | null>;
-  /** Remove a saved card */
-  removeCard: (cardId: string) => Promise<boolean>;
-  /** Set a card as the default payment method */
-  setDefaultCard: (cardId: string) => Promise<boolean>;
   /** Add a new bank account */
   addBankAccount: (data: BankAccountData) => Promise<BankAccount | null>;
   /** Remove a saved bank account */
@@ -97,17 +81,6 @@ interface UsePaymentsReturn {
   ) => Promise<Transaction | null>;
   /** Current withdrawal limits */
   withdrawalLimits: WithdrawalLimits | null;
-
-  /** Create a payment intent for gifting a moment */
-  createPaymentIntent: (
-    momentId: string,
-    amount: number,
-  ) => Promise<PaymentIntent | null>;
-  /** Confirm a payment using the intent */
-  confirmPayment: (
-    paymentIntentId: string,
-    paymentMethodId?: string,
-  ) => Promise<boolean>;
 }
 
 /**
@@ -162,8 +135,6 @@ export const usePayments = (): UsePaymentsReturn => {
   const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
   const [currentFilters, setCurrentFilters] = useState<TransactionFilters>({});
 
-  // Payment methods state
-  const [cards, setCards] = useState<PaymentCard[]>([]);
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(true);
 
@@ -258,13 +229,12 @@ export const usePayments = (): UsePaymentsReturn => {
   ]);
 
   /**
-   * Fetch payment methods
+   * Fetch bank accounts
    */
   const refreshPaymentMethods = useCallback(async (): Promise<void> => {
     try {
       setPaymentMethodsLoading(true);
       const response = await securePaymentService.getPaymentMethods();
-      setCards(response.cards);
       setBankAccounts(response.bankAccounts);
     } catch (error) {
       logger.error('Failed to fetch payment methods:', error);
@@ -272,56 +242,6 @@ export const usePayments = (): UsePaymentsReturn => {
       setPaymentMethodsLoading(false);
     }
   }, []);
-
-  /**
-   * Add a card
-   */
-  const addCard = useCallback(
-    async (tokenId: string): Promise<PaymentCard | null> => {
-      try {
-        const response = await securePaymentService.addCard(tokenId);
-        setCards((prev) => [...prev, response.card]);
-        return response.card;
-      } catch (error) {
-        logger.error('Failed to add card:', error);
-        return null;
-      }
-    },
-    [],
-  );
-
-  /**
-   * Remove a card
-   */
-  const removeCard = useCallback(async (cardId: string): Promise<boolean> => {
-    try {
-      await securePaymentService.removeCard(cardId);
-      setCards((prev) => prev.filter((c) => c.id !== cardId));
-      return true;
-    } catch (error) {
-      logger.error('Failed to remove card:', error);
-      return false;
-    }
-  }, []);
-
-  /**
-   * Set default card
-   */
-  const setDefaultCard = useCallback(
-    async (cardId: string): Promise<boolean> => {
-      try {
-        await securePaymentService.setDefaultCard(cardId);
-        setCards((prev) =>
-          prev.map((c) => ({ ...c, isDefault: c.id === cardId })),
-        );
-        return true;
-      } catch (error) {
-        logger.error('Failed to set default card:', error);
-        return false;
-      }
-    },
-    [],
-  );
 
   /**
    * Add bank account
@@ -405,57 +325,6 @@ export const usePayments = (): UsePaymentsReturn => {
   );
 
   /**
-   * Create payment intent
-   */
-  const createPaymentIntent = useCallback(
-    async (momentId: string, amount: number): Promise<PaymentIntent | null> => {
-      try {
-        const paymentIntent = await securePaymentService.createPaymentIntent(
-          momentId,
-          amount,
-        );
-        return paymentIntent;
-      } catch (error) {
-        logger.error('Failed to create payment intent:', error);
-        return null;
-      }
-    },
-    [],
-  );
-
-  /**
-   * Confirm payment
-   */
-  const confirmPayment = useCallback(
-    async (
-      paymentIntentId: string,
-      paymentMethodId?: string,
-    ): Promise<boolean> => {
-      try {
-        const response = await securePaymentService.confirmPayment(
-          paymentIntentId,
-          paymentMethodId,
-        );
-
-        if (response.success) {
-          // Refresh balance after successful payment (fire and forget with error logging)
-          refreshBalance().catch((err) => {
-            logger.warn('Failed to refresh balance after payment', {
-              error: err,
-            });
-          });
-        }
-
-        return response.success;
-      } catch (error) {
-        logger.error('Failed to confirm payment:', error);
-        return false;
-      }
-    },
-    [refreshBalance],
-  );
-
-  /**
    * Fetch withdrawal limits
    */
   const fetchWithdrawalLimits = useCallback(async () => {
@@ -497,24 +366,16 @@ export const usePayments = (): UsePaymentsReturn => {
     loadMoreTransactions,
     hasMoreTransactions,
 
-    // Payment methods
-    cards,
+    // Bank accounts
     bankAccounts,
     paymentMethodsLoading,
     refreshPaymentMethods,
-    addCard,
-    removeCard,
-    setDefaultCard,
     addBankAccount,
     removeBankAccount,
 
     // Withdrawals
     requestWithdrawal,
     withdrawalLimits,
-
-    // Payment intent
-    createPaymentIntent,
-    confirmPayment,
   };
 };
 

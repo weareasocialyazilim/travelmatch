@@ -204,8 +204,6 @@ const MomentCommentsScreen = lazyLoad(() =>
 // PAYMENTS FEATURE SCREENS
 // ===================================
 import {
-  PaymentMethodsScreen,
-  AddCardScreen,
   TransactionDetailScreen,
   TransactionHistoryScreen,
   PaymentsKYCScreen,
@@ -215,7 +213,6 @@ import {
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
-  // PayTRWebViewScreen removed for Apple Compliance (backend only)
   PromoCodeScreen,
   UnifiedGiftFlowScreen,
   SubscriberOfferModal,
@@ -763,11 +760,6 @@ const AppNavigator = () => {
             />
 
             {/* Payment Methods */}
-            <Stack.Screen
-              name="PaymentMethods"
-              component={PaymentMethodsScreen}
-            />
-            <Stack.Screen name="AddCard" component={AddCardScreen} />
 
             {/* Gift & Offer Flows */}
             <Stack.Screen
@@ -823,7 +815,6 @@ const AppNavigator = () => {
             {/* Ticket */}
             <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
-            {/* <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} /> */}
 
             {/* Footer Pages */}
             <Stack.Screen name="Safety" component={SafetyScreen} />

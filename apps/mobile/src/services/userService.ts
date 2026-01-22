@@ -273,12 +273,11 @@ export const userService = {
   getUserById: async (userId: string): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
-      .from('users')
+      .from('public_profiles')
       .select(
         `
         id,
         full_name,
-        email,
         avatar_url,
         bio,
         location,
@@ -286,7 +285,9 @@ export const userService = {
         rating,
         review_count,
         languages,
-        interests
+        interests,
+        created_at,
+        last_seen_at
       `,
       )
       .eq('id', userId)
@@ -320,8 +321,8 @@ export const userService = {
       giftsReceived: 0,
       coinsBalance: 0,
       pendingBalance: 0,
-      createdAt: '',
-      lastActiveAt: '',
+      createdAt: profile.created_at || '',
+      lastActiveAt: profile.last_seen_at || '',
     };
 
     return { user: mappedProfile };

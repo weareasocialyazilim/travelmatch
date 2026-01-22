@@ -165,7 +165,6 @@ export const ImmersiveMomentCard = memo(
 
         {/* 3. Content Layout */}
         <View style={styles.contentOverlay}>
-          {/* User Badge */}
           <TouchableOpacity
             style={styles.userInfo}
             onPress={onUserPress}

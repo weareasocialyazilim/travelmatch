@@ -175,87 +175,95 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   onFilterPress,
   viewMode,
   onToggleView,
-}) => (
-  <View style={styles.header}>
-    {/* Location Selector */}
-    <TouchableOpacity
-      style={styles.locationSelector}
-      onPress={onLocationPress}
-      activeOpacity={0.7}
-    >
-      <MaterialCommunityIcons
-        name="map-marker"
-        size={18}
-        color={COLORS.brand.primary}
-      />
-      <Text style={styles.locationText} numberOfLines={1}>
-        {location}
-      </Text>
-      <MaterialCommunityIcons
-        name="chevron-down"
-        size={18}
-        color={COLORS.utility.white}
-      />
-    </TouchableOpacity>
+}) => {
+  const insets = useSafeAreaInsets();
 
-    {/* Right Controls */}
-    <View style={styles.headerControls}>
-      {/* Filter Button */}
+  return (
+    <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+      {/* Location Selector */}
       <TouchableOpacity
-        style={styles.controlButton}
-        onPress={onFilterPress}
+        style={styles.locationSelector}
+        onPress={onLocationPress}
         activeOpacity={0.7}
       >
         <MaterialCommunityIcons
-          name="filter-variant"
-          size={22}
+          name="map-marker"
+          size={18}
+          color={COLORS.brand.primary}
+        />
+        <Text style={styles.locationText} numberOfLines={1}>
+          {location}
+        </Text>
+        <MaterialCommunityIcons
+          name="chevron-down"
+          size={18}
           color={COLORS.utility.white}
         />
-        {(activeFiltersCount ?? 0) > 0 && (
-          <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
-          </View>
-        )}
       </TouchableOpacity>
 
-      {onToggleView && (
+      {/* Right Controls */}
+      <View style={styles.headerControls}>
+        {/* Filter Button */}
         <TouchableOpacity
           style={styles.controlButton}
-          onPress={onToggleView}
+          onPress={onFilterPress}
           activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel={
-            viewMode === 'grid' ? 'Liste görünümüne geç' : 'Grid görünümüne geç'
-          }
         >
           <MaterialCommunityIcons
-            name={
-              viewMode === 'grid' ? 'view-agenda-outline' : 'view-grid-outline'
-            }
-            size={20}
+            name="filter-variant"
+            size={22}
             color={COLORS.utility.white}
           />
+          {(activeFiltersCount ?? 0) > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
-      )}
+
+        {onToggleView && (
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={onToggleView}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={
+              viewMode === 'grid'
+                ? 'Liste görünümüne geç'
+                : 'Grid görünümüne geç'
+            }
+          >
+            <MaterialCommunityIcons
+              name={
+                viewMode === 'grid'
+                  ? 'view-agenda-outline'
+                  : 'view-grid-outline'
+              }
+              size={20}
+              color={COLORS.utility.white}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   // Legacy header styles
   header: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(8, 8, 10, 0.35)',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 100,
-    paddingTop: 60,
+    paddingTop: 48,
   },
   locationSelector: {
     flexDirection: 'row',

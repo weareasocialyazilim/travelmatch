@@ -116,54 +116,40 @@ export const getTrustNotesForUser = async (
   offset: number = 0,
 ): Promise<TrustNote[]> => {
   try {
-    const { data, error } = await supabase
-      .from('trust_notes')
-      .select(
-        `
-        id,
-        author_id,
-        recipient_id,
-        moment_id,
-        note,
-        created_at,
-        is_public,
-        author:users!author_id(full_name, avatar_url),
-        moment:moments(title)
-      `,
-      )
-      .eq('recipient_id', userId)
-      .eq('is_public', true)
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    const { data, error } = await supabase.rpc('get_user_trust_notes', {
+      p_user_id: userId,
+      p_limit: limit,
+      p_offset: offset,
+    });
 
     if (error) throw error;
 
     return (
       (data || []) as {
         id: string;
-        author_id: string;
-        recipient_id: string;
-        moment_id: string | null;
+        author_name: string;
+        author_avatar: string | null;
         note: string;
+        moment_title: string | null;
         created_at: string;
-        is_public: boolean;
-        author: { full_name: string; avatar_url: string | null } | null;
-        moment: { title: string } | null;
       }[]
     ).map((note) => ({
       id: note.id,
-      writerId: note.author_id,
-      writerName: note.author?.full_name || 'Kullanıcı',
-      writerAvatar: note.author?.avatar_url || undefined,
-      receiverId: note.recipient_id,
-      momentId: note.moment_id || undefined,
-      momentTitle: note.moment?.title,
+      writerId: '',
+      writerName: note.author_name || 'Kullanıcı',
+      writerAvatar: note.author_avatar || undefined,
+      receiverId: userId,
+      momentId: undefined,
+      momentTitle: note.moment_title || undefined,
       note: note.note,
       createdAt: note.created_at,
-      isPublic: note.is_public,
+      isPublic: true,
     }));
   } catch (error) {
+    const errorMessage = String((error as { message?: string }).message || '');
+    if (errorMessage.toLowerCase().includes('permission denied')) {
+      return [];
+    }
     logger.error('[TrustNotes] Failed to get notes', error as Error);
     return [];
   }
@@ -174,17 +160,18 @@ export const getTrustNotesForUser = async (
  */
 export const getTrustNoteCount = async (userId: string): Promise<number> => {
   try {
-    const { count, error } = await supabase
-      .from('trust_notes')
-      .select('*', { count: 'exact', head: true })
-      .eq('recipient_id', userId)
-      .eq('is_public', true)
-      .eq('is_approved', true);
+    const { data, error } = await supabase.rpc('get_user_trust_note_count', {
+      p_user_id: userId,
+    });
 
     if (error) throw error;
 
-    return count || 0;
+    return Number(data || 0);
   } catch (error) {
+    const errorMessage = String((error as { message?: string }).message || '');
+    if (errorMessage.toLowerCase().includes('permission denied')) {
+      return 0;
+    }
     logger.error('[TrustNotes] Failed to get count', error as Error);
     return 0;
   }
@@ -198,47 +185,40 @@ export const getRecentTrustNotes = async (
   limit: number = 3,
 ): Promise<TrustNote[]> => {
   try {
-    const { data, error } = await supabase
-      .from('trust_notes')
-      .select(
-        `
-        id,
-        author_id,
-        note,
-        created_at,
-        author:users!author_id(full_name, avatar_url),
-        moment:moments(title)
-      `,
-      )
-      .eq('recipient_id', userId)
-      .eq('is_public', true)
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    const { data, error } = await supabase.rpc('get_user_trust_notes', {
+      p_user_id: userId,
+      p_limit: limit,
+      p_offset: 0,
+    });
 
     if (error) throw error;
 
     return (
       (data || []) as {
         id: string;
-        author_id: string;
+        author_name: string;
+        author_avatar: string | null;
         note: string;
+        moment_title: string | null;
         created_at: string;
-        author: { full_name: string; avatar_url: string | null } | null;
-        moment: { title: string } | null;
       }[]
     ).map((note) => ({
       id: note.id,
-      writerId: note.author_id,
-      writerName: note.author?.full_name || 'Kullanıcı',
-      writerAvatar: note.author?.avatar_url || undefined,
+      writerId: '',
+      writerName: note.author_name || 'Kullanıcı',
+      writerAvatar: note.author_avatar || undefined,
       receiverId: userId,
-      momentTitle: note.moment?.title || undefined,
+      momentId: undefined,
+      momentTitle: note.moment_title || undefined,
       note: note.note,
       createdAt: note.created_at,
       isPublic: true,
     }));
   } catch (error) {
+    const errorMessage = String((error as { message?: string }).message || '');
+    if (errorMessage.toLowerCase().includes('permission denied')) {
+      return [];
+    }
     logger.error('[TrustNotes] Failed to get recent notes', error as Error);
     return [];
   }

@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: SPACING['2xl'],
+    paddingHorizontal: SPACING.screenPadding,
     paddingVertical: SPACING['3xl'],
     flex: 1,
   },
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
-    maxWidth: SCREEN_WIDTH * 0.8,
+    maxWidth: SCREEN_WIDTH - SPACING.screenPadding * 2,
   },
   titlePremium: {
     fontSize: 28,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    maxWidth: SCREEN_WIDTH * 0.75,
+    maxWidth: SCREEN_WIDTH - SPACING.screenPadding * 2,
     marginBottom: SPACING.xl,
   },
   actionsContainer: {

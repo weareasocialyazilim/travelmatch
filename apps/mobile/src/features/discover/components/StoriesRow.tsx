@@ -63,11 +63,12 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
         >
           {/* Create Story Button */}
           <TouchableOpacity
-            style={styles.storyItem}
+            style={[styles.storyItem, styles.createStoryItem]}
             onPress={onCreatePress}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Create new moment"
+            accessibilityLabel="Yeni anı oluştur"
+            accessibilityHint="Anını paylaşmak için yeni bir hikaye oluştur"
           >
             <View style={styles.createStoryRing}>
               <View style={styles.createStoryInner}>
@@ -78,7 +79,6 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                 />
               </View>
             </View>
-            <Text style={styles.storyName}>Create</Text>
           </TouchableOpacity>
 
           {/* User Stories */}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   // Container - "Enerji bandı" background
   storiesSection: {
     backgroundColor: COLORS.bg.primary,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
 
   // Section Title - Uppercase label
@@ -161,6 +161,9 @@ const styles = StyleSheet.create({
   storyItem: {
     alignItems: 'center',
     width: 72,
+  },
+  createStoryItem: {
+    marginTop: 0,
   },
 
   // Create button - dashed border
