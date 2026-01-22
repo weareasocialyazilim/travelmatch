@@ -182,6 +182,56 @@
     "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli."
   },
 
+  "trust": {
+    "factors": {
+      "identity": "Kimlik",
+      "social": "Sosyal",
+      "experience": "Deneyim",
+      "response": "Yanıt",
+      "score": "Puan"
+    },
+    "garden": {
+      "title": "Güven Bahçesi",
+      "factorsTitle": "Güven Faktörleri",
+      "howToImprove": "Nasıl geliştirilir:",
+      "levelsTitle": "Güven Seviyeleri",
+      "points": "puan",
+      "levels": {
+        "sprout": "Fidan",
+        "developing": "Gelişen",
+        "growing": "Büyüyen",
+        "blooming": "Çiçeklenen"
+      },
+      "identityVerification": "Kimlik Doğrulama",
+      "identityDesc": "KYC doğrulama durumu",
+      "socialConnections": "Sosyal Bağlantılar",
+      "socialDesc": "Bağlı hesaplar",
+      "completedExperiences": "Tamamlanan Deneyimler",
+      "experienceDesc": "Tamamlanan moment sayısı",
+      "responseRate": "Yanıt Oranı",
+      "responseDesc": "İsteklere hızlı yanıt",
+      "receivedRatings": "Alınan Puanlar",
+      "ratingsDesc": "Ortalama değerlendirme",
+      "tips": {
+        "verifyId": "Kimliğini doğrula",
+        "addAddress": "Adresini ekle",
+        "completeKyc": "KYC sürecini tamamla",
+        "connectInstagram": "Instagram hesabını bağla",
+        "connectTwitter": "X (Twitter) hesabını bağla",
+        "addWebsite": "Web siteni ekle",
+        "completeMoments": "Daha fazla moment tamamla",
+        "getHighRatings": "Yüksek değerlendirmeler al",
+        "respondQuickly": "Mesajlara hızlı dön",
+        "respondIn2h": "İlk 2 saatte yanıt ver",
+        "acceptQuickly": "İstekleri hızlı onayla",
+        "keepCalendarUpdated": "Takvimi güncel tut",
+        "offerUnique": "Özgün deneyimler sun",
+        "clearCommunication": "Net iletişim kur",
+        "exceedExpectations": "Beklentilerin ötesine geç"
+      }
+    }
+  },
+
   "payment": {
     "payment": "Ödeme",
     "addCard": "Kart Ekle",

@@ -29,15 +29,28 @@ import { TrustScoreCircle, type TrustFactor } from '@/components/ui';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { UserProfile } from '@/services/userService';
 import type { NavigationProp } from '@react-navigation/native';
+import { EmptyState } from '@/components';
+import { showLoginPrompt } from '@/stores/modalStore';
 
 const TrustGardenDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const { t } = useTranslation();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
+    if (isGuest || !user) {
+      showLoginPrompt({ action: 'default' });
+    }
+  }, [isGuest, user]);
+
+  useEffect(() => {
     const fetchProfile = async () => {
+      if (!user?.id) {
+        setUserProfile(null);
+        return;
+      }
+
       try {
         const { user: profile } = await userService.getCurrentUser();
         setUserProfile(profile);
@@ -45,8 +58,9 @@ const TrustGardenDetailScreen: React.FC = () => {
         logger.error('Failed to fetch profile', error);
       }
     };
+
     fetchProfile();
-  }, []);
+  }, [user?.id]);
 
   const trustScore = user?.trustScore || 0;
 
@@ -191,6 +205,22 @@ const TrustGardenDetailScreen: React.FC = () => {
     },
   ];
 
+  if (isGuest || !user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <EmptyState
+          title={t('trust.garden.loginRequiredTitle', 'Giriş gerekli')}
+          description={t(
+            'trust.garden.loginRequiredMessage',
+            'Trust Garden için giriş yapmanız gerekir.',
+          )}
+          actionLabel={t('trust.garden.loginNow', 'Giriş Yap')}
+          onAction={() => showLoginPrompt({ action: 'default' })}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
@@ -228,92 +258,103 @@ const TrustGardenDetailScreen: React.FC = () => {
             {t('trust.garden.factorsTitle')}
           </Text>
 
-          {detailedFactors.map((factor) => (
-            <TouchableOpacity
-              key={factor.id}
-              style={styles.factorCard}
-              onPress={factor.onPress}
-              disabled={!factor.onPress}
-              activeOpacity={factor.onPress ? 0.7 : 1}
-            >
-              <View style={styles.factorHeader}>
-                <View
-                  style={[
-                    styles.factorIcon,
-                    { backgroundColor: `${factor.color}15` },
-                  ]}
-                >
-                  <MaterialCommunityIcons
-                    name={
-                      factor.icon as React.ComponentProps<
-                        typeof MaterialCommunityIcons
-                      >['name']
-                    }
-                    size={20}
-                    color={factor.color}
+          {detailedFactors.map((factor) => {
+            const normalizedValue = Math.min(factor.value, factor.maxValue);
+            const progress =
+              factor.maxValue > 0
+                ? (normalizedValue / factor.maxValue) * 100
+                : 0;
+
+            return (
+              <TouchableOpacity
+                key={factor.id}
+                style={styles.factorCard}
+                onPress={factor.onPress}
+                disabled={!factor.onPress}
+                activeOpacity={factor.onPress ? 0.7 : 1}
+              >
+                <View style={styles.factorHeader}>
+                  <View
+                    style={[
+                      styles.factorIcon,
+                      { backgroundColor: `${factor.color}15` },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={
+                        factor.icon as React.ComponentProps<
+                          typeof MaterialCommunityIcons
+                        >['name']
+                      }
+                      size={20}
+                      color={factor.color}
+                    />
+                  </View>
+                  <View style={styles.factorInfo}>
+                    <Text style={styles.factorName}>{factor.name}</Text>
+                    <Text style={styles.factorDesc}>{factor.description}</Text>
+                  </View>
+                  <View style={styles.factorValueContainer}>
+                    <View style={styles.factorValue}>
+                      <Text
+                        style={[
+                          styles.factorValueText,
+                          { color: factor.color },
+                        ]}
+                      >
+                        {factor.id === '5'
+                          ? factor.value.toFixed(1)
+                          : factor.value}
+                      </Text>
+                      <Text style={styles.factorMaxText}>
+                        /
+                        {factor.id === '5'
+                          ? factor.maxValue.toFixed(1)
+                          : factor.maxValue}
+                      </Text>
+                    </View>
+                    {factor.onPress && (
+                      <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={18}
+                        color={COLORS.text.secondary}
+                      />
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.factorProgressBar}>
+                  <View
+                    style={[
+                      styles.factorProgressFill,
+                      {
+                        width: `${Math.min(progress, 100)}%`,
+                        backgroundColor: factor.color,
+                      },
+                    ]}
                   />
                 </View>
-                <View style={styles.factorInfo}>
-                  <Text style={styles.factorName}>{factor.name}</Text>
-                  <Text style={styles.factorDesc}>{factor.description}</Text>
-                </View>
-                <View style={styles.factorValueContainer}>
-                  <View style={styles.factorValue}>
-                    <Text
-                      style={[styles.factorValueText, { color: factor.color }]}
-                    >
-                      {factor.id === '5'
-                        ? factor.value.toFixed(1)
-                        : factor.value}
+
+                {factor.value < factor.maxValue && (
+                  <View style={styles.tipsContainer}>
+                    <Text style={styles.tipsTitle}>
+                      {t('trust.garden.howToImprove')}
                     </Text>
-                    <Text style={styles.factorMaxText}>
-                      /
-                      {factor.id === '5'
-                        ? factor.maxValue.toFixed(1)
-                        : factor.maxValue}
-                    </Text>
+                    {factor.tips.slice(0, 2).map((tip, index) => (
+                      <View key={index} style={styles.tipItem}>
+                        <MaterialCommunityIcons
+                          name="arrow-right"
+                          size={14}
+                          color={factor.color}
+                        />
+                        <Text style={styles.tipText}>{tip}</Text>
+                      </View>
+                    ))}
                   </View>
-                  {factor.onPress && (
-                    <MaterialCommunityIcons
-                      name="chevron-right"
-                      size={18}
-                      color={COLORS.text.secondary}
-                    />
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.factorProgressBar}>
-                <View
-                  style={[
-                    styles.factorProgressFill,
-                    {
-                      width: `${(factor.value / factor.maxValue) * 100}%`,
-                      backgroundColor: factor.color,
-                    },
-                  ]}
-                />
-              </View>
-
-              {factor.value < factor.maxValue && (
-                <View style={styles.tipsContainer}>
-                  <Text style={styles.tipsTitle}>
-                    {t('trust.garden.howToImprove')}
-                  </Text>
-                  {factor.tips.slice(0, 2).map((tip, index) => (
-                    <View key={index} style={styles.tipItem}>
-                      <MaterialCommunityIcons
-                        name="arrow-right"
-                        size={14}
-                        color={factor.color}
-                      />
-                      <Text style={styles.tipText}>{tip}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Trust Levels Guide */}

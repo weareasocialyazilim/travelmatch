@@ -28,7 +28,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
-import { useSmartMicrocopy } from '@/hooks/useSmartMicrocopy';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -163,90 +162,6 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// AWWWARDS STYLE HEADER - Premium Discover Experience
-// ═══════════════════════════════════════════════════════════════════
-
-interface AwwwardsDiscoverHeaderProps {
-  /** User's name for greeting */
-  userName?: string;
-  /** User's avatar URL */
-  userAvatar?: string;
-  /** Greeting text (auto-detected by time if not provided) */
-  greeting?: string;
-  /** Notification count (shows dot if > 0) */
-  notificationCount?: number;
-  /** Active filters count (shows badge if > 0) */
-  activeFiltersCount?: number;
-  /** Callback when notifications are pressed */
-  onNotificationsPress?: () => void;
-  /** Callback when filter is pressed */
-  onFilterPress?: () => void;
-  /** Callback when avatar is pressed */
-  onAvatarPress?: () => void;
-}
-
-// Time-based greeting is handled by useSmartMicrocopy hook
-
-/**
- * AwwwardsDiscoverHeader - Awwwards standardında premium header
- *
- * Minimalist hiyerarşi ve premium boşluk kullanımı.
- * 40+ yaş için okunabilirlik, GenZ için estetik derinlik.
- */
-export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
-  userName,
-  userAvatar: _userAvatar,
-  greeting: _customGreeting,
-  notificationCount: _notificationCount = 0,
-  activeFiltersCount: _activeFiltersCount = 0,
-  onNotificationsPress: _onNotificationsPress,
-  onFilterPress: _onFilterPress,
-  onAvatarPress: _onAvatarPress,
-}) => {
-  const insets = useSafeAreaInsets();
-
-  // Smart micro-copy based on context
-  const { greeting, subtext } = useSmartMicrocopy({
-    userName: userName || 'Explorer',
-    city: 'şehir', // Location feature planned for v1.1
-  });
-
-  return (
-    <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
-      {/* Smart greeting */}
-      <Text style={awwwardsStyles.greeting}>{greeting}</Text>
-      {subtext && <Text style={awwwardsStyles.subtext}>{subtext}</Text>}
-    </View>
-  );
-};
-
-const awwwardsStyles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: COLORS.bg.primary,
-  },
-  greeting: {
-    fontSize: 18,
-    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    letterSpacing: -0.3,
-    textAlign: 'center',
-  },
-  subtext: {
-    fontSize: 14,
-    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
-    fontWeight: '400',
-    color: COLORS.text.secondary,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-});
-
-// ═══════════════════════════════════════════════════════════════════
 // LEGACY HEADERS - Backward Compatibility
 // ═══════════════════════════════════════════════════════════════════
 
@@ -258,6 +173,8 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   activeFiltersCount,
   onLocationPress,
   onFilterPress,
+  viewMode,
+  onToggleView,
 }) => (
   <View style={styles.header}>
     {/* Location Selector */}
@@ -277,7 +194,7 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
       <MaterialCommunityIcons
         name="chevron-down"
         size={18}
-        color={COLORS.text.secondary}
+        color={COLORS.utility.white}
       />
     </TouchableOpacity>
 
@@ -292,7 +209,7 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
         <MaterialCommunityIcons
           name="filter-variant"
           size={22}
-          color={COLORS.text.primary}
+          color={COLORS.utility.white}
         />
         {(activeFiltersCount ?? 0) > 0 && (
           <View style={styles.filterBadge}>
@@ -300,6 +217,26 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
           </View>
         )}
       </TouchableOpacity>
+
+      {onToggleView && (
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={onToggleView}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={
+            viewMode === 'grid' ? 'Liste görünümüne geç' : 'Grid görünümüne geç'
+          }
+        >
+          <MaterialCommunityIcons
+            name={
+              viewMode === 'grid' ? 'view-agenda-outline' : 'view-grid-outline'
+            }
+            size={20}
+            color={COLORS.utility.white}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   </View>
 );
@@ -307,14 +244,18 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
 const styles = StyleSheet.create({
   // Legacy header styles
   header: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: COLORS.utility.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    paddingTop: 60,
   },
   locationSelector: {
     flexDirection: 'row',
@@ -323,9 +264,9 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   locationText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text.primary,
+    color: COLORS.utility.white,
     marginLeft: 6,
     marginRight: 2,
     flexShrink: 1,
@@ -339,9 +280,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.bg.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   filterBadge: {
     position: 'absolute',

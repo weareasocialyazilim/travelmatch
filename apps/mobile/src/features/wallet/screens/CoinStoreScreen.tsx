@@ -29,6 +29,7 @@ import { HapticManager } from '@/services/HapticManager';
 import { logger } from '@/utils/logger';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { coinService } from '@/services/coinService';
 
 // RevenueCat import
 import Purchases, {
@@ -82,12 +83,9 @@ const CoinStoreScreen = () => {
       // Initialize RevenueCat (if not done globally)
       // await Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY });
 
-      const offerings = await Purchases.getOfferings();
-      if (
-        offerings.current !== null &&
-        offerings.current.availablePackages.length !== 0
-      ) {
-        setPackages(offerings.current.availablePackages);
+      const availablePackages = await coinService.getPackages();
+      if (availablePackages.length !== 0) {
+        setPackages(availablePackages);
       } else {
         // Fallback for Reviewer/Dev if no offerings found or unconnected
         // Default to Mock for uninterrupted Review Flow if RC fails
@@ -141,19 +139,14 @@ const CoinStoreScreen = () => {
 
     try {
       setPurchasing(true);
-      const { customerInfo } = await Purchases.purchasePackage(pack);
+      const result = await coinService.purchasePackage(pack);
 
-      // Check if purchase was successful (active entitlement)
-      // For testing without Real IAP, we might also allow if we are in DEV and simulation is active
-      const isPro =
-        typeof customerInfo.entitlements.active['pro'] !== 'undefined';
-
-      if (isPro || __DEV__) {
+      if (result.success || __DEV__) {
         // Verify via backend webhook (triggered by RC) -> Refresh Balance
         // Slight delay to allow webhook to process
         setTimeout(async () => {
           await fetchUserCoins();
-          Alert.alert('Success', 'LVND Coin loaded!');
+          Alert.alert('Success', 'LVND yüklendi!');
           HapticManager.success();
           setPurchasing(false);
         }, 2000);

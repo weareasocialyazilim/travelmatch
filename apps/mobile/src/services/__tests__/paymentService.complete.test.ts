@@ -71,6 +71,21 @@ describe('PaymentService', () => {
 
       // Mock both wallets and escrow_transactions tables
       mockSupabase.from.mockImplementation((tableName: string) => {
+        if (tableName === 'users') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                balance: 100.5,
+                coins_balance: 100.5,
+                pending_balance: 0,
+                currency: 'TRY',
+              },
+              error: null,
+            }),
+          };
+        }
         if (tableName === 'wallets') {
           const mockWallets = [
             { ...mockWalletBalance, currency: 'LVND', balance: 100.5 },
@@ -106,7 +121,7 @@ describe('PaymentService', () => {
               balance: 100.5,
               coins_balance: 100.5,
               pending_balance: 0,
-              currency: 'LVND',
+              currency: 'TRY',
             },
             error: null,
           }),
@@ -121,7 +136,7 @@ describe('PaymentService', () => {
         coins: 100.5,
         currency: 'TRY',
       });
-      expect(mockSupabase.from).toHaveBeenCalledWith('wallets');
+      expect(mockSupabase.from).toHaveBeenCalledWith('users');
     });
 
     it('should return zero balance when user not found', async () => {
@@ -774,6 +789,21 @@ describe('PaymentService', () => {
             insert: jest.fn().mockResolvedValue({ data: null, error: null }),
           };
         }
+        if (tableName === 'users') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                balance: 500,
+                coins_balance: 500,
+                pending_balance: 0,
+                currency: 'TRY',
+              },
+              error: null,
+            }),
+          };
+        }
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
@@ -822,6 +852,21 @@ describe('PaymentService', () => {
     it('should get complete wallet balance', async () => {
       // Mock both wallets and escrow_transactions tables
       mockSupabase.from.mockImplementation((tableName: string) => {
+        if (tableName === 'users') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                balance: 250.75,
+                coins_balance: 0,
+                pending_balance: 0,
+                currency: 'TRY',
+              },
+              error: null,
+            }),
+          };
+        }
         if (tableName === 'wallets') {
           const mockWallets = [
             { balance: 250.75, coins_balance: 0, currency: 'TRY' },

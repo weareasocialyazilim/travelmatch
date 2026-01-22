@@ -19,8 +19,9 @@ import { COLORS, GRADIENTS } from '@/constants/colors';
 import { VALUES } from '@/constants/values';
 import { HapticManager } from '@/services/HapticManager';
 import { Ionicons } from '@expo/vector-icons';
-import Purchases, { PurchasesPackage } from 'react-native-purchases'; // Adapting to existing RevenueCat lib
+import type { PurchasesPackage } from 'react-native-purchases'; // Adapting to existing RevenueCat lib
 import { logger } from '@/utils/logger';
+import { coinService } from '@/services/coinService';
 
 const LVND_PACKS_METADATA = [
   {
@@ -55,12 +56,9 @@ const CheckoutScreen = () => {
   useEffect(() => {
     const fetchOfferings = async () => {
       try {
-        const offerings = await Purchases.getOfferings();
-        if (
-          offerings.current !== null &&
-          offerings.current.availablePackages.length !== 0
-        ) {
-          setPackages(offerings.current.availablePackages);
+        const availablePackages = await coinService.getPackages();
+        if (availablePackages.length !== 0) {
+          setPackages(availablePackages);
         }
       } catch (e) {
         logger.error('Error fetching offerings', e);
@@ -78,8 +76,7 @@ const CheckoutScreen = () => {
     try {
       // Use RevenueCat if package found, otherwise mock success for dev/demo if allowed
       if (rcPackage) {
-        const { customerInfo } = await Purchases.purchasePackage(rcPackage);
-        // Check entitlement or coins addition here if needed, usually backend webhook handles it
+        await coinService.purchasePackage(rcPackage);
       } else {
         // Fallback or dev mode simulation
         logger.warn(

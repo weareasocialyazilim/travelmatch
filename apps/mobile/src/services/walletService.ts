@@ -84,7 +84,14 @@ class WalletService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        return {
+          available: 0,
+          coins: 0,
+          pending: 0,
+          currency: 'LVND',
+        };
+      }
 
       // Try cache first
       const cached = await getCachedWallet(user.id);
@@ -122,7 +129,14 @@ class WalletService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        return {
+          available: 0,
+          coins: 0,
+          pending: 0,
+          currency: 'LVND',
+        };
+      }
 
       // Check if we should use cached data (within TTL)
       const now = Date.now();
@@ -218,6 +232,21 @@ class WalletService {
    * Fallback: Get balance from database (used when PayTR API unavailable)
    */
   private async getDatabaseBalance(userId: string): Promise<WalletBalance> {
+    const { data: userRow, error: userError } = await supabase
+      .from('users')
+      .select('balance, currency, coins_balance, pending_balance')
+      .eq('id', userId)
+      .single();
+
+    if (!userError && userRow) {
+      return {
+        available: (userRow as { balance?: number }).balance || 0,
+        coins: (userRow as { coins_balance?: number }).coins_balance || 0,
+        pending: (userRow as { pending_balance?: number }).pending_balance || 0,
+        currency: (userRow as { currency?: string }).currency || 'TRY',
+      };
+    }
+
     const { data: wallets, error } = await supabase
       .from('wallets')
       .select('balance, currency')

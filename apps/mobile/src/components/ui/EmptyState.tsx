@@ -203,7 +203,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   subtitle,
   actionLabel,
   onAction,
-  actionSize = 'md',
+  actionSize = 'lg',
   secondaryActionLabel,
   onSecondaryAction,
   illustration,

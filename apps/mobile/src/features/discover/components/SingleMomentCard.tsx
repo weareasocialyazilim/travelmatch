@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { formatCurrency } from '@/utils/currencyFormatter';
+import type { CurrencyCode } from '@/constants/currencies';
 import type { MomentCardProps } from './types';
 
 interface SingleMomentCardProps {
@@ -15,6 +17,8 @@ export const SingleMomentCard: React.FC<SingleMomentCardProps> = memo(
   ({ item, onPress }) => {
     const creatorName = item.user?.name || 'Anonim';
     const locationName = item.location || 'Bilinmiyor';
+    const currency = (item.currency || 'TRY') as CurrencyCode;
+    const formattedPrice = formatCurrency(item.price || 0, currency);
 
     return (
       <TouchableOpacity
@@ -22,7 +26,7 @@ export const SingleMomentCard: React.FC<SingleMomentCardProps> = memo(
         onPress={() => onPress(item)}
         activeOpacity={0.95}
         accessibilityRole="button"
-        accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${locationName} konumunda, ${item.price} dolar`}
+        accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${locationName} konumunda, ${formattedPrice}`}
         accessibilityHint="Detayları görmek için dokunun"
       >
         {/* Image - Using OptimizedImage for better performance */}
@@ -90,7 +94,7 @@ export const SingleMomentCard: React.FC<SingleMomentCardProps> = memo(
           </View>
 
           {/* Price */}
-          <Text style={styles.priceValue}>${item.price}</Text>
+          <Text style={styles.priceValue}>{formattedPrice}</Text>
         </View>
       </TouchableOpacity>
     );

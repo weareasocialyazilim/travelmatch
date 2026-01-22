@@ -256,7 +256,9 @@ class SecurePaymentService {
     return paytrProvider.getSavedCards();
   }
 
-  async createPayment(params: CreatePaymentParams): Promise<PayTRPaymentResponse> {
+  async createPayment(
+    params: CreatePaymentParams,
+  ): Promise<PayTRPaymentResponse> {
     return paytrProvider.createPayment(params);
   }
 
@@ -264,7 +266,9 @@ class SecurePaymentService {
     return paytrProvider.deleteSavedCard(cardToken);
   }
 
-  async tokenizeAndSaveCard(params: CardTokenizeParams): Promise<CardTokenizeResult> {
+  async tokenizeAndSaveCard(
+    params: CardTokenizeParams,
+  ): Promise<CardTokenizeResult> {
     return paytrProvider.tokenizeAndSaveCard(params);
   }
 
@@ -408,7 +412,7 @@ class SecurePaymentService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) return { transactions: [], total: 0 };
 
       let dbType = undefined;
       if (params?.type === 'withdrawal') dbType = 'withdrawal';
@@ -491,7 +495,7 @@ class SecurePaymentService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) return { cards: [], bankAccounts: [] };
 
       const { data: paymentMethods, error } = await supabase
         .from('payment_methods')

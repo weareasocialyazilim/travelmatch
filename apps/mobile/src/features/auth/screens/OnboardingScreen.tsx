@@ -25,9 +25,6 @@ import {
   ImageBackground,
   Animated as RNAnimated,
   TouchableOpacity,
-  PanResponder,
-  type GestureResponderEvent,
-  type PanResponderGestureState,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -109,49 +106,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       enableHaptics: true,
     });
 
-  // Swipe gesture handler for navigating between slides
-  const handleSwipe = useCallback(
-    (direction: 'left' | 'right') => {
-      if (direction === 'left' && activeIndex < SLIDES.length - 1) {
-        // Swipe left = next slide
-        setActiveIndex(activeIndex + 1);
-        HapticManager.swipe();
-      } else if (direction === 'right' && activeIndex > 0) {
-        // Swipe right = previous slide
-        setActiveIndex(activeIndex - 1);
-        HapticManager.swipe();
-      }
-    },
-    [activeIndex],
-  );
-
-  // PanResponder for swipe gestures
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (
-        _evt: GestureResponderEvent,
-        gestureState: PanResponderGestureState,
-      ) => {
-        // Only respond to horizontal swipes
-        return (
-          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
-          Math.abs(gestureState.dx) > 10
-        );
-      },
-      onPanResponderRelease: (
-        _evt: GestureResponderEvent,
-        gestureState: PanResponderGestureState,
-      ) => {
-        const SWIPE_THRESHOLD = 50;
-        if (gestureState.dx < -SWIPE_THRESHOLD) {
-          handleSwipe('left');
-        } else if (gestureState.dx > SWIPE_THRESHOLD) {
-          handleSwipe('right');
-        }
-      },
-    }),
-  ).current;
+  const flatListRef = useRef<FlatList>(null);
 
   const handleNext = useCallback(async () => {
     logger.debug('OnboardingScreen handleNext called', {
@@ -168,6 +123,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
       // Update state to show next slide
       setActiveIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
 
       analytics.trackEvent('onboarding_page_view', {
         screen: 'onboarding',
@@ -231,25 +187,28 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   });
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
-      {/* Background Image - with fallback color */}
-      <View style={[StyleSheet.absoluteFillObject, styles.backgroundFallback]}>
-        <ImageBackground
-          source={{ uri: currentSlide.image }}
-          style={StyleSheet.absoluteFillObject}
-          resizeMode="cover"
-          onLoad={() => logger.info('🖼️ Image loaded', { id: currentSlide.id })}
-          onError={(e) =>
-            logger.error('🖼️ Image error', { error: e.nativeEvent })
+    <View style={styles.container}>
+      {/* Background Swipable Slides */}
+      <FlatList
+        ref={flatListRef}
+        data={SLIDES}
+        renderItem={_renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        style={StyleSheet.absoluteFillObject}
+        onMomentumScrollEnd={(event) => {
+          const newIndex = Math.round(
+            event.nativeEvent.contentOffset.x / width,
+          );
+          if (newIndex !== activeIndex) {
+            setActiveIndex(newIndex);
+            HapticManager.swipe();
           }
-        >
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
-            locations={[0.3, 0.6, 1]}
-            style={StyleSheet.absoluteFillObject}
-          />
-        </ImageBackground>
-      </View>
+        }}
+      />
 
       {/* Content overlay - full screen touchable area */}
       <View

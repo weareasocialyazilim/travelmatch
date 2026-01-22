@@ -21,6 +21,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
   FadeOut,
+  Easing,
   SlideInDown,
   SlideOutDown,
 } from 'react-native-reanimated';
@@ -123,8 +124,8 @@ export const LoginPromptModal: React.FC<LoginPromptModalProps> = ({
 
       <Animated.View
         style={styles.modalContainer}
-        entering={SlideInDown.springify().damping(25).stiffness(200)}
-        exiting={SlideOutDown.springify()}
+        entering={SlideInDown.duration(280).easing(Easing.out(Easing.cubic))}
+        exiting={SlideOutDown.duration(220).easing(Easing.in(Easing.cubic))}
       >
         {Platform.OS === 'ios' ? (
           <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
@@ -351,8 +352,8 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     width: '100%',
-    height: 56,
-    borderRadius: 28,
+    height: 52,
+    borderRadius: 26,
     overflow: 'hidden',
   },
   registerGradient: {
@@ -361,18 +362,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   registerText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: COLORS.text.inverse,
   },
   loginButton: {
     width: '100%',
-    height: 48,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loginText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.brand.primary,
   },

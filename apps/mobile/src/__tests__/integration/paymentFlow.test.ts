@@ -110,6 +110,7 @@ describe('Payment Flow Integration', () => {
       const initialBalance = 100;
       const paymentAmount = 50;
       const finalBalance = initialBalance - paymentAmount;
+      let userBalance = initialBalance;
 
       // Step 1: Get initial balance
       let mockWallets = [
@@ -139,6 +140,21 @@ describe('Payment Flow Integration', () => {
       mockSupabase.from.mockImplementation((tableName: string) => {
         if (tableName === 'wallets') {
           return mockFromChain;
+        }
+        if (tableName === 'users') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                balance: userBalance,
+                coins_balance: userBalance,
+                pending_balance: 0,
+                currency: 'TRY',
+              },
+              error: null,
+            }),
+          };
         }
         return {
           select: jest.fn().mockReturnThis(),
@@ -213,6 +229,7 @@ describe('Payment Flow Integration', () => {
           currency: 'LVND',
         },
       ];
+      userBalance = finalBalance;
 
       const balanceAfter = await paymentService.getBalance();
       expect(balanceAfter.available).toBe(finalBalance);

@@ -6,6 +6,10 @@ console.log('STEP 0: index.js start');
 import 'text-encoding-polyfill';
 console.log('STEP 1: text-encoding-polyfill ok');
 
+// 0.5) Buffer Polyfill
+global.Buffer = global.Buffer || require('buffer').Buffer;
+console.log('STEP 1.5: buffer-polyfill ok');
+
 // 1) URL polyfill
 import 'react-native-url-polyfill/auto';
 console.log('STEP 2: url-polyfill ok');

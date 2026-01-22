@@ -151,12 +151,7 @@ export async function discoverMomentsFallback(
         status,
         price,
         currency,
-        created_at,
-        users!inner (
-          id,
-          full_name,
-          avatar_url
-        )
+        created_at
       `,
       )
       .eq('status', 'active')
@@ -182,8 +177,8 @@ export async function discoverMomentsFallback(
         description: row.description,
         imageUrl: row.images?.[0] || null,
         userId: row.user_id,
-        userName: row.users?.full_name,
-        userAvatar: row.users?.avatar_url,
+        userName: undefined,
+        userAvatar: undefined,
         requestedAmount: row.price,
         currency: row.currency,
         status: row.status,

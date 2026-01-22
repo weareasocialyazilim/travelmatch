@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from 'react';
 import {
   View,
   Text,
@@ -29,7 +35,8 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { useToast } from '@/context/ToastContext';
-import { showAlert } from '@/stores/modalStore';
+import { showAlert, showLoginPrompt } from '@/stores/modalStore';
+import { EmptyState } from '@/components';
 
 // Enable LayoutAnimation on Android
 if (
@@ -135,12 +142,34 @@ const AppSettingsScreen: React.FC = () => {
     navigation.navigate('DeleteAccount');
   };
 
+  useEffect(() => {
+    if (!user) {
+      showLoginPrompt({ action: 'default' });
+    }
+  }, [user]);
+
   // Count enabled notifications
   const enabledNotificationsCount = [
     chatNotifications,
     requestNotifications,
     marketingNotifications,
   ].filter(Boolean).length;
+
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <EmptyState
+          title={t('settings.loginRequiredTitle', 'Giriş gerekli')}
+          description={t(
+            'settings.loginRequiredMessage',
+            'Ayarları görmek için giriş yapmanız gerekir.',
+          )}
+          actionLabel={t('settings.loginNow', 'Giriş Yap')}
+          onAction={() => showLoginPrompt({ action: 'default' })}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -161,7 +190,7 @@ const AppSettingsScreen: React.FC = () => {
         >
           <MaterialCommunityIcons name="arrow-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerTitle}>{t('settings.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -396,6 +425,67 @@ const AppSettingsScreen: React.FC = () => {
                 <View style={styles.settingContent}>
                   <Text style={styles.settingLabel}>Invite Friends</Text>
                   <Text style={styles.settingDesc}>Share Lovendo</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        }
+
+        {/* Help */}
+        {
+          <View style={styles.section}>
+            <View style={styles.settingsCard}>
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('FAQ')}
+              >
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.feedback.infoLight },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="frequently-asked-questions"
+                    size={20}
+                    color={COLORS.feedback.info}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>FAQ</Text>
+                  <Text style={styles.settingDesc}>Sık sorulan sorular</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
+              </TouchableOpacity>
+              <View style={styles.dividerFull} />
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('Support')}
+              >
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.mintTransparent },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="face-agent"
+                    size={20}
+                    color={COLORS.mint}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Support</Text>
+                  <Text style={styles.settingDesc}>Yardım ve iletişim</Text>
                 </View>
                 <MaterialCommunityIcons
                   name="chevron-right"

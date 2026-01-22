@@ -1,5 +1,5 @@
 /**
- * WalletScreen - LVND Sanal Para ve Titan Protocol Görünümü
+ * WalletScreen - LVND Coin ve Titan Protocol Görünümü
  */
 import React, { useCallback, useEffect } from 'react';
 import {
@@ -15,15 +15,15 @@ import { BlurView } from 'expo-blur';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withRepeat, 
-  withTiming, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
   withSequence,
-  interpolateColor
+  interpolateColor,
 } from 'react-native-reanimated';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
@@ -36,16 +36,12 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
     pulse.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1000 }),
-        withTiming(1, { duration: 1000 })
+        withTiming(1, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
-    glow.value = withRepeat(
-      withTiming(1, { duration: 2000 }),
-      -1,
-      true
-    );
+    glow.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -54,7 +50,7 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
     backgroundColor: interpolateColor(
       glow.value,
       [0, 1],
-      ['rgba(255, 165, 0, 0.1)', 'rgba(255, 165, 0, 0.25)']
+      ['rgba(255, 165, 0, 0.1)', 'rgba(255, 165, 0, 0.25)'],
     ),
   }));
 
@@ -66,9 +62,7 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
         color={COLORS.warning}
       />
       <View>
-        <Text style={styles.pendingText}>
-          {amount} LVND (Titan Flow)
-        </Text>
+        <Text style={styles.pendingText}>{amount} LVND (Titan Flow)</Text>
         <Text style={styles.pendingSubtext}>
           Gelecek ödemeleriniz protokol ile korunuyor.
         </Text>
@@ -78,12 +72,11 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
 };
 
 const WalletScreen = () => {
-  const { balance, refreshBalance } = usePayments();
+  const { balance, refreshBalance, balanceLoading } = usePayments();
   const navigation = useNavigation<any>();
-  const insets = useSafeAreaInsets();
-  const isLoading = false; // Inline loading state - hook doesn't expose this
+  const isLoading = balanceLoading;
 
-  // Realtime subscription for live LVND balance updates
+  // Realtime subscription for live coin balance updates
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
@@ -125,96 +118,141 @@ const WalletScreen = () => {
   }, [refreshBalance]);
 
   const handleWithdraw = () => {
-    navigation.navigate('WithdrawalRequest');
+    navigation.navigate('Withdraw');
+  };
+
+  const handleBack = () => {
+    if (typeof navigation.canGoBack === 'function' && navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+    navigation.navigate('MainTabs', { screen: 'Home' });
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <LinearGradient
-        colors={['#000000', '#1a1a1a']}
-        style={StyleSheet.absoluteFill}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['#000000', '#1a1a1a']}
+          style={StyleSheet.absoluteFill}
+        />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={onRefresh}
-            tintColor={COLORS.brand.primary}
-          />
-        }
-      >
-        <Text style={styles.headerTitle}>Cüzdan</Text>
-
-        {/* Sanal Bakiye Kartı */}
-        <BlurView intensity={50} tint="dark" style={styles.balanceContainer}>
-          <Text style={styles.label}>MEVCUT LVND</Text>
-          <View style={styles.balanceRow}>
-            <Text style={styles.amount}>{balance?.available || 0} LVND</Text>
-            <View style={styles.localCurrencyBadge}>
-              <Text style={styles.localCurrencyText}>≈ {(balance?.available || 0).toLocaleString('tr-TR')} TL</Text>
-            </View>
-          </View>
-
-          {/* Titan Protocol (Escrow) Bakiyesi */}
-          {(balance?.pending ?? 0) > 0 && (
-            <TitanFlowBadge amount={balance?.pending ?? 0} />
-          )}
-
+        {/* Header */}
+        <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('CoinStore')}
-            style={styles.topupButton}
+            style={styles.backButton}
+            onPress={handleBack}
+            accessibilityLabel="Back"
+            accessibilityRole="button"
           >
-            <LinearGradient
-              colors={GRADIENTS.primary}
-              style={styles.gradientButton}
-            >
-              <Text style={styles.buttonText}>LVND Yükle</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </BlurView>
-
-        <View style={styles.actionsContainer}>
-          {/* Para Çekme (Sadece Admin onaylı ve Teşekkür Videolu kullanıcılara) */}
-          <TouchableOpacity
-            onPress={handleWithdraw}
-            style={styles.withdrawLink}
-          >
-            <Text style={styles.withdrawText}>
-              Banka Hesabına Aktar (Withdraw)
-            </Text>
             <Ionicons
-              name="chevron-forward"
-              size={16}
-              color={COLORS.text.muted}
+              name="chevron-back"
+              size={22}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Cüzdan</Text>
+          <View style={styles.headerSpacer} />
         </View>
 
-        {/* Transaction History Placeholder - could be a separate component */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={styles.sectionTitle}>Son İşlemler</Text>
-          <Text
-            style={{ color: COLORS.text.muted, marginTop: 10, fontSize: 13 }}
-          >
-            Henüz işlem yok.
-          </Text>
-        </View>
-      </ScrollView>
-    </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={onRefresh}
+              tintColor={COLORS.brand.primary}
+            />
+          }
+        >
+          {/* LVND Bakiye Kartı */}
+          <BlurView intensity={50} tint="dark" style={styles.balanceContainer}>
+            <Text style={styles.label}>MEVCUT LVND</Text>
+            <View style={styles.balanceRow}>
+              <Text style={styles.amount}>{balance?.available || 0} LVND</Text>
+            </View>
+
+            {/* Titan Protocol (Escrow) Bakiyesi */}
+            {(balance?.pending ?? 0) > 0 && (
+              <TitanFlowBadge amount={balance?.pending ?? 0} />
+            )}
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('CoinStore')}
+              style={styles.topupButton}
+            >
+              <LinearGradient
+                colors={GRADIENTS.primary}
+                style={styles.gradientButton}
+              >
+                <Text style={styles.buttonText}>LVND Yükle</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+
+          <View style={styles.actionsContainer}>
+            {/* Para Çekme (Sadece Admin onaylı ve Teşekkür Videolu kullanıcılara) */}
+            <TouchableOpacity
+              onPress={handleWithdraw}
+              style={styles.withdrawLink}
+            >
+              <Text style={styles.withdrawText}>
+                Banka Hesabına Aktar (Withdraw)
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={COLORS.text.muted}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Transaction History Placeholder - could be a separate component */}
+          <View style={{ marginTop: 30 }}>
+            <Text style={styles.sectionTitle}>Son İşlemler</Text>
+            <Text
+              style={{ color: COLORS.text.muted, marginTop: 10, fontSize: 13 }}
+            >
+              Henüz işlem yok.
+            </Text>
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  scrollContent: { padding: 20 },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000',
   },
+  container: { flex: 1, backgroundColor: '#000' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'white',
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  scrollContent: { padding: 20 },
   balanceContainer: {
     padding: 24,
     borderRadius: 24,
@@ -271,17 +309,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 12,
-  },
-  localCurrencyBadge: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  localCurrencyText: {
-    color: COLORS.text.secondary,
-    fontSize: 14,
-    fontWeight: '500',
   },
   pendingSubtext: {
     color: 'rgba(255, 165, 0, 0.6)',

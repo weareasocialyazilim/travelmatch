@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
+import { showLoginPrompt } from '@/stores/modalStore';
+import { EmptyState } from '@/components';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const TOGGLES = [
   {
@@ -25,6 +29,8 @@ const TOGGLES = [
 
 export const NotificationSettingsScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const { user, isGuest } = useAuth();
   const [settings, setSettings] = useState({
     requests: true,
     messages: true,
@@ -32,9 +38,31 @@ export const NotificationSettingsScreen = ({ navigation }: any) => {
     reminders: true,
   });
 
+  useEffect(() => {
+    if (isGuest || !user) {
+      showLoginPrompt({ action: 'default' });
+    }
+  }, [isGuest, user]);
+
   const toggle = (id: string) => {
     setSettings((prev) => ({ ...prev, [id]: !prev[id as keyof typeof prev] }));
   };
+
+  if (isGuest || !user) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <EmptyState
+          title={t('settings.loginRequiredTitle', 'Giriş gerekli')}
+          description={t(
+            'settings.loginRequiredMessage',
+            'Ayarları görmek için giriş yapmanız gerekir.',
+          )}
+          actionLabel={t('settings.loginNow', 'Giriş Yap')}
+          onAction={() => showLoginPrompt({ action: 'default' })}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

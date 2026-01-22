@@ -6,7 +6,7 @@
  *
  * Features:
  * - Soft Dark tema ile uyumlu spacing ve hiyerarşi
- * - Canlı deneyimler için özel styling
+ * - Story şeridi için özel styling
  * - Premium spacing (20px horizontal padding)
  *
  * Part of Lovendo "Cinematic Trust Jewelry" Design System.
@@ -37,7 +37,7 @@ interface StoriesRowProps {
   stories: UserStory[];
   onStoryPress: (story: UserStory, index: number) => void;
   onCreatePress: () => void;
-  /** Section title (default: "Canlı Deneyimler") */
+  /** Section title (optional) */
   sectionTitle?: string;
   /** Hide section title */
   hideTitle?: boolean;
@@ -48,8 +48,8 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
     stories,
     onStoryPress,
     onCreatePress,
-    sectionTitle = 'Canlı Deneyimler',
-    hideTitle = false,
+    sectionTitle,
+    hideTitle = true,
   }) => {
     return (
       <View style={styles.storiesSection}>

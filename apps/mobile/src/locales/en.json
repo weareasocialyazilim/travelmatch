@@ -182,6 +182,56 @@
     "offlineMessage": "Internet connection required to view profile."
   },
 
+  "trust": {
+    "factors": {
+      "identity": "Identity",
+      "social": "Social",
+      "experience": "Experience",
+      "response": "Response",
+      "score": "Score"
+    },
+    "garden": {
+      "title": "Trust Garden",
+      "factorsTitle": "Trust Factors",
+      "howToImprove": "How to improve:",
+      "levelsTitle": "Trust Levels",
+      "points": "points",
+      "levels": {
+        "sprout": "Sprout",
+        "developing": "Developing",
+        "growing": "Growing",
+        "blooming": "Blooming"
+      },
+      "identityVerification": "Identity Verification",
+      "identityDesc": "KYC verification status",
+      "socialConnections": "Social Connections",
+      "socialDesc": "Linked accounts",
+      "completedExperiences": "Completed Experiences",
+      "experienceDesc": "Completed moments count",
+      "responseRate": "Response Rate",
+      "responseDesc": "Quick responses to requests",
+      "receivedRatings": "Received Ratings",
+      "ratingsDesc": "Average rating score",
+      "tips": {
+        "verifyId": "Verify your identity",
+        "addAddress": "Add your address",
+        "completeKyc": "Complete KYC",
+        "connectInstagram": "Connect Instagram",
+        "connectTwitter": "Connect X (Twitter)",
+        "addWebsite": "Add your website",
+        "completeMoments": "Complete more moments",
+        "getHighRatings": "Get higher ratings",
+        "respondQuickly": "Reply faster",
+        "respondIn2h": "Respond within 2 hours",
+        "acceptQuickly": "Accept requests quickly",
+        "keepCalendarUpdated": "Keep your calendar updated",
+        "offerUnique": "Offer unique experiences",
+        "clearCommunication": "Communicate clearly",
+        "exceedExpectations": "Exceed expectations"
+      }
+    }
+  },
+
   "payment": {
     "payment": "Payment",
     "addCard": "Add Card",

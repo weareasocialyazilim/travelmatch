@@ -22,7 +22,7 @@ import {
   Switch,
   ActivityIndicator,
 } from 'react-native';
-import { showAlert } from '@/stores/modalStore';
+import { showAlert, showLoginPrompt } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -33,6 +33,8 @@ import { supabase } from '@/config/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { logger } from '@/utils/logger';
+import { EmptyState } from '@/components';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -328,8 +330,9 @@ const PlatinumVitrinCard: React.FC<{
 
 export const VisibilitySettingsScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -345,6 +348,12 @@ export const VisibilitySettingsScreen: React.FC = () => {
     allowMessageRequests: true,
     showLocation: true,
   });
+
+  useEffect(() => {
+    if (isGuest || !user) {
+      showLoginPrompt({ action: 'default' });
+    }
+  }, [isGuest, user]);
 
   // Fetch current settings
   useEffect(() => {
@@ -504,6 +513,22 @@ export const VisibilitySettingsScreen: React.FC = () => {
     }
     saveSettings({ profileDiscoverability: value });
   };
+
+  if (isGuest || !user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <EmptyState
+          title={t('settings.loginRequiredTitle', 'Giriş gerekli')}
+          description={t(
+            'settings.loginRequiredMessage',
+            'Ayarları görmek için giriş yapmanız gerekir.',
+          )}
+          actionLabel={t('settings.loginNow', 'Giriş Yap')}
+          onAction={() => showLoginPrompt({ action: 'default' })}
+        />
+      </SafeAreaView>
+    );
+  }
 
   if (loading) {
     return (

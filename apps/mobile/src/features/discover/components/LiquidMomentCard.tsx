@@ -25,20 +25,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { formatCurrency } from '@/utils/currencyFormatter';
+import type { CurrencyCode } from '@/constants/currencies';
 import type { SubscriptionTier } from '@/features/moments/services/momentsService';
 
 const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
-
-// Currency symbols for display
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: '$',
-  EUR: '€',
-  TRY: '₺',
-  GBP: '£',
-  JPY: '¥',
-  CAD: 'C$',
-};
 
 // Subscription tier styling configuration
 const TIER_CONFIG: Record<
@@ -108,8 +100,8 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
   }) => {
     // Format price with currency symbol
     const formattedPrice = useMemo(() => {
-      const symbol = CURRENCY_SYMBOLS[currency] || currency;
-      return `${symbol}${price.toLocaleString()}`;
+      const currencyCode = (currency || 'TRY') as CurrencyCode;
+      return formatCurrency(price, currencyCode);
     }, [price, currency]);
 
     // Get tier styling

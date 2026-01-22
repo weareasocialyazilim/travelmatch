@@ -383,12 +383,11 @@ const styles = StyleSheet.create({
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
     backgroundColor: 'transparent',
+    opacity: 0,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.brand.primary,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.15,
-        shadowRadius: 15,
+        shadowOpacity: 0,
+        shadowRadius: 0,
       },
       android: {
         elevation: 0,

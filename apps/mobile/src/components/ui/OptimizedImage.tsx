@@ -133,6 +133,20 @@ export const OptimizedImage = memo<OptimizedImageProps>(
       setIsLoading(false);
       setHasError(true);
       onError?.(error);
+      const errorMessage =
+        error?.error ||
+        error?.message ||
+        (typeof error === 'string' ? error : '');
+      const isHostnameError =
+        typeof errorMessage === 'string' &&
+        errorMessage.toLowerCase().includes('hostname') &&
+        errorMessage.toLowerCase().includes('could not be found');
+
+      if (isHostnameError) {
+        logger.warn('OptimizedImage hostname not found', error);
+        return;
+      }
+
       logger.error('OptimizedImage load error', error);
     };
 

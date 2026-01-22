@@ -41,17 +41,28 @@ export const momentsService = {
     try {
       let query = supabase.from('moments').select(
         `
-          *,
-          users:user_id (
-            id,
-            full_name,
-            avatar_url,
-            location,
-            kyc_status,
-            rating,
-            created_at
-          )
-        `,
+        id,
+        user_id,
+        title,
+        description,
+        location,
+        status,
+        price,
+        currency,
+        category,
+        images,
+        tags,
+        created_at,
+        updated_at,
+        users:user_id (
+          id,
+          full_name,
+          avatar_url,
+          location,
+          kyc_status,
+          rating
+        )
+      `,
         { count: 'exact' },
       );
 
@@ -121,16 +132,26 @@ export const momentsService = {
         .from('moments')
         .select(
           `
-          *,
+          id,
+          user_id,
+          title,
+          description,
+          location,
+          status,
+          price,
+          currency,
+          category,
+          images,
+          tags,
+          created_at,
+          updated_at,
           users:user_id (
             id,
             full_name,
             avatar_url,
             location,
             kyc_status,
-            rating,
-            review_count,
-            created_at
+            rating
           ),
           moment_requests:requests!moment_id (
             id,
@@ -478,16 +499,7 @@ export const momentsService = {
       const limit = options?.limit || 20;
 
       let query = supabase.from('moments').select(`
-          *,
-          users:user_id (
-            id,
-            full_name,
-            avatar_url,
-            location,
-            kyc_status,
-            rating,
-            created_at
-          )
+          *
         `);
 
       if (options?.category) {

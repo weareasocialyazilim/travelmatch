@@ -37,7 +37,7 @@ import { logger } from '../../../utils/logger';
 // ============================================
 interface WelcomeScreenProps {
   navigation: {
-    navigate: (screen: string) => void;
+    navigate: (screen: string, params?: Record<string, unknown>) => void;
   };
 }
 
@@ -258,11 +258,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   }, [socialAuth]);
 
   const handleCreateAccount = useCallback(() => {
-    navigation.navigate('UnifiedAuth');
+    navigation.navigate('UnifiedAuth', { initialMode: 'register' });
   }, [navigation]);
 
   const handleLogin = useCallback(() => {
-    navigation.navigate('UnifiedAuth');
+    navigation.navigate('UnifiedAuth', { initialMode: 'login' });
   }, [navigation]);
 
   return (
@@ -328,15 +328,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             </Text>
           </AnimatedButton>
 
-{/* Google login hidden until implementation is complete */}
-          {/* <AnimatedButton
+          {/* Google login enabled via Generic OAuth */}
+          <AnimatedButton
             variant="google"
             onPress={handleGoogleLogin}
             delay={700}
             accessibilityLabel="Google ile devam et"
             accessibilityHint="Google ile giriş yapın"
-            disabled={true}
-            showComingSoon={false}
           >
             <MaterialCommunityIcons
               name="google"
@@ -346,7 +344,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             <Text style={styles.socialButtonText}>
               {t('welcome.continueWithGoogle')}
             </Text>
-          </AnimatedButton> */}
+          </AnimatedButton>
 
           {/* Divider */}
           <View style={styles.divider}>

@@ -26,6 +26,8 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { COLORS } from '@/constants/colors';
 import { VALUES } from '@/constants/values';
+import { formatCurrency } from '@/utils/currencyFormatter';
+import type { CurrencyCode } from '@/constants/currencies';
 import type { Moment } from '@/hooks/useMoments';
 
 const { width, height } = Dimensions.get('window');
@@ -38,6 +40,8 @@ export interface ImmersiveMomentCardProps {
   onSharePress?: () => void;
   onUserPress?: () => void;
   onReportPress?: () => void;
+  priceDisplay?: string;
+  priceSecondary?: string;
 }
 
 // Format large numbers (e.g., 2400 -> 2.4k)
@@ -121,6 +125,8 @@ export const ImmersiveMomentCard = memo(
     onSharePress,
     onUserPress,
     onReportPress,
+    priceDisplay,
+    priceSecondary,
   }: ImmersiveMomentCardProps) => {
     // Get the first image or use a placeholder
     const imageUrl =
@@ -134,6 +140,9 @@ export const ImmersiveMomentCard = memo(
 
     // Get price
     const price = item.price || item.pricePerGuest || 0;
+    const currency = (item.currency || 'TRY') as CurrencyCode;
+    const fallbackPrice = formatCurrency(price, currency);
+    const primaryPrice = priceDisplay || fallbackPrice;
 
     // Determine Chat Lock tier based on price
     const chatLockTier = getChatLockTier(price);
@@ -200,7 +209,10 @@ export const ImmersiveMomentCard = memo(
             {/* Price Tag */}
             <View style={styles.priceTag}>
               <Text style={styles.priceLabel}>Requested Gift</Text>
-              <Text style={styles.priceValue}>{price} LVND</Text>
+              <Text style={styles.priceValue}>{primaryPrice}</Text>
+              {!!priceSecondary && (
+                <Text style={styles.priceSecondary}>{priceSecondary}</Text>
+              )}
             </View>
 
             {/* Chat Lock Badge */}
@@ -253,19 +265,33 @@ export const ImmersiveMomentCard = memo(
                 <BlurView intensity={30} style={styles.glassInner}>
                   <MaterialCommunityIcons
                     name="swap-horizontal-bold"
-                    size={24}
+                    size={20}
                     color="white"
                   />
-                  <Text style={styles.recommendText}>Subscriber Offer</Text>
+                  <Text
+                    style={styles.recommendText}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                  >
+                    Offer
+                  </Text>
                 </BlurView>
               ) : (
                 <View style={[styles.glassInner, styles.androidGlass]}>
                   <MaterialCommunityIcons
                     name="swap-horizontal-bold"
-                    size={24}
+                    size={20}
                     color="white"
                   />
-                  <Text style={styles.recommendText}>Subscriber Offer</Text>
+                  <Text
+                    style={styles.recommendText}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                  >
+                    Offer
+                  </Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -280,7 +306,7 @@ export const ImmersiveMomentCard = memo(
               activeOpacity={0.8}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel={`Gift this moment for $${price}`}
+              accessibilityLabel={`Gift this moment for ${primaryPrice}`}
               accessibilityHint="Opens gift payment flow"
             >
               <Text style={styles.giftText}>Gift This</Text>
@@ -384,6 +410,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
   },
+  priceSecondary: {
+    marginTop: 4,
+    color: COLORS.text.secondary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
 
   // Chat Lock Badge
   chatLockBadge: {
@@ -427,8 +459,8 @@ const styles = StyleSheet.create({
   },
   recommendButton: {
     flex: 1,
-    height: 56,
-    borderRadius: 28,
+    height: 50,
+    borderRadius: 25,
     overflow: 'hidden',
   },
   glassInner: {
@@ -437,7 +469,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
-    gap: 8,
+    gap: 6,
   },
   androidGlass: {
     backgroundColor: 'rgba(255,255,255,0.15)',
@@ -446,12 +478,12 @@ const styles = StyleSheet.create({
   recommendText: {
     color: 'white',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 15,
   },
   giftButton: {
-    flex: 1.5, // Wider
-    height: 56,
-    borderRadius: 28,
+    flex: 1,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: COLORS.brand.primary,
     flexDirection: 'row',
     alignItems: 'center',

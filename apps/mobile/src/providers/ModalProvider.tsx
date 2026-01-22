@@ -35,6 +35,7 @@ import {
 import { LoginPromptModal } from '@/components/LoginPromptModal';
 import { GlassModal } from '@/components/ui/GlassModal';
 import { SelectionBottomSheet } from '@/components/ui/GenericBottomSheet';
+import { navigate } from '@/services/navigationService';
 
 // ============================================================================
 // MODAL COMPONENTS
@@ -87,12 +88,12 @@ const LoginModal: React.FC = () => {
   };
 
   const handleLogin = () => {
-    // Navigate to login - navigation handled by LoginPromptModal
+    navigate('UnifiedAuth', { initialMode: 'login' });
     closeModal();
   };
 
   const handleRegister = () => {
-    // Navigate to register - navigation handled by LoginPromptModal
+    navigate('UnifiedAuth', { initialMode: 'register' });
     closeModal();
   };
 

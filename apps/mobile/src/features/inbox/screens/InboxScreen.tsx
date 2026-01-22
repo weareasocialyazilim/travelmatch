@@ -33,6 +33,9 @@ import { useNavigation } from '@react-navigation/native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { HapticManager } from '@/services/HapticManager';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import { EmptyState } from '@/components';
+import { showLoginPrompt } from '@/stores/modalStore';
 
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 
@@ -55,6 +58,7 @@ const InboxScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { user, isGuest } = useAuth();
 
   // Use the inbox hook for real data
   const {
@@ -153,42 +157,28 @@ const InboxScreen: React.FC = () => {
                 <Text style={styles.emptyButtonText}>{t('inbox.explore')}</Text>
               </LinearGradient>
             </TouchableOpacity>
-            {/* Smart suggestion: Popular moments */}
-            <View style={styles.suggestionSection}>
-              <Text style={styles.suggestionTitle}>
-                {t('inbox.suggestions.title')}
-              </Text>
-              <Text style={styles.suggestionSubtitle}>
-                {t('inbox.suggestions.subtitle')}
-              </Text>
-              <TouchableOpacity
-                style={styles.suggestionCard}
-                onPress={() =>
-                  navigation.navigate('MainTabs', { screen: 'Home' })
-                }
-                activeOpacity={0.9}
-              >
-                <MaterialCommunityIcons
-                  name="compass-outline"
-                  size={24}
-                  color={VIBE_ROOM_COLORS.neon.lime}
-                />
-                <Text style={styles.suggestionCardText}>
-                  {t('inbox.suggestions.cardText')}
-                </Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={20}
-                  color={VIBE_ROOM_COLORS.text.secondary}
-                />
-              </TouchableOpacity>
-            </View>
           </>
         )}
       </Animated.View>
     ),
     [activeTab, navigation],
   );
+
+  if (isGuest || !user) {
+    return (
+      <View style={styles.container}>
+        <EmptyState
+          title={t('inbox.loginRequiredTitle', 'Giriş gerekli')}
+          description={t(
+            'inbox.loginRequiredMessage',
+            'Mesajlara erişmek için giriş yapmanız gerekir.',
+          )}
+          actionLabel={t('inbox.loginNow', 'Giriş Yap')}
+          onAction={() => showLoginPrompt({ action: 'chat' })}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
