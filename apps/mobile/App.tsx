@@ -60,6 +60,7 @@ function App() {
     useState<AppInitState>('initializing');
   const [bootstrapProgress, setBootstrapProgress] =
     useState<BootstrapProgress | null>(null);
+  const hasInitializedRef = useRef(false);
 
   // Background/foreground state
   const [_isBackground, setIsBackground] = useState(false);
@@ -82,6 +83,10 @@ function App() {
   // Initialize app with new bootstrap service
   useEffect(() => {
     async function initializeApp() {
+      if (hasInitializedRef.current) {
+        return;
+      }
+      hasInitializedRef.current = true;
       try {
         // Set up progress callback for UI updates
         appBootstrap.onProgress((progress) => {
@@ -159,7 +164,9 @@ function App() {
     // Cleanup
     return () => {
       subscription.remove();
-      appBootstrap.cleanup();
+      if (hasInitializedRef.current) {
+        appBootstrap.cleanup();
+      }
     };
   }, []);
 

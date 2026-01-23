@@ -35,9 +35,6 @@ import {
   OnboardingScreen,
   CompleteProfileScreen,
   VerifyPhoneScreen,
-  PhoneAuthScreen,
-  EmailAuthScreen,
-  RegisterScreen,
   UnifiedAuthScreen,
   SetPasswordScreen,
   TwoFactorSetupScreen,
@@ -495,11 +492,6 @@ const AppNavigator = () => {
               component={WelcomeScreen}
               options={{ animation: 'fade' }}
             />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{ animation: 'fade' }}
-            />
             {/* UnifiedAuth - Master 2026 Liquid Auth Flow */}
             <Stack.Screen
               name="UnifiedAuth"
@@ -513,8 +505,6 @@ const AppNavigator = () => {
             <Stack.Screen name="LinkNotFound" component={LinkNotFoundScreen} />
             <Stack.Screen name="LinkExpired" component={LinkExpiredScreen} />
             <Stack.Screen name="LinkInvalid" component={LinkInvalidScreen} />
-            <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
-            <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
             <Stack.Screen
               name="ForgotPassword"
               component={ForgotPasswordScreen}

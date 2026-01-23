@@ -91,6 +91,45 @@ export const refreshSession = async (): Promise<Session | null> => {
   return data.session;
 };
 
+const extractGatewayError = async (
+  response?: Response,
+): Promise<AuthError | null> => {
+  if (!response) return null;
+
+  try {
+    const contentType = response.headers.get('Content-Type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await response
+        .clone()
+        .json()
+        .catch(() => null);
+      if (body?.error) {
+        return {
+          message: body.error,
+          name: 'AuthGatewayError',
+          status: response.status,
+        } as AuthError;
+      }
+    } else {
+      const text = await response
+        .clone()
+        .text()
+        .catch(() => '');
+      if (text) {
+        return {
+          message: text,
+          name: 'AuthGatewayError',
+          status: response.status,
+        } as AuthError;
+      }
+    }
+  } catch {
+    // Ignore parsing errors and fall back to generic error
+  }
+
+  return null;
+};
+
 // ============================================
 // Email/Password Authentication
 // ============================================
@@ -115,19 +154,37 @@ export const signUpWithEmail = async (
     // Use Auth Gateway (Edge Function)
     logger.info('[Auth] Attempting sign up via auth-proxy');
 
-    const { data: proxyData, error: proxyError } =
-      await supabase.functions.invoke('auth-proxy', {
-        body: {
-          email,
-          password,
-          type: 'signup',
-          options: { data: metadata },
-        },
-      });
+    const {
+      data: proxyData,
+      error: proxyError,
+      response,
+    } = await supabase.functions.invoke('auth-proxy', {
+      body: {
+        email,
+        password,
+        type: 'signup',
+        options: { data: metadata },
+      },
+    });
 
     if (proxyError) {
-      logger.error('[Auth] Gateway sign up error:', proxyError);
-      return { user: null, session: null, error: proxyError as AuthError };
+      const gatewayError = await extractGatewayError(response);
+      const errorToReturn = (gatewayError || proxyError) as AuthError;
+      const errorMessage = errorToReturn?.message?.toLowerCase?.() || '';
+
+      if (errorMessage.includes('email not confirmed')) {
+        logger.warn('[Auth] Gateway sign up requires email confirmation');
+      } else if (errorMessage.includes('password is known to be weak')) {
+        logger.warn('[Auth] Gateway sign up rejected weak password');
+      } else {
+        logger.error('[Auth] Gateway sign up error:', errorToReturn);
+      }
+
+      return {
+        user: null,
+        session: null,
+        error: errorToReturn,
+      };
     }
 
     if (!proxyData?.user && !proxyData?.session) {
@@ -198,14 +255,30 @@ export const signInWithEmail = async (
     // Use Auth Gateway (Edge Function) for rate limiting and security
     logger.info('[Auth] Attempting sign in via auth-proxy');
 
-    const { data: proxyData, error: proxyError } =
-      await supabase.functions.invoke('auth-proxy', {
-        body: { email, password, type: 'signin' },
-      });
+    const {
+      data: proxyData,
+      error: proxyError,
+      response,
+    } = await supabase.functions.invoke('auth-proxy', {
+      body: { email, password, type: 'signin' },
+    });
 
     if (proxyError) {
-      logger.error('[Auth] Gateway error:', proxyError);
-      return { user: null, session: null, error: proxyError as AuthError };
+      const gatewayError = await extractGatewayError(response);
+      const errorToReturn = (gatewayError || proxyError) as AuthError;
+      const errorMessage = errorToReturn?.message?.toLowerCase?.() || '';
+
+      if (errorMessage.includes('email not confirmed')) {
+        logger.warn('[Auth] Gateway sign in requires email confirmation');
+      } else {
+        logger.error('[Auth] Gateway error:', errorToReturn);
+      }
+
+      return {
+        user: null,
+        session: null,
+        error: errorToReturn,
+      };
     }
 
     if (!proxyData?.session) {

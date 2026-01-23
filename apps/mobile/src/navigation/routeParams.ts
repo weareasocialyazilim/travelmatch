@@ -30,9 +30,6 @@ export type RootStackParamList = {
   Onboarding: undefined;
   // UnifiedAuth - Master 2026 Liquid Auth Flow (replaces Login)
   UnifiedAuth: { initialMode?: 'login' | 'register' } | undefined;
-  Register: undefined;
-  PhoneAuth: undefined;
-  EmailAuth: undefined;
   ForgotPassword: undefined;
   VerifyCode: { phone?: string; email?: string } | undefined;
   SuccessConfirmation: undefined;

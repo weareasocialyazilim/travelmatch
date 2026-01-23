@@ -167,8 +167,7 @@ export const requiredPhoneValidation = z
   .regex(/^\+?[1-9]\d{9,14}$/, 'forms.validation.phone.invalid');
 
 export const completeProfileSchema = z.object({
-  fullName: nameValidation,
-  username: usernameValidation,
+  fullName: nameValidation.optional(),
   bio: bioValidation,
   avatar: z.string().optional().or(z.literal('')),
   interests: z
@@ -177,6 +176,8 @@ export const completeProfileSchema = z.object({
     .max(5, 'forms.validation.interests.max'),
   // Phone number for SMS verification (REQUIRED)
   phone: requiredPhoneValidation,
+  gender: genderValidation,
+  dateOfBirth: dateOfBirthValidation,
 });
 
 // ============================================================================

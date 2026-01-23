@@ -181,7 +181,7 @@ export const ImmersiveMomentCard = memo(
               style={styles.avatar}
             />
             <Text style={styles.username}>@{item.hostName || 'unknown'}</Text>
-            {item.hostRating && item.hostRating > 4.5 && (
+            {typeof item.hostRating === 'number' && item.hostRating > 4.5 && (
               <View style={styles.verifiedBadge}>
                 <MaterialCommunityIcons
                   name="check-decagram"

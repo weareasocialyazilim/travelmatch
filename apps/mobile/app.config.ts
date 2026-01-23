@@ -12,8 +12,10 @@ const ENV_SCHEMA = z.object({
   SENTRY_PROJECT: z.string().min(1),
 });
 
-ENV_SCHEMA.parse({
-  APP_ENV: process.env.APP_ENV,
+const APP_ENV = process.env.APP_ENV ?? 'development';
+
+const envValidation = ENV_SCHEMA.safeParse({
+  APP_ENV,
   EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
   EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
   EXPO_PUBLIC_POSTHOG_API_KEY: process.env.EXPO_PUBLIC_POSTHOG_API_KEY,
@@ -23,7 +25,18 @@ ENV_SCHEMA.parse({
   SENTRY_PROJECT: process.env.SENTRY_PROJECT,
 });
 
-const IS_PRODUCTION = process.env.APP_ENV === 'production';
+if (!envValidation.success) {
+  const issueSummary = envValidation.error.issues
+    .map((issue) => {
+      const pathLabel = issue.path.length > 0 ? issue.path.join('.') : 'root';
+      return `${pathLabel}: ${issue.message}`;
+    })
+    .join('; ');
+
+  throw new Error(`Invalid environment variables: ${issueSummary}`);
+}
+
+const IS_PRODUCTION = APP_ENV === 'production';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,

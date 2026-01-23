@@ -556,7 +556,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       return { success: true };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed';
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? String((error as { message?: unknown }).message)
+            : 'Login failed';
       return { success: false, error: message };
     }
   };
@@ -580,6 +585,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (error) throw error;
       if (!authUser) throw new Error('Registration failed');
+
+      if (!session) {
+        return {
+          success: false,
+          error:
+            'E-posta doğrulaması gerekiyor. Lütfen e-postanı kontrol et ve doğrula.',
+        };
+      }
 
       if (session) {
         const newUser = createUser({
@@ -620,7 +633,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return { success: true };
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Registration failed';
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? String((error as { message?: unknown }).message)
+            : 'Registration failed';
       return { success: false, error: message };
     }
   };
@@ -900,4 +917,8 @@ export const useAuth = (): AuthContextType => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+export const useAuthOptional = (): AuthContextType | null => {
+  return useContext(AuthContext) ?? null;
 };

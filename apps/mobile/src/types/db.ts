@@ -251,6 +251,9 @@ export interface UpdateProfilePayload {
   full_name?: string;
   bio?: string;
   location?: unknown;
+  phone?: string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  date_of_birth?: string;
   languages?: string[];
   interests?: string[];
   instagram?: string;

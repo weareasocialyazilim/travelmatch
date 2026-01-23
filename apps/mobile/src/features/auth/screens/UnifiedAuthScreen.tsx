@@ -51,6 +51,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import { resendVerificationEmail } from '@/features/auth/services/authService';
 
 // ============================================
 // TYPES
@@ -73,6 +74,28 @@ const detectIdentifierType = (value: string): IdentifierType | null => {
   if (isEmail(value)) return 'email';
   if (isPhone(value)) return 'phone';
   return null;
+};
+
+const mapAuthErrorMessage = (message?: string) => {
+  if (!message) return 'İşlem başarısız.';
+
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('password is known to be weak') ||
+    normalized.includes('password is too weak')
+  ) {
+    return 'Şifre çok zayıf. Daha güçlü bir şifre seç.';
+  }
+
+  if (
+    normalized.includes('email not confirmed') ||
+    normalized.includes('email_not_confirmed')
+  ) {
+    return 'E-posta doğrulanmadı. Lütfen e-postanı kontrol et.';
+  }
+
+  return message;
 };
 
 // ============================================
@@ -240,6 +263,11 @@ export const UnifiedAuthScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // For secureTextEntry toggle
+  const [authError, setAuthError] = useState<string | null>(null);
+  const confirmPasswordError =
+    password && confirmPassword && password !== confirmPassword
+      ? 'Şifreler eşleşmiyor'
+      : undefined;
 
   // Refs
   const passwordRef = useRef<TextInput | null>(null);
@@ -284,6 +312,7 @@ export const UnifiedAuthScreen: React.FC = () => {
 
   // Handle identifier submission
   const handleIdentifierSubmit = async () => {
+    setAuthError(null);
     const type = detectIdentifierType(identifier);
 
     if (!type) {
@@ -342,6 +371,7 @@ export const UnifiedAuthScreen: React.FC = () => {
     }
 
     setIsLoading(true);
+    setAuthError(null);
     Keyboard.dismiss();
 
     try {
@@ -355,11 +385,36 @@ export const UnifiedAuthScreen: React.FC = () => {
         });
       } else {
         HapticManager.error();
-        showToast(result.error || 'Giriş başarısız', 'error');
+        const errorMessage = result.error || 'Giriş başarısız';
+        const isEmailNotConfirmed =
+          errorMessage.toLowerCase().includes('email not confirmed') ||
+          errorMessage.toLowerCase().includes('email_not_confirmed') ||
+          errorMessage.toLowerCase().includes('email doğrulanmadı') ||
+          errorMessage.toLowerCase().includes('doğrulanmamış');
+
+        if (isEmailNotConfirmed && isEmail(identifier)) {
+          const { error: resendError } =
+            await resendVerificationEmail(identifier);
+          if (resendError) {
+            showToast('Doğrulama e-postası gönderilemedi', 'error');
+            setAuthError('E-posta doğrulanamadı. Tekrar deneyin.');
+          } else {
+            showToast(
+              'E-posta doğrulanmamış. Doğrulama e-postası yeniden gönderildi.',
+              'warning',
+            );
+            setAuthError('E-posta doğrulanmadı. Lütfen e-postanı kontrol et.');
+          }
+          return;
+        }
+
+        setAuthError(errorMessage);
+        showToast(errorMessage, 'error');
       }
     } catch (error) {
       HapticManager.error();
       logger.error('[UnifiedAuth] Login error:', error);
+      setAuthError('Giriş yapılırken bir hata oluştu');
       showToast('Giriş yapılırken bir hata oluştu', 'error');
     } finally {
       setIsLoading(false);
@@ -387,6 +442,7 @@ export const UnifiedAuthScreen: React.FC = () => {
     }
 
     setIsLoading(true);
+    setAuthError(null);
     Keyboard.dismiss();
 
     try {
@@ -401,15 +457,25 @@ export const UnifiedAuthScreen: React.FC = () => {
         showToast('Hesap oluşturuldu!', 'success');
         navigation.reset({
           index: 0,
-          routes: [{ name: 'CompleteProfile' as never }],
+          routes: [
+            {
+              name: 'CompleteProfile' as never,
+              params: { fullName: name.trim(), email: identifier },
+            },
+          ],
         });
       } else {
         HapticManager.error();
-        showToast(result.error || 'Kayıt başarısız', 'error');
+        const errorMessage = mapAuthErrorMessage(
+          result.error || 'Kayıt başarısız',
+        );
+        setAuthError(errorMessage);
+        showToast(errorMessage, 'error');
       }
     } catch (error) {
       HapticManager.error();
       logger.error('[UnifiedAuth] Register error:', error);
+      setAuthError('Kayıt olurken bir hata oluştu');
       showToast('Kayıt olurken bir hata oluştu', 'error');
     } finally {
       setIsLoading(false);
@@ -427,23 +493,36 @@ export const UnifiedAuthScreen: React.FC = () => {
     HapticManager.buttonPress();
     if (step === 'identifier') {
       navigation.goBack();
+      return;
+    }
+
+    if (step === 'register' && initialMode === 'register') {
+      navigation.goBack();
+      return;
+    }
+
+    if (step === 'register' && initialMode !== 'register') {
+      setStep('password');
     } else {
       setStep('identifier');
-      setPassword('');
-      setConfirmPassword('');
-      setName('');
     }
+
+    setPassword('');
+    setConfirmPassword('');
+    setName('');
   };
 
   // Switch to register mode
   const switchToRegister = () => {
     HapticManager.buttonPress();
+    setAuthError(null);
     setStep('register');
   };
 
   // Switch to login mode
   const switchToLogin = () => {
     HapticManager.buttonPress();
+    setAuthError(null);
     setStep('password');
   };
 
@@ -644,6 +723,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                 >
                   Giriş Yap
                 </Button>
+                {authError && <Text style={styles.errorText}>{authError}</Text>}
 
                 <TouchableOpacity
                   style={styles.switchMode}
@@ -736,6 +816,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   rightIconAccessibilityLabel={
                     showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'
                   }
+                  error={confirmPasswordError}
                 />
 
                 <View style={styles.policySection}>
@@ -754,12 +835,18 @@ export const UnifiedAuthScreen: React.FC = () => {
                   variant="primary"
                   onPress={handleRegister}
                   size="lg"
-                  disabled={!name || !password || !confirmPassword}
+                  disabled={
+                    !name ||
+                    !password ||
+                    !confirmPassword ||
+                    !!confirmPasswordError
+                  }
                   fullWidth
                   style={styles.submitButton}
                 >
                   Hesabımı Oluştur
                 </Button>
+                {authError && <Text style={styles.errorText}>{authError}</Text>}
 
                 <TouchableOpacity
                   style={styles.switchMode}

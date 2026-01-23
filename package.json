@@ -60,6 +60,8 @@
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "android": "pnpm --filter @lovendo/mobile android",
     "ios": "pnpm --filter @lovendo/mobile ios",
+    "android:prod": "pnpm --filter @lovendo/mobile android:prod",
+    "ios:prod": "pnpm --filter @lovendo/mobile ios:prod",
     "ios:simulator": "pnpm --filter @lovendo/mobile ios",
     "ios:device": "pnpm --filter @lovendo/mobile ios -- --device",
     "ios:pods": "cd apps/mobile/ios && pod install",

@@ -1,6 +1,6 @@
 /**
  * Validation Utilities for Edge Functions
- * 
+ *
  * Input validation, schema validation, and sanitization.
  */
 
@@ -30,7 +30,10 @@ export const UsernameSchema = z
   .string()
   .min(3, 'Username must be at least 3 characters')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores');
+  .regex(
+    /^[a-zA-Z0-9_]+$/,
+    'Username can only contain letters, numbers, and underscores',
+  );
 
 export const DateTimeSchema = z.string().datetime();
 
@@ -127,11 +130,19 @@ export const RespondToRequestSchema = z.object({
 export const UpdateProfileSchema = z.object({
   fullName: z.string().min(2).max(100).optional(),
   bio: z.string().max(500).optional(),
+  phone: z.string().min(8).max(20).optional(),
+  gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).optional(),
+  dateOfBirth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
+    .optional(),
   age: z.number().int().min(18).max(120).optional(),
   location: z.string().max(100).optional(),
   interests: z.array(z.string()).max(20).optional(),
   languages: z.array(z.string()).max(10).optional(),
-  verificationLevel: z.enum(['none', 'email', 'phone', 'id', 'full']).optional(),
+  verificationLevel: z
+    .enum(['none', 'email', 'phone', 'id', 'full'])
+    .optional(),
 });
 
 // =============================================================================
@@ -155,7 +166,7 @@ export const CreateEscrowSchema = z.object({
 // VALIDATION HELPERS
 // =============================================================================
 
-export type ValidationResult<T> = 
+export type ValidationResult<T> =
   | { success: true; data: T }
   | { success: false; errors: z.ZodError['errors'] };
 
@@ -164,24 +175,21 @@ export type ValidationResult<T> =
  */
 export function validate<T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): ValidationResult<T> {
   const result = schema.safeParse(data);
-  
+
   if (result.success) {
     return { success: true, data: result.data };
   }
-  
+
   return { success: false, errors: result.error.errors };
 }
 
 /**
  * Validate and throw on error
  */
-export function validateOrThrow<T>(
-  schema: z.ZodSchema<T>,
-  data: unknown
-): T {
+export function validateOrThrow<T>(schema: z.ZodSchema<T>, data: unknown): T {
   return schema.parse(data);
 }
 
@@ -189,10 +197,10 @@ export function validateOrThrow<T>(
  * Format validation errors for API response
  */
 export function formatValidationErrors(
-  errors: z.ZodError['errors']
+  errors: z.ZodError['errors'],
 ): Record<string, string[]> {
   const formatted: Record<string, string[]> = {};
-  
+
   for (const error of errors) {
     const path = error.path.join('.') || '_root';
     if (!formatted[path]) {
@@ -200,7 +208,7 @@ export function formatValidationErrors(
     }
     formatted[path].push(error.message);
   }
-  
+
   return formatted;
 }
 

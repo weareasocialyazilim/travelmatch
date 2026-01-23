@@ -9,6 +9,8 @@
     "start": "infisical run --env=dev -- pnpm exec expo start --dev-client",
     "android": "infisical run --env=dev -- pnpm exec expo run:android",
     "ios": "infisical run --env=dev -- pnpm exec expo run:ios",
+    "android:prod": "infisical run --env=prod -- pnpm exec expo run:android",
+    "ios:prod": "infisical run --env=prod -- pnpm exec expo run:ios",
     "web": "pnpm exec expo start --web",
     "dev:infisical": "infisical run --env=dev -- pnpm exec expo start",
     "ios:infisical": "infisical run --env=dev -- pnpm exec expo run:ios",

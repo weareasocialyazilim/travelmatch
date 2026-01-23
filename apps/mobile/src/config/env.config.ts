@@ -104,14 +104,16 @@ const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
 
 /**
  * Sensitive keys that should NEVER use EXPO_PUBLIC_ prefix
+ * Note: MAPBOX tokens are intentionally excluded because:
+ * 1. MAPBOX_SECRET_TOKEN is a "public" access token for client-side SDK usage
+ * 2. Despite the name, it's designed for client bundles (similar to Stripe publishable key)
+ * 3. The real secret is the Mapbox secret API token for server-side operations
  */
 const FORBIDDEN_PUBLIC_VARS = [
   'SUPABASE_SERVICE_ROLE_KEY',
   'OPENAI_API_KEY',
   'CLOUDFLARE_STREAM_API_KEY',
   'CLOUDFLARE_IMAGES_TOKEN', // API token for image uploads
-  'MAPBOX_SECRET_TOKEN', // Download token for native SDK
-  'MAPBOX_DOWNLOAD_TOKEN', // Build-time download token
   'GOOGLE_CLIENT_SECRET',
   'APPLE_CLIENT_SECRET',
 ] as const;

@@ -12,7 +12,7 @@ import { AppState, type AppStateStatus } from 'react-native';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
-import { useAuth } from './AuthContext';
+import { useAuthOptional } from './AuthContext';
 import {
   realtimeChannelManager,
   ConnectionHealth,
@@ -133,7 +133,10 @@ const RealtimeContext = createContext<RealtimeContextType | undefined>(
 export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, isAuthenticated } = useAuth();
+  const auth = useAuthOptional();
+  const user = auth?.user ?? null;
+  const isAuthenticated = auth?.isAuthenticated ?? false;
+  const hasAuthProvider = Boolean(auth);
 
   // State
   const [connectionState, setConnectionState] =
@@ -150,6 +153,12 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
   // Derived state
   const isConnected = connectionState === 'connected';
+
+  useEffect(() => {
+    if (!hasAuthProvider) {
+      logger.warn('RealtimeContext', 'AuthProvider missing; realtime disabled');
+    }
+  }, [hasAuthProvider]);
 
   /**
    * Get current connection health from channel manager

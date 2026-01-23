@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -32,6 +32,10 @@ export const RegisterScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { register } = useAuth();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    navigation.replace('UnifiedAuth', { initialMode: 'register' });
+  }, [navigation]);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -54,7 +54,6 @@ export type PrivacySettings = z.infer<typeof privacySettingsSchema>;
  * Update profile schema (extended with settings)
  */
 export const updateProfileSchema = z.object({
-  username: z.string().min(3).max(30).optional(),
   full_name: z
     .string()
     .min(2, 'Name must be at least 2 characters')
@@ -65,7 +64,11 @@ export const updateProfileSchema = z.object({
   avatar_url: z.string().url().optional(), // Legacy field
   cover_image: z.string().url().optional().or(z.literal('')),
   phone: phoneSchema.optional(),
-  date_of_birth: z.string().datetime().optional(),
+  gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).optional(),
+  date_of_birth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
+    .optional(),
   languages: z.array(z.string()).optional(),
   interests: z
     .array(z.string())
@@ -89,7 +92,6 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
  */
 export const userFollowStatusSchema = z.object({
   id: z.string().uuid(),
-  username: z.string(),
   full_name: z.string().nullable(),
   avatar: z.string().nullable(),
   bio: z.string().nullable(),
