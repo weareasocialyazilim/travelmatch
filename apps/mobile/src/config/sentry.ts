@@ -45,7 +45,7 @@ const isSentryEnabled = () => Boolean(SENTRY_DSN) && !__DEV__;
 
 const hasClient = () => {
   try {
-    return Boolean(Sentry.getCurrentHub().getClient());
+    return Boolean(Sentry.getClient());
   } catch {
     return false;
   }
@@ -229,16 +229,17 @@ export function startPerformanceTransaction(
     return { finish: () => {} };
   }
 
-  const transaction = Sentry.startTransaction({
-    name: _name,
-    op: _operation,
-  });
-
-  return {
-    finish: () => {
-      transaction.finish();
+  return Sentry.startSpan(
+    {
+      name: _name,
+      op: _operation,
     },
-  };
+    (span) => ({
+      finish: () => {
+        span?.end();
+      },
+    }),
+  );
 }
 
 /**
