@@ -20,7 +20,7 @@ jobs:
   accessibility-check:
     name: Accessibility Check
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
     steps:
       - uses: actions/checkout@v4
@@ -39,10 +39,10 @@ jobs:
 
       - name: Build web app
         run: |
-          cd apps/web && pnpm run build || echo "Web build failed, skipping"
+          cd apps/web && pnpm run build
         env:
           NODE_ENV: production
-        continue-on-error: true
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
       - name: Install pa11y
         run: npm install -g pa11y pa11y-ci
@@ -58,7 +58,7 @@ jobs:
             cd apps/web
             pnpm run preview &
             sleep 10
-            pa11y http://localhost:3000 --reporter cli --threshold 10 || true
+            pa11y http://localhost:3000 --reporter cli --threshold 10
             kill %1 || true
           else
             echo "⚠️ No web build found, skipping live accessibility tests"

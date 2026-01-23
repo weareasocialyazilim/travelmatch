@@ -8,17 +8,14 @@ export async function GET(request: NextRequest) {
     // P0 FIX: Add authentication check - Finance API was publicly accessible
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     // Check permission for finance viewing
     if (!hasPermission(session, 'transactions', 'view')) {
       return NextResponse.json(
         { error: 'Bu işlem için yetkiniz yok' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -26,16 +23,16 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const period = searchParams.get('period') || '30d';
     const type = searchParams.get('type');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 200);
+    const cursor = searchParams.get('cursor');
 
-    // Build query for transactions
+    // Build query for transactions (view-backed, cursor pagination)
     let query = supabase
-      .from('transactions')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false });
-
-    if (type) {
-      query = query.eq('type', type);
-    }
+      .from('view_admin_finance_transactions')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(limit);
 
     // Apply date filter based on period
     const now = new Date();
@@ -57,40 +54,55 @@ export async function GET(request: NextRequest) {
 
     query = query.gte('created_at', startDate.toISOString());
 
-    const { data: transactions, error, count } = await query.limit(100);
+    if (type) {
+      query = query.eq('type', type);
+    }
+
+    if (cursor) {
+      const [cursorDate, cursorId] = cursor.split('|');
+      if (cursorDate && cursorId) {
+        query = query.or(
+          `created_at.lt.${cursorDate},and(created_at.eq.${cursorDate},id.lt.${cursorId})`,
+        );
+      } else if (cursorDate) {
+        query = query.lt('created_at', cursorDate);
+      }
+    }
+
+    const { data: transactions, error } = await query;
 
     if (error) throw error;
 
-    // Calculate summary stats
-    type Transaction = { type?: string; amount?: number };
+    const { data: summaryData, error: summaryError } = await supabase
+      .rpc('admin_finance_summary', {
+        p_start: startDate.toISOString(),
+        p_type: type ?? null,
+      })
+      .single();
+
+    if (summaryError) {
+      throw summaryError;
+    }
+
     const summary = {
-      totalRevenue:
-        transactions
-          ?.filter(
-            (t: Transaction) => t.type === 'subscription' || t.type === 'boost',
-          )
-          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
-        0,
-      totalRefunds:
-        transactions
-          ?.filter((t: Transaction) => t.type === 'refund')
-          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
-        0,
-      subscriptionRevenue:
-        transactions
-          ?.filter((t: Transaction) => t.type === 'subscription')
-          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
-        0,
-      boostRevenue:
-        transactions
-          ?.filter((t: Transaction) => t.type === 'boost')
-          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
-        0,
-      transactionCount: count || 0,
+      totalRevenue: summaryData?.total_revenue ?? 0,
+      totalRefunds: summaryData?.total_refunds ?? 0,
+      subscriptionRevenue: summaryData?.subscription_revenue ?? 0,
+      boostRevenue: summaryData?.boost_revenue ?? 0,
+      transactionCount: summaryData?.transaction_count ?? 0,
     };
 
+    const nextCursor =
+      transactions && transactions.length === limit
+        ? `${transactions[transactions.length - 1].created_at}|${
+            transactions[transactions.length - 1].id
+          }`
+        : null;
+
     // Log the finance data access for audit trail
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const clientIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
     await createAuditLog(
       session.admin.id,
@@ -98,15 +110,17 @@ export async function GET(request: NextRequest) {
       'finance',
       'summary',
       null,
-      { period, type, transactionCount: count },
+      { period, type, transactionCount: summary.transactionCount },
       clientIp || undefined,
-      userAgent || undefined
+      userAgent || undefined,
     );
 
     return NextResponse.json({
       transactions,
       summary,
-      total: count,
+      total: summary.transactionCount,
+      limit,
+      nextCursor,
     });
   } catch (error) {
     logger.error('Finance API error:', error);

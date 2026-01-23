@@ -35,6 +35,7 @@ import { DOCUMENT_OPTIONS } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
+import { useKycAuthGuard } from './useKycAuthGuard';
 import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
@@ -155,6 +156,7 @@ const KYCReviewScreen: React.FC = () => {
   const route = useRoute<RouteProp<RouteParams, 'KYCReview'>>();
   const { data } = route.params;
   const { showToast } = useToast();
+  useKycAuthGuard();
 
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);

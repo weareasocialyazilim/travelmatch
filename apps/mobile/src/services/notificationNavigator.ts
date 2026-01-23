@@ -207,9 +207,9 @@ const NOTIFICATION_ROUTES: Record<
   proof_approved: () => ({
     screen: 'Success',
     params: {
-      type: 'proof_verified' as const,
-      title: 'Kanıt Onaylandı!',
-      subtitle: 'Ödeme hesabınıza aktarıldı.',
+      type: 'proof_approved' as const,
+      title: 'Kanıt Onaylandı',
+      subtitle: 'Ödeme hesabına geçti.',
     },
     success: true,
   }),

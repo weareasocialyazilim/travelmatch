@@ -1,15 +1,13 @@
 /**
- * Sentry Configuration - TEMPORARILY DISABLED (STUB)
+ * Sentry Configuration
  *
- * REASON: Sentry v7 is incompatible with React 19.
- * Sentry's monkey-patching of React.Component.prototype fails because
- * React 19 changed internal structures.
- *
- * This file provides no-op stub functions to maintain API compatibility
- * while Sentry is disabled. Re-enable when Sentry v8 supports React 19.
- *
- * TODO: Monitor https://github.com/getsentry/sentry-javascript/issues for React 19 support
+ * Minimal production crash reporting wrapper around @sentry/react-native.
+ * - Uses bootOnce initialization when DSN is present
+ * - Guards all calls when Sentry is disabled
  */
+
+import * as Sentry from '@sentry/react-native';
+import { logger } from '@/utils/logger';
 
 // ============================================
 // STUB TYPES - Match original API signatures
@@ -38,19 +36,48 @@ interface StubSpan {
 }
 
 // ============================================
-// NO-OP STUB FUNCTIONS
+// HELPERS
 // ============================================
 
+const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN || '';
+
+const isSentryEnabled = () => Boolean(SENTRY_DSN) && !__DEV__;
+
+const hasClient = () => {
+  try {
+    return Boolean(Sentry.getCurrentHub().getClient());
+  } catch {
+    return false;
+  }
+};
+
 /**
- * Initialize Sentry - NO-OP STUB
+ * Initialize Sentry (idempotent)
  */
 export function initSentry(): void {
-  // Sentry disabled - React 19 incompatibility
-  console.log('[Sentry] Disabled - React 19 incompatibility');
+  if (!isSentryEnabled()) {
+    return;
+  }
+
+  if (hasClient()) {
+    return;
+  }
+
+  try {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      enabled: true,
+      sendDefaultPii: true,
+      enableLogs: true,
+    });
+    logger.info('Sentry initialized');
+  } catch (error) {
+    logger.warn('Sentry init failed', error);
+  }
 }
 
 /**
- * Set user context - NO-OP STUB
+ * Set user context
  */
 export function setSentryUser(_user: {
   id: string;
@@ -58,18 +85,28 @@ export function setSentryUser(_user: {
   kycStatus?: string;
   accountType?: string;
 }): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+
+  Sentry.setUser({
+    id: _user.id,
+    username: _user.username,
+    segment: _user.accountType,
+    data: {
+      kycStatus: _user.kycStatus,
+    },
+  });
 }
 
 /**
- * Clear user context - NO-OP STUB
+ * Clear user context
  */
 export function clearSentryUser(): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.setUser(null);
 }
 
 /**
- * Add breadcrumb - NO-OP STUB
+ * Add breadcrumb
  */
 export function addBreadcrumb(
   _message: string,
@@ -77,11 +114,17 @@ export function addBreadcrumb(
   _level: SeverityLevel = 'info',
   _data?: Record<string, unknown>,
 ): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.addBreadcrumb({
+    message: _message,
+    category: _category,
+    level: _level,
+    data: _data,
+  });
 }
 
 /**
- * Log payment error - NO-OP STUB
+ * Log payment error
  */
 export function logPaymentError(
   _errorType: PaymentErrorType,
@@ -95,11 +138,16 @@ export function logPaymentError(
     giftId?: string;
   },
 ): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.withScope((scope) => {
+    scope.setTag('payment_error_type', _errorType);
+    scope.setContext('payment', _details);
+    Sentry.captureMessage('Payment error', 'error');
+  });
 }
 
 /**
- * Log successful payment - NO-OP STUB
+ * Log successful payment
  */
 export function logPaymentSuccess(_details: {
   transactionId: string;
@@ -108,101 +156,135 @@ export function logPaymentSuccess(_details: {
   momentId?: string;
   giftId?: string;
 }): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.withScope((scope) => {
+    scope.setContext('payment', _details);
+    Sentry.captureMessage('Payment success', 'info');
+  });
 }
 
 /**
- * Capture exception - NO-OP STUB
+ * Capture exception
  */
 export function captureException(
   _error: Error,
   _context?: Record<string, unknown>,
 ): void {
-  // No-op - but log to console in dev
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    console.error('[Sentry Stub] Exception:', _error);
+  if (isSentryEnabled() && hasClient()) {
+    Sentry.withScope((scope) => {
+      if (_context) {
+        scope.setContext('context', _context);
+      }
+      Sentry.captureException(_error);
+    });
+    return;
+  }
+
+  if (__DEV__) {
+    logger.error('[Sentry] Exception:', _error);
   }
 }
 
 /**
- * Capture message - NO-OP STUB
+ * Capture message
  */
 export function captureMessage(
   _message: string,
   _level: SeverityLevel = 'info',
   _context?: Record<string, unknown>,
 ): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.withScope((scope) => {
+    if (_context) {
+      scope.setContext('context', _context);
+    }
+    Sentry.captureMessage(_message, _level);
+  });
 }
 
 /**
- * Set tag - NO-OP STUB
+ * Set tag
  */
 export function setTag(_key: string, _value: string): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.setTag(_key, _value);
 }
 
 /**
- * Set tags - NO-OP STUB
+ * Set tags
  */
 export function setTags(_tags: Record<string, string>): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.setTags(_tags);
 }
 
 /**
- * Start performance transaction - NO-OP STUB
+ * Start performance transaction
  */
 export function startPerformanceTransaction(
   _name: string,
   _operation: string,
 ): StubSpan | undefined {
-  return { finish: () => {} };
+  if (!isSentryEnabled() || !hasClient()) {
+    return { finish: () => {} };
+  }
+
+  const transaction = Sentry.startTransaction({
+    name: _name,
+    op: _operation,
+  });
+
+  return {
+    finish: () => {
+      transaction.finish();
+    },
+  };
 }
 
 /**
- * Measure screen load time - NO-OP STUB
+ * Measure screen load time
  */
 export function measureScreenLoad(_screenName: string): () => void {
-  return () => {};
+  if (!isSentryEnabled() || !hasClient()) {
+    return () => {};
+  }
+
+  const span = startPerformanceTransaction(
+    `screen_load:${_screenName}`,
+    'screen.load',
+  );
+
+  return () => span?.finish();
 }
 
 /**
- * Track critical user action - NO-OP STUB
+ * Track critical user action
  */
 export function trackCriticalAction(
   _action: string,
   _metadata?: Record<string, string | number | boolean>,
 ): void {
-  // No-op
+  if (!isSentryEnabled() || !hasClient()) return;
+  Sentry.addBreadcrumb({
+    message: _action,
+    category: 'user-action',
+    level: 'info',
+    data: _metadata,
+  });
 }
 
 /**
- * Start span for performance monitoring - NO-OP STUB
+ * Start span for performance monitoring
  */
 export function startTransaction(
   _name: string,
   _operation: string,
 ): StubSpan | undefined {
-  return { finish: () => {} };
+  return startPerformanceTransaction(_name, _operation);
 }
 
 // ============================================
-// STUB SENTRY OBJECT - For `import * as Sentry`
+// EXPORTS
 // ============================================
 
-export const Sentry = {
-  init: (_options?: unknown) => {},
-  setUser: (_user: unknown) => {},
-  setTag: (_key?: string, _value?: string) => {},
-  setTags: (_tags?: Record<string, string>) => {},
-  setContext: (_name?: string, _context?: unknown) => {},
-  addBreadcrumb: (_breadcrumb?: unknown) => {},
-  captureException: (_error?: unknown, _context?: unknown) => {},
-  captureMessage: (_message?: string, _context?: unknown) => {},
-  withScope: (_callback: (scope: unknown) => void) => {},
-  startInactiveSpan: (_options?: unknown) => ({ finish: () => {} }),
-  metrics: {
-    distribution: (_name?: string, _value?: number, _options?: unknown) => {},
-  },
-  wrap: <T>(component: T): T => component,
-};
+export { Sentry };

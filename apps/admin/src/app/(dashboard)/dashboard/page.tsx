@@ -189,7 +189,7 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
-            Platform genel bakış ve canlı metrikler
+            Gerçek anlar yarat, güvenle paylaş.
           </p>
         </div>
         <div className="flex items-center gap-3">

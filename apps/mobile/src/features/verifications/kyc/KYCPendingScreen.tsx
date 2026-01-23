@@ -34,6 +34,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import type { RootStackParamList } from '@/navigation/routeParams';
+import { useKycAuthGuard } from './useKycAuthGuard';
 
 /**
  * Animated processing ring component (vault lock visualization)
@@ -122,6 +123,7 @@ const KYCPendingScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RootStackParamList, 'KYCPending'>>();
   const insets = useSafeAreaInsets();
+  useKycAuthGuard();
 
   const status = route.params?.status ?? 'pending';
   const returnTo = route.params?.returnTo;

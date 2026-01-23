@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/Button';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
+import { useKycAuthGuard } from './useKycAuthGuard';
 import type { DocumentType, VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -197,6 +198,7 @@ const KYCDocumentTypeScreen: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DocumentType | null>(
     data.documentType,
   );
+  useKycAuthGuard();
 
   const handleContinue = () => {
     if (!selectedType) return;

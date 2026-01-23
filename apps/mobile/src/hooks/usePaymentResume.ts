@@ -243,8 +243,9 @@ export function usePaymentResume(options?: {
 
         navigation.navigate('Success', {
           type: 'gift_sent',
-          title: 'Ödeme Başarılı!',
-          subtitle: 'Hediyeniz başarıyla gönderildi.',
+          title: 'Hediye Gönderildi',
+          subtitle:
+            'Ödeme emanet hesabında. Kanıt onaylanınca alıcıya aktarılır.',
           details: {
             amount: pendingPayment.amount,
             referenceId: pendingPayment.merchantOid,

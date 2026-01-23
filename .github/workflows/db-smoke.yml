@@ -27,7 +27,7 @@ jobs:
           sudo apt-get install -y postgresql-client
 
       - name: Start Supabase local
-        run: supabase start
+        run: supabase start --exclude logflare
 
       - name: Get DB URL
         id: dburl

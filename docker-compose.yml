@@ -549,36 +549,7 @@ services:
   # ============================================================================
   # Lovendo Apps (Production)
   # ============================================================================
-
-  # Web (Next.js Landing Page)
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    container_name: lovendo-web
-    restart: unless-stopped
-    ports:
-      - '3001:3000'
-    environment:
-      NEXT_PUBLIC_SUPABASE_URL: http://kong:8000
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
-    depends_on:
-      - kong
-    networks:
-      - lovendo-network
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--quiet',
-          '--tries=1',
-          '--spider',
-          'http://localhost:3000/api/health',
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # Note: Web (Landing Page) is deployed via Vercel, not Docker
 
   # Admin (React + Refine Dashboard)
   admin:

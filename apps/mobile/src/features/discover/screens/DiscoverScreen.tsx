@@ -366,10 +366,13 @@ const DiscoverScreen = () => {
   }, [refresh]);
 
   const handleCitySelect = useCallback(
-    (coords: { latitude: number; longitude: number }) => {
+    (coords: { latitude: number; longitude: number; name?: string }) => {
       // Manually set location and refresh
       // Note: This would require extending useDiscoverMoments to accept manual coords
       logger.info('City selected:', coords);
+      if (coords.name) {
+        setSelectedCity(coords.name);
+      }
       // For now, just refresh with the hook's logic
       refresh();
     },
@@ -834,6 +837,8 @@ const DiscoverScreen = () => {
         <LocationPermissionPrompt
           onCitySelect={handleCitySelect}
           onRequestPermission={handleRequestLocationPermission}
+          disableCitySelection={!canChangeLocation}
+          disabledMessage="Premium ile şehir seçimi açılır"
         />
       </LiquidScreenWrapper>
     );
@@ -915,6 +920,12 @@ const DiscoverScreen = () => {
           selectedCity ||
           (locationPermission === 'granted' ? 'Yakınımda' : 'Konum Seç')
         }
+        locationDisabled={!canChangeLocation}
+        locationDisabledMessage={
+          isGuest
+            ? 'Konum değiştirmek için giriş yapmalısın.'
+            : 'Konum değiştirme Premium üyelikte aktif.'
+        }
         activeFiltersCount={
           activeFilters ? Object.keys(activeFilters).length : 0
         }
@@ -982,7 +993,7 @@ const DiscoverScreen = () => {
         onLocationSelect={(location) => {
           setSelectedCity(location);
           setFilters({ ...searchFilters, location });
-          handleCitySelect({ latitude: 0, longitude: 0 });
+          handleCitySelect({ latitude: 0, longitude: 0, name: location });
           setShowLocationModal(false);
         }}
       />

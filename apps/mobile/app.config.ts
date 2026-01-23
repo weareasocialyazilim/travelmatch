@@ -1,4 +1,27 @@
 import type { ExpoConfig, ConfigContext } from 'expo/config';
+import { z } from 'zod';
+
+const ENV_SCHEMA = z.object({
+  APP_ENV: z.enum(['development', 'preview', 'production']),
+  EXPO_PUBLIC_SUPABASE_URL: z.string().url(),
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  EXPO_PUBLIC_POSTHOG_API_KEY: z.string().min(1),
+  EXPO_PUBLIC_POSTHOG_HOST: z.string().url(),
+  SENTRY_DSN: z.string().min(1),
+  SENTRY_ORG: z.string().min(1),
+  SENTRY_PROJECT: z.string().min(1),
+});
+
+ENV_SCHEMA.parse({
+  APP_ENV: process.env.APP_ENV,
+  EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+  EXPO_PUBLIC_POSTHOG_API_KEY: process.env.EXPO_PUBLIC_POSTHOG_API_KEY,
+  EXPO_PUBLIC_POSTHOG_HOST: process.env.EXPO_PUBLIC_POSTHOG_HOST,
+  SENTRY_DSN: process.env.SENTRY_DSN,
+  SENTRY_ORG: process.env.SENTRY_ORG,
+  SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+});
 
 const IS_PRODUCTION = process.env.APP_ENV === 'production';
 

@@ -17,9 +17,30 @@ Settings → Branches → Add branch protection rule
      - `db-smoke`
      - `security-baseline`
      - `monorepo-quality`
+     - `CI / Quality Gate`
 
    - [x] Require branches to be up to date
    - [x] Restrict who can push
    - [x] Disable force pushes
    - [x] Disable deletions
    - [x] Include administrators: enabled
+
+---
+
+## Release Candidate Branch Protection (Manual Steps)
+
+Create branch rules for RC gating:
+
+1. **Branch name pattern**: `release/*`
+2. **Branch name pattern**: `rc/*`
+
+Enable for both patterns:
+
+- [x] Require pull request before merging
+- [x] Require status checks to pass:
+  - `Release Candidate Gate / RC Quality Gate (qa:rc)`
+- [x] Require branches to be up to date
+- [x] Restrict who can push
+- [x] Disable force pushes
+- [x] Disable deletions
+- [x] Include administrators: enabled

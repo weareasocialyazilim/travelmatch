@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * iDenfy Webhook Handler
  * Receives verification results from iDenfy and updates user profiles
@@ -6,10 +5,13 @@
  */
 import { serve } from 'std/http/server.ts';
 import { createClient } from '@supabase/supabase-js';
+import { Logger } from '../_shared/logger.ts';
 
-const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET')!;
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const logger = new Logger('idenfy-webhook');
+
+const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,12 +25,13 @@ const corsHeaders = {
 async function verifySignature(
   body: string,
   signature: string,
+  secret: string,
 ): Promise<boolean> {
   try {
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
       'raw',
-      encoder.encode(IDENFY_API_SECRET),
+      encoder.encode(secret),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['sign'],
@@ -41,9 +44,24 @@ async function verifySignature(
 
     return signature === expectedSignature;
   } catch (error) {
-    console.error('[iDenfy] Signature verification error:', error);
+    logger.error('Signature verification error', error as Error);
     return false;
   }
+}
+
+interface IdenfyPayload {
+  final?: {
+    status?: string;
+    clientId?: string;
+    scanRef?: string;
+    idenfyRef?: string;
+  };
+  status?: string;
+  clientId?: string;
+  scanRef?: string;
+  idenfyRef?: string;
+  externalId?: string;
+  denyReason?: string;
 }
 
 serve(async (req: Request) => {
@@ -53,12 +71,22 @@ serve(async (req: Request) => {
   }
 
   try {
+    if (!IDENFY_API_SECRET || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      return new Response(JSON.stringify({ error: 'Env missing' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const signature = req.headers.get('x-idenfy-signature');
     const body = await req.text();
 
     // 1. Verify HMAC-SHA256 signature
-    if (!signature || !(await verifySignature(body, signature))) {
-      console.error('[iDenfy] SECURITY ALERT: Invalid signature detected!');
+    if (
+      !signature ||
+      !(await verifySignature(body, signature, IDENFY_API_SECRET))
+    ) {
+      logger.warn('SECURITY ALERT: Invalid signature detected');
       return new Response(
         JSON.stringify({ error: 'Unauthorized - Invalid signature' }),
         {
@@ -69,7 +97,7 @@ serve(async (req: Request) => {
     }
 
     // 2. Parse payload
-    const payload = JSON.parse(body);
+    const payload = JSON.parse(body) as IdenfyPayload;
     const {
       status, // 'APPROVED', 'DENIED', 'SUSPECTED', 'REVIEWING'
       clientId, // Our user_id (externalId)
@@ -79,17 +107,78 @@ serve(async (req: Request) => {
 
     const userId = clientId || payload.externalId;
 
-    console.log(
-      `[iDenfy] Received webhook: status=${status}, userId=${userId}, scanRef=${scanRef}`,
-    );
+    logger.info('Received webhook', {
+      status,
+      userId,
+      scanRef,
+    });
 
     // 3. Initialize Supabase client with service role
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // 4. Update user profile based on verification status
     const normalizedStatus = (status || '').toUpperCase();
+    const providerId = scanRef || idenfyRef;
+
+    const mapStatus = (value: string) => {
+      if (value === 'APPROVED') return 'verified';
+      if (value === 'REVIEWING') return 'in_review';
+      if (value === 'DENIED' || value === 'SUSPECTED') return 'rejected';
+      return 'pending';
+    };
+
+    const upsertVerification = async (
+      newStatus: string,
+      extra?: Record<string, unknown>,
+    ) => {
+      if (!providerId) return 'skipped';
+
+      const { data: existing } = await supabase
+        .from('kyc_verifications')
+        .select('id, status')
+        .eq('provider', 'idenfy')
+        .eq('provider_id', providerId)
+        .maybeSingle();
+
+      if (existing?.status === newStatus) {
+        logger.info('Duplicate webhook ignored', { providerId, status });
+        return 'duplicate';
+      }
+
+      if (existing?.id) {
+        await supabase
+          .from('kyc_verifications')
+          .update({
+            status: newStatus,
+            metadata: { status: normalizedStatus },
+            ...(extra || {}),
+          })
+          .eq('id', existing.id);
+        return 'updated';
+      }
+
+      await supabase.from('kyc_verifications').insert({
+        user_id: userId,
+        provider: 'idenfy',
+        provider_id: providerId,
+        status: newStatus,
+        metadata: { status: normalizedStatus },
+        ...(extra || {}),
+      });
+      return 'inserted';
+    };
 
     if (normalizedStatus === 'APPROVED') {
+      const dedupe = await upsertVerification(mapStatus(normalizedStatus));
+      if (dedupe === 'duplicate') {
+        return new Response(
+          JSON.stringify({ received: true, status, duplicate: true }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
       const { error } = await supabase
         .from('users')
         .update({
@@ -104,7 +193,7 @@ serve(async (req: Request) => {
         .eq('id', userId);
 
       if (error) {
-        console.error('[iDenfy] Profile update error:', error);
+        logger.error('Profile update error', error as Error);
         throw error;
       }
 
@@ -116,19 +205,23 @@ serve(async (req: Request) => {
         severity: 'info',
       });
 
-      console.log(`[iDenfy] User ${userId} verified successfully`);
-
-      await supabase.from('kyc_verifications').insert({
-        user_id: userId,
-        provider: 'idenfy',
-        provider_id: scanRef || idenfyRef,
-        status: 'verified',
-        metadata: { status: normalizedStatus },
-      });
+      logger.info('User verified successfully', { userId });
     } else if (
       normalizedStatus === 'DENIED' ||
       normalizedStatus === 'SUSPECTED'
     ) {
+      const dedupe = await upsertVerification(mapStatus(normalizedStatus), {
+        rejection_reasons: payload.denyReason ? [payload.denyReason] : null,
+      });
+      if (dedupe === 'duplicate') {
+        return new Response(
+          JSON.stringify({ received: true, status, duplicate: true }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
       const { error } = await supabase
         .from('users')
         .update({
@@ -140,7 +233,7 @@ serve(async (req: Request) => {
         .eq('id', userId);
 
       if (error) {
-        console.error('[iDenfy] Profile update error:', error);
+        logger.error('Profile update error', error as Error);
         throw error;
       }
 
@@ -156,17 +249,18 @@ serve(async (req: Request) => {
         severity: normalizedStatus === 'DENIED' ? 'warning' : 'high',
       });
 
-      await supabase.from('kyc_verifications').insert({
-        user_id: userId,
-        provider: 'idenfy',
-        provider_id: scanRef || idenfyRef,
-        status: 'rejected',
-        rejection_reasons: payload.denyReason ? [payload.denyReason] : null,
-        metadata: { status: normalizedStatus },
-      });
-
-      console.log(`[iDenfy] User ${userId} verification ${status}`);
+      logger.info('User verification rejected', { userId, status });
     } else if (normalizedStatus === 'REVIEWING') {
+      const dedupe = await upsertVerification(mapStatus(normalizedStatus));
+      if (dedupe === 'duplicate') {
+        return new Response(
+          JSON.stringify({ received: true, status, duplicate: true }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
       await supabase
         .from('users')
         .update({
@@ -175,14 +269,6 @@ serve(async (req: Request) => {
           idenfy_scan_ref: scanRef || idenfyRef,
         })
         .eq('id', userId);
-
-      await supabase.from('kyc_verifications').insert({
-        user_id: userId,
-        provider: 'idenfy',
-        provider_id: scanRef || idenfyRef,
-        status: 'in_review',
-        metadata: { status: normalizedStatus },
-      });
     }
 
     return new Response(JSON.stringify({ received: true, status }), {
@@ -190,7 +276,7 @@ serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('[iDenfy] Webhook processing error:', error);
+    logger.error('Webhook processing error', error as Error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

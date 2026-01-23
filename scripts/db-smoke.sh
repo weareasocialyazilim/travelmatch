@@ -6,7 +6,7 @@ supabase start --exclude logflare
 
 if [[ -z "${SUPABASE_DB_URL:-}" ]]; then
   echo "[db-smoke] SUPABASE_DB_URL not set, trying to infer from 'supabase status'..."
-  DB_URL="$(supabase status 2>/dev/null | awk -F': ' '/DB URL/ {print $2}' | tail -n 1 || true)"
+  DB_URL="$(supabase status 2>/dev/null | grep -Eo 'postgresql://[^ ]+' | head -n 1 || true)"
   if [[ -z "${DB_URL:-}" ]]; then
     echo "[db-smoke] ERROR: Could not infer DB URL. Please export SUPABASE_DB_URL."
     supabase stop || true

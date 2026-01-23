@@ -534,11 +534,11 @@ const CreateMomentScreen: React.FC = () => {
           {/* STEP: DETAILS (Title & Experience Category) */}
           {step === 'details' && (
             <Animated.View entering={SlideInDown} exiting={SlideOutDown}>
-              <Text style={styles.label}>SET THE VIBE</Text>
+              <Text style={styles.label}>Ne yaşamak istiyorsun?</Text>
 
               <TextInput
                 style={styles.titleInput}
-                placeholder="Dinner at Hotel Costes..."
+                placeholder="Örn: Paris’te sakin bir kahvaltı"
                 placeholderTextColor="rgba(255,255,255,0.5)"
                 value={title}
                 onChangeText={setTitle}
@@ -550,6 +550,7 @@ const CreateMomentScreen: React.FC = () => {
                 keyboardType="default"
                 accessibilityLabel={t('screens.createMoment.a11y.momentTitle')}
               />
+              <Text style={styles.stepHint}>Sonradan düzenleyebilirsin.</Text>
 
               <View style={styles.categoryGrid}>
                 {EXPERIENCE_CATEGORIES.map((cat) => (

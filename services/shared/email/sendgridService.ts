@@ -33,9 +33,11 @@ const TEMPLATE_IDS = {
   NEW_MESSAGE: process.env.SENDGRID_TEMPLATE_NEW_MESSAGE || '',
 };
 
-// Initialize SendGrid
+// Initialize SendGrid with EU data residency
 if (SENDGRID_API_KEY) {
   sgMail.setApiKey(SENDGRID_API_KEY);
+  // Use EU data center for GDPR/KVKK compliance
+  sgMail.setDataResidency('eu');
 }
 
 export interface SendEmailResult {

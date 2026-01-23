@@ -56,22 +56,22 @@ const SLIDES = [
     id: '1',
     image:
       'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
-    title: 'Discover Local Vibes',
-    desc: 'Find exclusive moments curated by locals. From hidden bars to sunset dinners.',
+    title: 'Ne yaşamak istiyorsun?',
+    desc: 'Bir kahve, bir sergi, bir akşam yemeği.\nİnsanlar bunu senin için gerçekleştirsin.',
   },
   {
     id: '2',
     image:
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
-    title: 'Connect & Support',
-    desc: 'Connect with creators who share your vibe and support them with a gift.',
+    title: 'Para asla boşa gitmez.',
+    desc: 'Deneyim gerçekleşene kadar paran güvende tutulur.',
   },
   {
     id: '3',
     image:
       'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200',
-    title: 'Secure & Cashless',
-    desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
+    title: 'Gerçekleştiğinde kanıtlanır.',
+    desc: 'An yaşanır, onaylanır, tamamlanır.',
   },
 ];
 
@@ -236,38 +236,46 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           </View>
 
           {/* Next Button with Magnetic Physics - Apple Vision Pro style */}
-          <GestureDetector gesture={panGestureHandler}>
-            <Animated.View
-              style={[styles.magneticButtonContainer, magneticStyle]}
-              onLayout={(event) => {
-                const { x, y, width: w, height: h } = event.nativeEvent.layout;
-                // Set button center for magnetic attraction calculations
-                setButtonCenter(x + w / 2, y + h / 2);
-              }}
-            >
-              {/* Glow layer - appears when finger approaches */}
-              <Animated.View style={[styles.buttonGlow, glowStyle]} />
-
-              <Pressable
-                onPress={() => {
-                  logger.info('🔘 BUTTON PRESSED!', { activeIndex });
-                  HapticManager.primaryAction();
-                  handleNext();
+          <View style={styles.ctaContainer}>
+            <GestureDetector gesture={panGestureHandler}>
+              <Animated.View
+                style={[styles.magneticButtonContainer, magneticStyle]}
+                onLayout={(event) => {
+                  const {
+                    x,
+                    y,
+                    width: w,
+                    height: h,
+                  } = event.nativeEvent.layout;
+                  // Set button center for magnetic attraction calculations
+                  setButtonCenter(x + w / 2, y + h / 2);
                 }}
-                style={({ pressed }) => [
-                  styles.nextButton,
-                  pressed && styles.nextButtonPressed,
-                ]}
               >
-                <LinearGradient
-                  colors={[COLORS.brand.primary, '#A2FF00']}
-                  style={styles.nextButtonGradient}
+                {/* Glow layer - appears when finger approaches */}
+                <Animated.View style={[styles.buttonGlow, glowStyle]} />
+
+                <Pressable
+                  onPress={() => {
+                    logger.info('🔘 BUTTON PRESSED!', { activeIndex });
+                    HapticManager.primaryAction();
+                    handleNext();
+                  }}
+                  style={({ pressed }) => [
+                    styles.nextButton,
+                    pressed && styles.nextButtonPressed,
+                  ]}
                 >
-                  <Ionicons name="arrow-forward" size={24} color="black" />
-                </LinearGradient>
-              </Pressable>
-            </Animated.View>
-          </GestureDetector>
+                  <LinearGradient
+                    colors={[COLORS.brand.primary, '#A2FF00']}
+                    style={styles.nextButtonGradient}
+                  >
+                    <Ionicons name="arrow-forward" size={24} color="black" />
+                  </LinearGradient>
+                </Pressable>
+              </Animated.View>
+            </GestureDetector>
+            <Text style={styles.ctaText}>İlk moment’ini oluştur</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -346,6 +354,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  ctaContainer: {
+    alignItems: 'center',
+  },
+  ctaText: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
   magneticButtonContainer: {
     position: 'relative',
     alignItems: 'center',
@@ -383,20 +400,20 @@ export default OnboardingScreen;
 const AWWWARDS_SLIDES = [
   {
     id: '1',
-    title: 'Eşsiz Anları\nKeşfet',
-    desc: 'Dünyanın dört bir yanından doğrulanmış ve ipeksi deneyimlere tanıklık et.',
+    title: 'Ne yaşamak\nistiyorsun?',
+    desc: 'Bir kahve, bir sergi, bir akşam yemeği. İnsanlar bunu senin için gerçekleştirsin.',
     color: COLORS.primary,
   },
   {
     id: '2',
-    title: 'Güvenle\nPaylaş',
-    desc: 'Trust Score sistemimizle sadece en güvenilir kullanıcılarla bağ kur.',
+    title: 'Para asla\nboşa gitmez.',
+    desc: 'Deneyim gerçekleşene kadar paran güvende tutulur.',
     color: COLORS.secondary,
   },
   {
     id: '3',
-    title: 'Hediye Et,\nİz Bırak',
-    desc: 'Sevdiklerine unutulmaz anlar hediye ederek sosyal ağını genişlet.',
+    title: 'Gerçekleştiğinde\nkanıtlanır.',
+    desc: 'An yaşanır, onaylanır, tamamlanır.',
     color: COLORS.accent.primary,
   },
 ];
@@ -543,7 +560,7 @@ export const AwwwardsOnboardingScreen: React.FC<
         <Button
           title={
             currentIndex === AWWWARDS_SLIDES.length - 1
-              ? 'Hadi Başlayalım'
+              ? 'İlk moment’ini oluştur'
               : 'Devam Et'
           }
           variant="primary"

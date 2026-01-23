@@ -15,7 +15,7 @@ import {
   Zap,
   Sparkles,
 } from 'lucide-react';
-import { TRANSLATIONS, MOMENTS, Language } from '../data/content';
+import { TRANSLATIONS, MOMENTS, Language, Moment } from '../data/content';
 import StoreBadge from '../components/StoreBadge';
 
 const PulseEngine = dynamic(() => import('../components/PulseEngine'), {
@@ -194,7 +194,7 @@ const AnimatedTitle = ({ text }: { text: string }) => {
 */
 export default function App() {
   const [lang, setLang] = useState<Language>('EN');
-  const [selected, setSelected] = useState<unknown>(null);
+  const [selected, setSelected] = useState<Moment | null>(null);
   const [view, setView] = useState('home');
   const [showSuccess, setShowSuccess] = useState(false);
   const [showGiftSuccess, setShowGiftSuccess] = useState(false);

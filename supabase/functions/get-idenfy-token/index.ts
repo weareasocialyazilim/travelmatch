@@ -1,13 +1,15 @@
-// @ts-nocheck
 /**
  * Get iDenfy Token
  * Generates a single-use auth token for iDenfy SDK session
  */
 import { serve } from 'std/http/server.ts';
 import { createClient } from '@supabase/supabase-js';
+import { Logger } from '../_shared/logger.ts';
 
-const IDENFY_API_KEY = Deno.env.get('IDENFY_API_KEY')!;
-const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET')!;
+const logger = new Logger('get-idenfy-token');
+
+const IDENFY_API_KEY = Deno.env.get('IDENFY_API_KEY');
+const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET');
 const IDENFY_BASE_URL = 'https://ivs.idenfy.com/api/v2';
 
 const corsHeaders = {
@@ -16,6 +18,11 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type',
 };
 
+interface IdenfyTokenResponse {
+  authToken: string;
+  scanRef: string;
+}
+
 serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -23,6 +30,16 @@ serve(async (req: Request) => {
   }
 
   try {
+    if (!IDENFY_API_KEY || !IDENFY_API_SECRET) {
+      return new Response(
+        JSON.stringify({ error: 'KYC service not configured' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
+    }
+
     // 1. Get user from auth header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
@@ -35,16 +52,22 @@ serve(async (req: Request) => {
       );
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    );
+    if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+      return new Response(JSON.stringify({ error: 'Supabase env missing' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     const {
       data: { user },
@@ -86,7 +109,7 @@ serve(async (req: Request) => {
 
     if (!idenfyResponse.ok) {
       const errorData = await idenfyResponse.text();
-      console.error('[iDenfy] Token creation failed:', errorData);
+      logger.error('Token creation failed', new Error(errorData));
       return new Response(
         JSON.stringify({ error: 'Failed to create verification session' }),
         {
@@ -96,7 +119,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const tokenData = await idenfyResponse.json();
+    const tokenData = (await idenfyResponse.json()) as IdenfyTokenResponse;
 
     await supabaseAdmin
       .from('users')
@@ -124,7 +147,7 @@ serve(async (req: Request) => {
       severity: 'info',
     });
 
-    console.log(`[iDenfy] Token generated for user ${user.id}`);
+    logger.info('Token generated for user', { userId: user.id });
 
     return new Response(
       JSON.stringify({
@@ -138,7 +161,7 @@ serve(async (req: Request) => {
       },
     );
   } catch (error) {
-    console.error('[iDenfy] Token generation error:', error);
+    logger.error('Token generation error', error as Error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

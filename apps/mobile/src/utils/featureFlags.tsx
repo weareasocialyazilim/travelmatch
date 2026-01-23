@@ -12,6 +12,11 @@ import { logger } from './logger';
  * Feature Flag Configuration
  */
 export interface FeatureFlags {
+  // Critical Kill Switches
+  paymentsEnabled: boolean;
+  proofUploadEnabled: boolean;
+  kycEnabled: boolean;
+
   // UX Improvements
   newOnboardingFlow: boolean;
   simplifiedProofUpload: boolean;
@@ -46,6 +51,10 @@ export interface FeatureFlags {
  * Default flag values (safe fallbacks)
  */
 const DEFAULT_FLAGS: FeatureFlags = {
+  paymentsEnabled: true,
+  proofUploadEnabled: true,
+  kycEnabled: true,
+
   newOnboardingFlow: false,
   simplifiedProofUpload: false,
   newGiftFlow: false,

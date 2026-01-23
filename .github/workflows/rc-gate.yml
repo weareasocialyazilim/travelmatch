@@ -1,0 +1,30 @@
+name: Release Candidate Gate
+
+on:
+  pull_request:
+    branches:
+      - 'release/*'
+      - 'rc/*'
+  push:
+    branches:
+      - 'release/*'
+      - 'rc/*'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22.22.0'
+
+jobs:
+  rc-gate:
+    name: RC Quality Gate (qa:rc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Run RC gate
+        run: pnpm qa:rc

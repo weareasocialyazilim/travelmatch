@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
-        continue-on-error: true
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
         with:
           files: ./coverage/coverage-final.json
           flags: unittests

@@ -61,7 +61,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
   const handleApprove = async () => {
     showAlert({
       title: 'Kanıtı Onayla',
-      message: `${receiverName}'in kanıtını onaylamak istediğinize emin misiniz? Onayladığınızda ${amount} ₺ alıcıya aktarılacaktır.`,
+      message: `${receiverName}'in kanıtını onaylamak istiyor musunuz? Onayladığınızda ödeme alıcıya aktarılır.`,
       buttons: [
         { text: 'İptal', style: 'cancel' },
         {
@@ -88,8 +88,8 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
               await supabase.from('notifications').insert({
                 user_id: receiverId,
                 type: 'proof_approved',
-                title: 'Kanıtınız onaylandı! 🎉',
-                body: `${momentTitle} için kanıtınız onaylandı ve ${amount} ₺ cüzdanınıza eklendi.`,
+                title: 'Kanıtın onaylandı 🎉',
+                body: `${momentTitle} için kanıt onaylandı. Ödeme cüzdanına geçti.`,
                 data: {
                   escrow_id: escrowId,
                   gift_id: giftId,
@@ -97,7 +97,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
                 },
               });
 
-              showToast('Kanıt onaylandı, para alıcıya aktarıldı', 'success');
+              showToast('Kanıt onaylandı, ödeme alıcıya aktarıldı', 'success');
               navigation.navigate('Success', { type: 'proof_approved' });
             } catch (error) {
               const message =
@@ -118,7 +118,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
   const handleReject = async () => {
     showAlert({
       title: 'Kanıtı Reddet',
-      message: `${receiverName}'in kanıtını reddetmek istediğinize emin misiniz? Reddettiğinizde ${amount} ₺ size iade edilecektir.`,
+      message: `${receiverName}'in kanıtını reddetmek istiyor musunuz? Reddettiğinizde ödeme size iade edilir ve alıcı yeni kanıt yükleyebilir.`,
       buttons: [
         { text: 'İptal', style: 'cancel' },
         {
@@ -143,8 +143,8 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
               await supabase.from('notifications').insert({
                 user_id: receiverId,
                 type: 'proof_rejected',
-                title: 'Kanıtınız reddedildi 😔',
-                body: `${momentTitle} için kanıtınız reddedildi. Lütfen yeni bir kanıt yükleyin.`,
+                title: 'Kanıtın reddedildi',
+                body: `${momentTitle} için kanıt reddedildi. Yeni bir kanıt yükleyebilirsin.`,
                 data: {
                   escrow_id: escrowId,
                   gift_id: giftId,

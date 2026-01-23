@@ -170,6 +170,8 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
  */
 export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   location,
+  locationDisabled = false,
+  locationDisabledMessage = 'Konum değiştirme Premium üyelikte aktif.',
   activeFiltersCount,
   onLocationPress,
   onFilterPress,
@@ -182,24 +184,33 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
     <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
       {/* Location Selector */}
       <TouchableOpacity
-        style={styles.locationSelector}
+        style={[
+          styles.locationSelector,
+          locationDisabled && styles.locationSelectorDisabled,
+        ]}
         onPress={onLocationPress}
-        activeOpacity={0.7}
+        activeOpacity={locationDisabled ? 1 : 0.7}
+        disabled={locationDisabled}
       >
         <MaterialCommunityIcons
           name="map-marker"
           size={18}
-          color={COLORS.brand.primary}
+          color={locationDisabled ? COLORS.text.muted : COLORS.brand.primary}
         />
         <Text style={styles.locationText} numberOfLines={1}>
           {location}
         </Text>
         <MaterialCommunityIcons
-          name="chevron-down"
+          name={locationDisabled ? 'lock' : 'chevron-down'}
           size={18}
-          color={COLORS.utility.white}
+          color={locationDisabled ? COLORS.text.muted : COLORS.utility.white}
         />
       </TouchableOpacity>
+      {locationDisabled ? (
+        <Text style={styles.locationDisabledText} numberOfLines={1}>
+          {locationDisabledMessage}
+        </Text>
+      ) : null}
 
       {/* Right Controls */}
       <View style={styles.headerControls}>
@@ -271,6 +282,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 16,
   },
+  locationSelectorDisabled: {
+    opacity: 0.5,
+  },
   locationText: {
     fontSize: 16,
     fontWeight: '600',
@@ -278,6 +292,13 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     marginRight: 2,
     flexShrink: 1,
+  },
+  locationDisabledText: {
+    position: 'absolute',
+    left: 16,
+    top: 58,
+    fontSize: 12,
+    color: COLORS.text.muted,
   },
   headerControls: {
     flexDirection: 'row',

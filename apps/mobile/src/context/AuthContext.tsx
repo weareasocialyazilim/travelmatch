@@ -30,8 +30,9 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from 'react';
-import { Linking } from 'react-native';
+import { AppState, type AppStateStatus, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../features/auth/services/authService';
 import {
@@ -45,6 +46,9 @@ import type { User, KYCStatus, Role } from '../types/index';
 import { setSentryUser, clearSentryUser } from '../config/sentry'; // ADDED: Sentry integration
 import { analytics } from '../services/analytics'; // PostHog analytics
 import { cacheUtils } from '../services/offlineCache'; // Offline cache management
+import { useToast } from './ToastContext';
+import { sessionManager } from '../services/sessionManager';
+import { apiClient } from '../services/apiV1Service';
 
 /**
  * Helper to create a valid User object with defaults
@@ -205,6 +209,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
+  const { warning } = useToast();
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
   // Derived state
   const isAuthenticated = authState === 'authenticated' && user !== null;
@@ -282,6 +288,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const handleSessionExpired = useCallback(
+    async (message = 'Oturum süresi doldu. Lütfen tekrar giriş yapın.') => {
+      await clearAuthData();
+      warning(message, 4000);
+    },
+    [clearAuthData, warning],
+  );
+
+  useEffect(() => {
+    apiClient.setSessionExpiredCallback(() => {
+      void handleSessionExpired();
+    });
+
+    const unsubscribe = sessionManager.addListener((event) => {
+      if (event === 'session_expired' || event === 'refresh_failed') {
+        void handleSessionExpired();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      apiClient.setSessionExpiredCallback(() => {});
+    };
+  }, [handleSessionExpired]);
+
   /**
    * Get access token (with refresh if needed)
    */
@@ -314,10 +345,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return newTokens.accessToken;
     } catch (error) {
       logger.error('[Auth] Token refresh failed, clearing auth:', error);
-      await clearAuthData();
+      await handleSessionExpired();
       return null;
     }
-  }, [tokens]);
+  }, [tokens, handleSessionExpired]);
 
   /**
    * Load auth state from storage on mount
@@ -413,6 +444,51 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     void loadAuthState();
   }, []);
+
+  const refreshSessionOnForeground = useCallback(async () => {
+    if (authState === 'loading') return;
+    if (!tokens && authState !== 'authenticated') return;
+
+    try {
+      const session = await authService.refreshSession();
+
+      if (!session) {
+        await handleSessionExpired();
+        return;
+      }
+
+      const newTokens: AuthTokens = {
+        accessToken: session.access_token,
+        refreshToken: session.refresh_token,
+        expiresAt: (session.expires_at || 0) * 1000,
+      };
+
+      await saveTokens(newTokens);
+      setAuthState('authenticated');
+    } catch (error) {
+      logger.warn('[Auth] Foreground refresh failed:', error);
+      const stillValid = tokens?.expiresAt
+        ? tokens.expiresAt > Date.now()
+        : false;
+      if (!stillValid) {
+        await handleSessionExpired();
+      }
+    }
+  }, [authState, tokens, handleSessionExpired]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextState === 'active'
+      ) {
+        void refreshSessionOnForeground();
+      }
+      appStateRef.current = nextState;
+    });
+
+    return () => subscription.remove();
+  }, [refreshSessionOnForeground]);
 
   /**
    * Login with email/password

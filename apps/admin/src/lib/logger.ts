@@ -56,9 +56,9 @@ class AdminLogger {
     if (LOG_LEVEL_PRIORITY[level] < LOG_LEVEL_PRIORITY[this.minLevel]) {
       return false;
     }
-    // In production, only log warnings and errors
+    // In production, avoid console output entirely
     if (this.isProduction()) {
-      return level === 'warn' || level === 'error';
+      return false;
     }
     return true;
   }

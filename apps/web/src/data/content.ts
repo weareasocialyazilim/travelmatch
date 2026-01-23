@@ -1,10 +1,19 @@
 export type Language = 'EN' | 'TR';
 
+export interface Moment {
+  id: string;
+  creator: string;
+  title: { EN: string; TR: string };
+  price: number;
+  location: string;
+  image: string;
+  altSuggestion: string;
+}
+
 export const TRANSLATIONS = {
   EN: {
     hero_title: 'STOP THE YAP.\nLOVE N DO.',
-    hero_sub:
-      'Because matching with a ghost won’t buy you dinner. Real chemistry requires actual physics.',
+    hero_sub: 'Real experiences. Real people. Trusted.',
     nav_creator: 'CLAIM THE STAGE',
     manifesto_title: 'THE TRUTH HURTS',
     manifesto_txt:
@@ -23,9 +32,9 @@ export const TRANSLATIONS = {
       'Application received. We’ll check your profile. If you’re not mid, you’re in. Stay loud or get muted.',
     moments_title: 'CHOOSE YOUR POISON',
     moments_sub: 'CONSUME OR BE CONSUMED.',
-    unlock: 'UNLOCK THE VIBE',
+    unlock: 'CREATE YOUR FIRST MOMENT',
     gift: 'PAY THE TAX',
-    alternative: 'DO BETTER',
+    alternative: 'HOW IT WORKS',
     footer_tag: 'Stop the yapping. Sync the biology.',
     footer_rights: 'LOVENDO PROJECT. STOP SWIPING.',
     version: 'Engineered for Entities | v0.0.5-savage',
@@ -48,8 +57,7 @@ export const TRANSLATIONS = {
   },
   TR: {
     hero_title: 'BOŞ YAPMA.\nSEV. YAP.',
-    hero_sub:
-      'GELMEYENLER İÇİN MASA KURMUYORUZ. GERÇEK KİMYA İÇİN FİZİKSEL VARLIK ŞART.',
+    hero_sub: 'Gerçek anlar yarat, güvenle paylaş.',
     nav_creator: 'SAHNE AL',
     manifesto_title: 'GERÇEKLER ACITIR',
     manifesto_txt:
@@ -68,9 +76,9 @@ export const TRANSLATIONS = {
       'BAŞVURU ALINDI. PROFİLİNE BAKACAĞIZ. BAYIK DEĞİLSEN İÇERDESİN. SESİ KESİLENLER DIŞARIDA KALIR.',
     moments_title: 'SEÇİM SENİN',
     moments_sub: 'TÜKET YA DA TÜKEN.',
-    unlock: 'ERİŞİMİ AÇ',
+    unlock: 'İLK MOMENT’İNİ OLUŞTUR',
     gift: 'BEDELİNİ ÖDE',
-    alternative: 'DAHA İYİSİNİ ÖNER',
+    alternative: 'NASIL ÇALIŞIR?',
     footer_tag: 'BOŞ MUHABBETİ KES. BİYOLOJİNİ SENKRONİZE ET.',
     footer_rights: 'LOVENDO PROJECT. SWIPE YOK.',
     version: 'VARLIK İÇİN TASARLANDI | v0.0.5-savage',
@@ -92,7 +100,7 @@ export const TRANSLATIONS = {
   },
 };
 
-export const MOMENTS = [
+export const MOMENTS: Moment[] = [
   {
     id: 'LV-01',
     creator: 'Sandra Smith',

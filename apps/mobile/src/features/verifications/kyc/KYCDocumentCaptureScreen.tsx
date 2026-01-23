@@ -33,6 +33,7 @@ import { SPACING, RADIUS } from '@/constants/spacing';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { KYCProgressBar } from './KYCProgressBar';
+import { useKycAuthGuard } from './useKycAuthGuard';
 import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -60,6 +61,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
   const route = useRoute<RouteProp<RouteParams, 'KYCDocumentCapture'>>();
   const insets = useSafeAreaInsets();
   const { data: initialData } = route.params;
+  useKycAuthGuard();
 
   const [_data, setData] = useState<VerificationData>(initialData);
   const [captureSide, setCaptureSide] = useState<'front' | 'back'>('front');

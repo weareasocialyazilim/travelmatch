@@ -1,5 +1,39 @@
 /** @type {import('next').NextConfig} */
 
+const { z } = require('zod');
+
+const ENV_SCHEMA = z
+  .object({
+    NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
+    SENTRY_DSN: z.string().min(1),
+    POSTHOG_API_KEY: z.string().optional(),
+    EXPO_PUBLIC_POSTHOG_API_KEY: z.string().optional(),
+    POSTHOG_PROJECT_ID: z.string().optional(),
+  })
+  .refine(
+    (env) => Boolean(env.POSTHOG_API_KEY || env.EXPO_PUBLIC_POSTHOG_API_KEY),
+    {
+      message: 'POSTHOG_API_KEY or EXPO_PUBLIC_POSTHOG_API_KEY is required',
+      path: ['POSTHOG_API_KEY'],
+    },
+  );
+
+ENV_SCHEMA.parse({
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  SENTRY_DSN: process.env.SENTRY_DSN,
+  POSTHOG_API_KEY: process.env.POSTHOG_API_KEY,
+  EXPO_PUBLIC_POSTHOG_API_KEY: process.env.EXPO_PUBLIC_POSTHOG_API_KEY,
+  POSTHOG_PROJECT_ID: process.env.POSTHOG_PROJECT_ID,
+});
+
 // Security headers configuration
 // OWASP recommended headers for web application security
 const securityHeaders = [

@@ -839,9 +839,9 @@
     "failed": "{{count}} kez başarısız oldu"
   },
   "emptyState": {
-    "noMomentsNearby": "Bu civarda henüz an yok 🗺️",
-    "tryIncreasingDistance": "Mesafe filtreni artırmayı dene veya\nyeni bir an başlatan ilk sen ol!",
-    "createMoment": "An Oluştur",
+    "noMomentsNearby": "Burada henüz bir moment yok.",
+    "tryIncreasingDistance": "Bugün ne yaşamak istiyorsun? İlk moment’i sen başlat.",
+    "createMoment": "İlk moment’ini oluştur",
     "discoveringMoments": "Anlar keşfediliyor...",
     "tapToRetry": "Yeniden denemek için dokun"
   },

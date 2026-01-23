@@ -31,13 +31,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { showLoginPrompt } from '@/stores/modalStore';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const { width: _width, height } = Dimensions.get('window');
-
 export const MomentDetailScreen = ({ navigation, route }: any) => {
   const insets = useSafeAreaInsets();
   const _momentId = route?.params?.momentId;
+  const { isGuest } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -169,7 +171,11 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
         </View>
         <TouchableOpacity
           style={styles.bookBtn}
-          onPress={() =>
+          onPress={() => {
+            if (isGuest) {
+              showLoginPrompt({ action: 'chat' });
+              return;
+            }
             navigation.navigate('Chat', {
               otherUser: {
                 id: 'demo-host-selin',
@@ -177,8 +183,8 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
                 avatar:
                   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100',
               },
-            })
-          }
+            });
+          }}
         >
           <Text style={styles.bookText}>Request to Join</Text>
         </TouchableOpacity>

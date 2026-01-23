@@ -40,6 +40,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { KYCProgressBar } from './KYCProgressBar';
 import { KYC_COLORS, KYC_TYPOGRAPHY, KYC_SPACING, KYC_SPRINGS } from './theme';
+import { useKycAuthGuard } from './useKycAuthGuard';
 import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -272,6 +273,7 @@ const KYCSelfieScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp<RouteParams, 'KYCSelfie'>>();
   const { data: initialData } = route.params;
+  useKycAuthGuard();
 
   const [data, setData] = useState<VerificationData>(initialData);
   const [scanState, setScanState] = useState<ScanState>('idle');

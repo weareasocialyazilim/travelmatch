@@ -177,12 +177,8 @@ export default function ModerationPage() {
 
   useEffect(() => {
     loadData();
-<<<<<<< Updated upstream
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-=======
   }, [activeTab, dateRange]);
->>>>>>> Stashed changes
 
   async function loadData() {
     setLoading(true);

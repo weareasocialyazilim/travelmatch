@@ -80,8 +80,8 @@ export const PROOF_UX_FLOW = {
 
   // Step 4: Success
   successScreen: {
-    message: 'Kanıtın gönderildi!',
-    subtext: 'Onaylandığında ödemen hesabına geçecek.',
+    message: 'Kanıtın gönderildi.',
+    subtext: 'Onaylandığında ödeme hesabına geçer.',
     nextAction: 'Teşekkür Notu Yaz',
   },
 } as const;

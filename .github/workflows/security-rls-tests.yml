@@ -17,7 +17,7 @@ jobs:
   rls-security-tests:
     name: RLS Security Tests
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
     steps:
       - name: Checkout code

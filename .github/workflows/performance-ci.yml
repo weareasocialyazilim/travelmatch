@@ -33,7 +33,7 @@ jobs:
         run: |
           cd apps/mobile
           npx expo export --platform android --output-dir dist-android 2>/dev/null || echo "Export not available, checking bundle size differently"
-        continue-on-error: true
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
       - name: Analyze bundle size
         run: |
@@ -89,7 +89,7 @@ jobs:
           echo '```' >> dependency-report.md
           pnpm outdated 2>/dev/null || echo "All dependencies up to date"
           echo '```' >> dependency-report.md
-        continue-on-error: true
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
       - name: Check for duplicate dependencies
         run: |
@@ -98,7 +98,7 @@ jobs:
           echo '```' >> dependency-report.md
           pnpm dedupe --check 2>/dev/null || echo "No duplicates or dedupe not available"
           echo '```' >> dependency-report.md
-        continue-on-error: true
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
       - name: Upload dependency report
         uses: actions/upload-artifact@v4
@@ -126,8 +126,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript check
-        run: pnpm run type-check 2>&1 | tee typescript-report.txt
-        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm run type-check 2>&1 | tee typescript-report.txt
+        continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
 
       - name: Count TypeScript errors
         run: |

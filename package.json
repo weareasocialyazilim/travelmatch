@@ -51,8 +51,11 @@
     "seed:staging": "tsx scripts/seed-database.ts",
     "db:test:all": "supabase/tests/run_rls_tests.sh local all",
     "db:test:all:staging": "supabase/tests/run_rls_tests.sh staging all",
+    "db:smoke": "./scripts/db-smoke.sh",
     "test:visual": "turbo run chromatic",
     "test:visual:ci": "turbo run chromatic:ci",
+    "qa:pr": "pnpm lint && pnpm type-check && pnpm format:check && pnpm test -- --ci --maxWorkers=2 && pnpm test:e2e:web && pnpm test:e2e:admin && pnpm db:smoke",
+    "qa:rc": "pnpm build && pnpm test:e2e && pnpm db:test:all && pnpm test:visual:ci",
     "prepare": "husky",
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "android": "pnpm --filter @lovendo/mobile android",
@@ -75,6 +78,7 @@
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "chromatic": "^13.3.5",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.4",
@@ -140,6 +144,7 @@
     ]
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "expo": "~54.0.31",
     "react": "19.1.0",
     "react-native": "0.81.5",

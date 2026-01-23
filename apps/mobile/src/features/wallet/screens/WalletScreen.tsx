@@ -28,6 +28,8 @@ import Animated, {
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import { securePaymentService, type KYCStatus } from '@/services';
+import { useAuth } from '@/hooks/useAuth';
+import { showLoginPrompt } from '@/stores/modalStore';
 
 const TitanFlowBadge = ({ amount }: { amount: number }) => {
   const pulse = useSharedValue(1);
@@ -111,6 +113,7 @@ const WalletScreen = () => {
   const { balance, refreshBalance, balanceLoading } = usePayments();
   const navigation = useNavigation<any>();
   const isLoading = balanceLoading;
+  const { isGuest } = useAuth();
   const [kycStatus, setKycStatus] =
     useState<KYCStatus['status']>('not_started');
   const [kycLoading, setKycLoading] = useState(false);
@@ -174,7 +177,14 @@ const WalletScreen = () => {
     }, [refreshKycStatus]),
   );
 
+  const requireLogin = useCallback(() => {
+    if (!isGuest) return true;
+    showLoginPrompt({ action: 'default' });
+    return false;
+  }, [isGuest]);
+
   const handleKycPress = () => {
+    if (!requireLogin()) return;
     if (kycStatus === 'verified') {
       return;
     }
@@ -191,6 +201,7 @@ const WalletScreen = () => {
   };
 
   const handleWithdraw = () => {
+    if (!requireLogin()) return;
     if (kycStatus !== 'verified') {
       handleKycPress();
       return;
@@ -255,7 +266,10 @@ const WalletScreen = () => {
             )}
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('CoinStore')}
+              onPress={() => {
+                if (!requireLogin()) return;
+                navigation.navigate('CoinStore');
+              }}
               style={styles.topupButton}
             >
               <LinearGradient

@@ -839,9 +839,9 @@
     "failed": "Failed {{count}} time(s)"
   },
   "emptyState": {
-    "noMomentsNearby": "No moments nearby 🗺️",
-    "tryIncreasingDistance": "Try increasing your distance filter or\nbe the first to create a moment!",
-    "createMoment": "Create Moment",
+    "noMomentsNearby": "No moments here yet.",
+    "tryIncreasingDistance": "What do you want to experience today? Be the first to start a moment.",
+    "createMoment": "Create your first moment",
     "discoveringMoments": "Discovering moments...",
     "tapToRetry": "Tap to retry"
   },

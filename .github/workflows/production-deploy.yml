@@ -61,15 +61,12 @@ jobs:
 
       - name: Run type check
         run: pnpm run type-check
-        continue-on-error: true
 
       - name: Run tests
         run: pnpm test -- --ci --passWithNoTests
-        continue-on-error: true
 
       - name: Security audit
         run: pnpm audit --audit-level=critical
-        continue-on-error: true
 
   build-ios:
     name: Build iOS Production
@@ -128,7 +125,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ env.SENTRY_ORG || 'lovendo' }}
           SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'lovendo-mobile' }}
-        continue-on-error: true
 
   build-android:
     name: Build Android Production
@@ -187,7 +183,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ env.SENTRY_ORG || 'lovendo' }}
           SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'lovendo-mobile' }}
-        continue-on-error: true
 
   submit-ios:
     name: Submit to App Store

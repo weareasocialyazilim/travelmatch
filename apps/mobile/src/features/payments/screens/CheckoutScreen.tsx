@@ -22,6 +22,11 @@ import { Ionicons } from '@expo/vector-icons';
 import type { PurchasesPackage } from 'react-native-purchases'; // Adapting to existing RevenueCat lib
 import { logger } from '@/utils/logger';
 import { coinService } from '@/services/coinService';
+import { useAuth } from '@/hooks/useAuth';
+import { showLoginPrompt } from '@/stores/modalStore';
+import { useFeatureFlag } from '@/utils/featureFlags';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { ANALYTICS_EVENTS } from '@lovendo/shared';
 
 const LVND_PACKS_METADATA = [
   {
@@ -51,6 +56,9 @@ const CheckoutScreen = () => {
   const navigation = useNavigation<any>();
   const [isProcessing, setIsProcessing] = useState(false);
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+  const { isGuest } = useAuth();
+  const paymentsEnabled = useFeatureFlag('paymentsEnabled');
+  const analytics = useAnalytics();
 
   // Fetch offerings from RevenueCat
   useEffect(() => {
@@ -71,9 +79,24 @@ const CheckoutScreen = () => {
     packId: string,
     rcPackage?: PurchasesPackage,
   ) => {
+    if (isGuest) {
+      showLoginPrompt({ action: 'default' });
+      return;
+    }
+    if (!paymentsEnabled) {
+      Alert.alert(
+        'Ödemeler kapalı',
+        'Ödemeler geçici olarak kapalı. Lütfen daha sonra tekrar deneyin.',
+      );
+      return;
+    }
     HapticManager.buttonPress();
     setIsProcessing(true);
     try {
+      analytics.trackEvent(ANALYTICS_EVENTS.PAYMENT_INIT, {
+        packId,
+        source: 'checkout',
+      });
       // Use RevenueCat if package found, otherwise mock success for dev/demo if allowed
       if (rcPackage) {
         await coinService.purchasePackage(rcPackage);
@@ -90,6 +113,10 @@ const CheckoutScreen = () => {
       navigation.navigate('Success', {
         type: 'payment',
         title: 'LVND Yüklendi!',
+      });
+      analytics.trackEvent(ANALYTICS_EVENTS.PAYMENT_SUCCESS, {
+        packId,
+        source: 'checkout',
       });
     } catch (error: any) {
       if (!error.userCancelled) {

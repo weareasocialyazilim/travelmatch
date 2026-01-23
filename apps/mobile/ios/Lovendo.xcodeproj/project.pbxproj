@@ -170,6 +170,11 @@
 						DevelopmentTeam = LVBFTMQ2MA;
 						LastSwiftMigration = 1250;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};

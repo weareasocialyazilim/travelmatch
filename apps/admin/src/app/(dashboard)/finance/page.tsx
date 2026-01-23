@@ -144,7 +144,9 @@ export default function FinancePage() {
 
   const handleApprove = async (id: string) => {
     try {
-      const response = await fetch(`/api/finance/payout/${id}/approve`, { method: 'POST' });
+      const response = await fetch(`/api/finance/payout/${id}/approve`, {
+        method: 'POST',
+      });
       if (!response.ok) throw new Error('Onay başarısız');
       toast.success('Ödeme başarıyla onaylandı');
       loadData();
@@ -155,7 +157,9 @@ export default function FinancePage() {
 
   const handleReject = async (id: string) => {
     try {
-      const response = await fetch(`/api/finance/payout/${id}/reject`, { method: 'POST' });
+      const response = await fetch(`/api/finance/payout/${id}/reject`, {
+        method: 'POST',
+      });
       if (!response.ok) throw new Error('Red başarısız');
       toast.success('Ödeme reddedildi');
       loadData();
@@ -321,7 +325,9 @@ export default function FinancePage() {
                 ? formatCurrency(titanHealth.pending_withdrawals_amount)
                 : '...'}
             </p>
-            <p className="text-xs text-muted-foreground">Manual Check Required if > 1k</p>
+            <p className="text-xs text-muted-foreground">
+              Manual Check Required if &gt; 1k
+            </p>
           </div>
         </div>
 
@@ -333,12 +339,17 @@ export default function FinancePage() {
             </span>
             <div className="flex items-baseline space-x-2">
               <span className="text-2xl font-bold">
-                {titanHealth ? titanHealth.total_coins_sold?.toLocaleString() : '...'}
+                {titanHealth
+                  ? titanHealth.total_coins_sold?.toLocaleString()
+                  : '...'}
               </span>
               <span className="text-xs text-blue-500">Units</span>
             </div>
             <p className="text-sm font-medium">
-              Gross: {titanHealth ? formatCurrency(titanHealth.total_coins_sold * 1.5) : '...'}
+              Gross:{' '}
+              {titanHealth
+                ? formatCurrency(titanHealth.total_coins_sold * 1.5)
+                : '...'}
             </p>
             <p className="text-xs text-muted-foreground">Consumable Revenue</p>
           </div>
@@ -352,9 +363,13 @@ export default function FinancePage() {
             </span>
             <div className="flex items-baseline space-x-2">
               <span className="text-2xl font-bold">
-                {titanHealth ? formatCurrency(titanHealth.apple_pending_funds) : '...'}
+                {titanHealth
+                  ? formatCurrency(titanHealth.apple_pending_funds)
+                  : '...'}
               </span>
-              <span className="text-xs text-emerald-500 font-medium">Verified</span>
+              <span className="text-xs text-emerald-500 font-medium">
+                Verified
+              </span>
             </div>
             <p className="text-xs text-muted-foreground">
               Estimated Payout from App Store

@@ -274,10 +274,10 @@ function App() {
   const appProviders = [
     SafeAreaProvider,
     NetworkProvider,
+    ToastProvider,
     AuthProvider,
     BiometricAuthProvider,
     RealtimeProvider,
-    ToastProvider,
     ConfirmationProvider,
   ];
 

@@ -69,6 +69,8 @@ export interface DiscoverHeaderProps {
   userName?: string;
   userAvatar?: string;
   location?: string;
+  locationDisabled?: boolean;
+  locationDisabledMessage?: string;
   activeFiltersCount?: number;
   onLocationPress?: () => void;
   onFilterPress?: () => void;

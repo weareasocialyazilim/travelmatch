@@ -15,7 +15,13 @@ begin
 
   -- A1) Public read RPC must work (update this to your actual function/signature)
   -- Example:
-  -- perform 1 from public.discover_nearby_moments(41.0, 29.0, 10.0, 20, null, null, null, null);
+  perform 1 from public.discover_nearby_moments(
+    41.0::double precision,
+    29.0::double precision,
+    10000::integer,
+    20::integer,
+    0::integer
+  );
 
   -- A2) Table write must fail (replace table name with a real sensitive table)
   begin

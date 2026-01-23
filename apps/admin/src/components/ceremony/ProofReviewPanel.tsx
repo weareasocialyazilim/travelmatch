@@ -116,7 +116,7 @@ export function ProofReviewPanel({
     <div className="bg-card rounded-xl shadow-lg p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-foreground">Proof İnceleme</h2>
+        <h2 className="text-xl font-bold text-foreground">Kanıt İnceleme</h2>
         <CanvaBadge variant={getStatusVariant(proof.status) as any}>
           {proof.status === 'needs_review'
             ? 'İnceleme Bekliyor'
@@ -268,7 +268,7 @@ export function ProofReviewPanel({
           onClick={() => setShowInfoModal(true)}
         >
           <QuestionMarkCircleIcon className="w-5 h-5 mr-2" />
-          Daha Fazla Bilgi
+          Ek Bilgi İste
         </CanvaButton>
         <CanvaButton variant="danger" onClick={() => setShowRejectModal(true)}>
           <XMarkIcon className="w-5 h-5 mr-2" />
@@ -280,18 +280,18 @@ export function ProofReviewPanel({
       <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Proof'u Reddet</DialogTitle>
+            <DialogTitle>Kanıtı Reddet</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <label className="text-sm font-medium text-foreground">
-              Red Nedeni
+              Ret Nedeni
             </label>
             <Textarea
               value={rejectReason}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setRejectReason(e.target.value)
               }
-              placeholder="Kullanıcıya gösterilecek red nedenini yazın..."
+              placeholder="Kullanıcıya net ve saygılı bir açıklama yazın..."
               className="mt-2"
               rows={4}
             />
@@ -314,7 +314,7 @@ export function ProofReviewPanel({
       <Dialog open={showInfoModal} onOpenChange={setShowInfoModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Daha Fazla Bilgi İste</DialogTitle>
+            <DialogTitle>Ek Bilgi İste</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <label className="text-sm font-medium text-foreground">
@@ -325,7 +325,7 @@ export function ProofReviewPanel({
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setInfoMessage(e.target.value)
               }
-              placeholder="Kullanıcıdan ne tür bilgi istediğinizi açıklayın..."
+              placeholder="Kullanıcıdan hangi bilgiyi istediğinizi açıkça belirtin..."
               className="mt-2"
               rows={4}
             />

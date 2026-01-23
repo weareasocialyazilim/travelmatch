@@ -30,6 +30,7 @@ import { logger } from '@/utils/logger';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { coinService } from '@/services/coinService';
+import { showLoginPrompt } from '@/stores/modalStore';
 
 // RevenueCat import
 import Purchases, {
@@ -52,7 +53,7 @@ const CoinStoreScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
 
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,9 +61,16 @@ const CoinStoreScreen = () => {
   const [userCoins, setUserCoins] = useState(0);
 
   useEffect(() => {
+    if (isGuest) {
+      showLoginPrompt({ action: 'default' });
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+      return;
+    }
     fetchPackages();
     fetchUserCoins();
-  }, []);
+  }, [isGuest, navigation]);
 
   const fetchUserCoins = async () => {
     if (!user) return;

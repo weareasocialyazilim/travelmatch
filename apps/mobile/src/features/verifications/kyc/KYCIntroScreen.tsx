@@ -34,6 +34,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { securePaymentService } from '@/services';
 import { useToast } from '@/context/ToastContext';
+import { useKycAuthGuard } from './useKycAuthGuard';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -71,6 +72,7 @@ const KYCIntroScreen: React.FC = () => {
   const { showToast } = useToast();
   const insets = useSafeAreaInsets();
   const [isStarting, setIsStarting] = useState(false);
+  useKycAuthGuard();
 
   // Breathing glow animation
   const glowPulse = useSharedValue(0);

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,10 @@ import { useConfirmation } from '@/context/ConfirmationContext';
 import { supabase } from '@/config/supabase';
 import { uploadFile } from '@/services/supabaseStorageService';
 import { useAuth } from '@/context/AuthContext';
+import { showLoginPrompt } from '@/stores/modalStore';
+import { useFeatureFlag } from '@/utils/featureFlags';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { ANALYTICS_EVENTS } from '@lovendo/shared';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
@@ -90,8 +94,25 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
   const { user } = useAuth();
+  const analytics = useAnalytics();
+  const proofUploadEnabled = useFeatureFlag('proofUploadEnabled');
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!proofUploadEnabled) {
+      showToast(
+        'Proof yükleme şu anda geçici olarak kapalı. Lütfen daha sonra tekrar deneyin.',
+        'info',
+      );
+      navigation.goBack();
+      return;
+    }
+
+    if (user) return;
+    showLoginPrompt({ action: 'default' });
+    navigation.goBack();
+  }, [navigation, proofUploadEnabled, showToast, user]);
 
   // Get escrow/gift context from route params
   const {
@@ -267,13 +288,13 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   const handleNext = () => {
     if (currentStep === 'upload') {
       if (!photos || photos.length === 0) {
-        showToast('Please add at least one photo as proof', 'info');
+        showToast('Kısa bir fotoğraf veya video yeterli.', 'info');
         return;
       }
       setCurrentStep('details');
     } else if (currentStep === 'details') {
       if (!title || title.trim() === '') {
-        showToast('Please add a title for your proof', 'info');
+        showToast('Bu anı tamamlamak için kısa bir başlık ekle.', 'info');
         return;
       }
       setCurrentStep('verify');
@@ -391,8 +412,14 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         }
       }
 
-      // 6. Navigate to success
+      // 6. Track analytics + Navigate to success
       setLoading(false);
+      analytics.trackEvent(ANALYTICS_EVENTS.PROOF_UPLOADED, {
+        proofId: proofRecord?.id,
+        proofType: data.type,
+        hasTicket: Boolean(ticketUrl),
+        momentId: momentId || null,
+      });
       navigation.navigate('Success', { type: 'proof_uploaded' });
     } catch (error) {
       setLoading(false);
@@ -407,10 +434,8 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
   const renderTypeSelection = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Choose Proof Type</Text>
-      <Text style={styles.stepSubtitle}>
-        Select the type of gesture you want to verify
-      </Text>
+      <Text style={styles.stepTitle}>Kanıt türünü seç</Text>
+      <Text style={styles.stepSubtitle}>Doğrulamak istediğin anı seç</Text>
 
       <View style={styles.typesContainer}>
         {PROOF_TYPES.map((type) => (
@@ -438,21 +463,21 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
   const renderUploadStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Upload Evidence</Text>
+      <Text style={styles.stepTitle}>Bu anı tamamlıyorsun.</Text>
       <Text style={styles.stepSubtitle}>
-        Add photos, tickets, or location to verify your gesture
+        Kısa bir fotoğraf veya video yeterli. İstersen bilet de ekleyebilirsin.
       </Text>
 
       {/* Photos */}
       <View style={styles.uploadSection}>
-        <Text style={styles.sectionLabel}>Photos (Required)</Text>
+        <Text style={styles.sectionLabel}>Fotoğraflar (Zorunlu)</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
             style={styles.addPhotoButton}
             onPress={handleAddPhoto}
           >
             <Icon name="camera-plus" size={32} color={COLORS.brand.primary} />
-            <Text style={styles.addPhotoText}>Add Photo</Text>
+            <Text style={styles.addPhotoText}>Fotoğraf Ekle</Text>
           </TouchableOpacity>
           {photos?.map((photo) => (
             <View key={photo} style={styles.photoPreview}>
@@ -477,23 +502,23 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       {/* Ticket/Receipt */}
       <View style={styles.uploadSection}>
-        <Text style={styles.sectionLabel}>Ticket/Receipt (Optional)</Text>
+        <Text style={styles.sectionLabel}>Bilet/Belge (Opsiyonel)</Text>
         <TouchableOpacity style={styles.uploadButton} onPress={handleAddTicket}>
           <Icon name="receipt" size={24} color={COLORS.brand.primary} />
-          <Text style={styles.uploadButtonText}>Upload Ticket</Text>
+          <Text style={styles.uploadButtonText}>Bilet/Belge Ekle</Text>
         </TouchableOpacity>
       </View>
 
       {/* Location */}
       <View style={styles.uploadSection}>
-        <Text style={styles.sectionLabel}>Location</Text>
+        <Text style={styles.sectionLabel}>Konum</Text>
         <TouchableOpacity
           style={styles.uploadButton}
           onPress={handleSelectLocation}
         >
           <Icon name="map-marker" size={24} color={COLORS.brand.primary} />
           <Text style={styles.uploadButtonText}>
-            {location ? location.name : 'Add Location'}
+            {location ? location.name : 'Konum Ekle'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -505,7 +530,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>Devam Et</Text>
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -513,21 +538,19 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
   const renderDetailsStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Add Details</Text>
-      <Text style={styles.stepSubtitle}>
-        Describe your gesture to help others understand
-      </Text>
+      <Text style={styles.stepTitle}>Detayları ekle</Text>
+      <Text style={styles.stepSubtitle}>Bu anı kısaca anlat</Text>
 
       {/* Title */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>Title *</Text>
+        <Text style={styles.inputLabel}>Başlık *</Text>
         <Controller
           control={control}
           name="title"
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               style={styles.input}
-              placeholder="e.g., Coffee for a stranger"
+              placeholder="Örn: Paris’te sakin bir kahvaltı"
               placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
@@ -542,14 +565,14 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       {/* Description */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>Description *</Text>
+        <Text style={styles.inputLabel}>Açıklama *</Text>
         <Controller
           control={control}
           name="description"
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               style={[styles.input, styles.textArea]}
-              placeholder="Share the story behind your gesture..."
+              placeholder="Bu anı senin için özel yapan şey ne?"
               placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
@@ -567,7 +590,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       {/* Amount (for micro-kindness) */}
       {proofType === 'micro-kindness' && (
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Amount (Optional)</Text>
+          <Text style={styles.inputLabel}>Tutar (Opsiyonel)</Text>
           <View style={styles.amountInput}>
             <Text style={styles.currency}>$</Text>
             <Controller
@@ -592,14 +615,14 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       {/* Receiver */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>Receiver (Optional)</Text>
+        <Text style={styles.inputLabel}>Alıcı (Opsiyonel)</Text>
         <Controller
           control={control}
           name="receiver"
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               style={styles.input}
-              placeholder="Name or username of the receiver"
+              placeholder="Alıcının adı veya kullanıcı adı"
               placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
@@ -616,7 +639,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.buttonText}>Review</Text>
+          <Text style={styles.buttonText}>Gözden Geçir</Text>
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -624,54 +647,53 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
   const renderVerifyStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Review & Submit</Text>
+      <Text style={styles.stepTitle}>Gönder ve tamamla</Text>
       <Text style={styles.stepSubtitle}>
-        Check your proof before submitting for verification
+        Kısa bir kontrol yap, sonra gönder
       </Text>
 
       <View style={styles.reviewCard}>
         <View style={styles.reviewSection}>
-          <Text style={styles.reviewLabel}>Type</Text>
+          <Text style={styles.reviewLabel}>Tür</Text>
           <Text style={styles.reviewValue}>
             {PROOF_TYPES.find((t) => t.id === proofType)?.name}
           </Text>
         </View>
 
         <View style={styles.reviewSection}>
-          <Text style={styles.reviewLabel}>Title</Text>
+          <Text style={styles.reviewLabel}>Başlık</Text>
           <Text style={styles.reviewValue}>{title}</Text>
         </View>
 
         <View style={styles.reviewSection}>
-          <Text style={styles.reviewLabel}>Description</Text>
+          <Text style={styles.reviewLabel}>Açıklama</Text>
           <Text style={styles.reviewValue}>{description}</Text>
         </View>
 
         {location && (
           <View style={styles.reviewSection}>
-            <Text style={styles.reviewLabel}>Location</Text>
+            <Text style={styles.reviewLabel}>Konum</Text>
             <Text style={styles.reviewValue}>{location.name}</Text>
           </View>
         )}
 
         {amount && (
           <View style={styles.reviewSection}>
-            <Text style={styles.reviewLabel}>Amount</Text>
+            <Text style={styles.reviewLabel}>Tutar</Text>
             <Text style={styles.reviewValue}>${amount}</Text>
           </View>
         )}
 
         <View style={styles.reviewSection}>
-          <Text style={styles.reviewLabel}>Photos</Text>
-          <Text style={styles.reviewValue}>{photos?.length || 0} photos</Text>
+          <Text style={styles.reviewLabel}>Fotoğraf</Text>
+          <Text style={styles.reviewValue}>{photos?.length || 0} fotoğraf</Text>
         </View>
       </View>
 
       <View style={styles.verificationNote}>
         <Icon name="information" size={20} color={COLORS.feedback.info} />
         <Text style={styles.verificationText}>
-          Your proof will be verified using AI and blockchain technology. This
-          process usually takes 2-5 minutes.
+          Bu kanıt, deneyimin tamamlandığını doğrulamak için incelenecek.
         </Text>
       </View>
 
@@ -690,14 +712,13 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           end={{ x: 1, y: 0 }}
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Uploading Proof...' : 'Submit Proof'}
+            {loading ? 'Kanıt yükleniyor...' : 'Kanıtı Gönder'}
           </Text>
         </LinearGradient>
       </TouchableOpacity>
       {!loading && (
         <Text style={styles.uploadHint}>
-          This may take a moment to upload your photos. Please don't close the
-          screen.
+          Kısa bir fotoğraf veya video yeterli.
         </Text>
       )}
     </View>
@@ -707,10 +728,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {loading && (
         <>
-          <LoadingState type="overlay" message="Uploading your proof..." />
+          <LoadingState type="overlay" message="Kanıt yükleniyor..." />
           <View style={styles.loadingWarning}>
             <Text style={styles.loadingWarningText}>
-              Please don't close the screen while uploading.
+              Yükleme sırasında ekrandan ayrılma.
             </Text>
           </View>
         </>
@@ -737,7 +758,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         >
           <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Proof</Text>
+        <Text style={styles.headerTitle}>Kanıt Oluştur</Text>
         <TouchableOpacity
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
