@@ -11,9 +11,24 @@ console.log("RevenueCat Webhook Function Initialized");
 
 serve(async (req) => {
   try {
-    // 1. Verify Authentication
+    // EK-P0-4: SECURITY - Fail closed if secret is not configured
+    // Never accept requests without proper authentication
+    if (!REVENUECAT_SECRET) {
+      console.error("CRITICAL: REVENUECAT_WEBHOOK_SECRET is not configured");
+      return new Response(
+        JSON.stringify({ error: "Service misconfigured" }),
+        { status: 500 }
+      );
+    }
+
+    // 1. Verify Authentication - Bearer token format
     const authHeader = req.headers.get("Authorization");
-    if (REVENUECAT_SECRET && authHeader !== REVENUECAT_SECRET) {
+    const token = authHeader?.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : authHeader;
+
+    if (token !== REVENUECAT_SECRET) {
+      console.warn("Unauthorized webhook attempt");
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
