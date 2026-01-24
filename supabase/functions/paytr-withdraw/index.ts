@@ -7,10 +7,6 @@ import {
   generateMerchantOid,
 } from '../_shared/paytr.ts';
 
-// Exchange Rate: 1 Coin = X TRY
-// In a real app, this should be fetched from DB or config
-const COIN_TO_TRY_RATE = 0.50; 
-
 const WithdrawalSchema = z.object({
   amount: z.number().min(50, "En az 50 Coin çekebilirsiniz"), // Minimum 50 Coins
   bankAccountId: z.string().uuid(),
@@ -27,7 +23,8 @@ const handler = createGuard(
     const { amount: coinAmount, bankAccountId } = body;
     const userId = user!.id;
 
-    // 1. Exchange Rate (1:1 per Financial Constitution 2026)
+    // 1. Exchange Rate (Financial Constitution 2026: 1 LVND = 1 TRY)
+    // NOTE: Rate is hardcoded for consistency. Future: fetch from exchange_rates table
     const COIN_TO_TRY_RATE = 1.0;
     const fiatAmountGross = coinAmount * COIN_TO_TRY_RATE;
 
@@ -39,10 +36,14 @@ const handler = createGuard(
       .eq('status', 'active')
       .maybeSingle();
 
+    // Tier-based commission rates (aligned with subscription system)
     const planId = userSub?.plan_id || 'basic';
-    let commissionRate = 0.15; // Free: 15%
-    if (planId === 'premium') commissionRate = 0.10; // Pro: 10%
-    if (planId === 'platinum') commissionRate = 0.05; // Elite: 5%
+    const COMMISSION_RATES: Record<string, number> = {
+      'basic': 0.15,    // Basic: 15% commission
+      'premium': 0.10,  // Premium: 10% commission
+      'platinum': 0.05, // Platinum: 5% commission
+    };
+    const commissionRate = COMMISSION_RATES[planId] || 0.15;
 
     const commissionAmount = fiatAmountGross * commissionRate;
     const fiatAmountNet = fiatAmountGross - commissionAmount;
