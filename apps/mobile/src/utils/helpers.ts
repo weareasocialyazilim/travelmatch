@@ -16,6 +16,10 @@ export const formatTime = (date: Date): string => {
   });
 };
 
+/**
+ * @deprecated Use formatCurrency from @/utils/currencyFormatter instead
+ * This provides basic formatting - for advanced options use currencyFormatter
+ */
 export const formatCurrency = (amount: number, currency = 'USD'): string => {
   return new Intl.NumberFormat('tr-TR', {
     style: 'currency',
@@ -30,13 +34,11 @@ export const truncateText = (text: string, maxLength: number): string => {
 
 /**
  * Validation Helpers
+ * @deprecated Use isValidEmail from @/utils/security instead
  */
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
+export { isValidEmail as validateEmail } from './security';
 
-export const validatePhone = (phone: string): boolean => {
-  const phoneRegex = /^[\d\s\-+()]+$/;
-  return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
-};
+/**
+ * @deprecated Use isValidPhone from @/utils/security instead
+ */
+export { isValidPhone as validatePhone } from './security';
