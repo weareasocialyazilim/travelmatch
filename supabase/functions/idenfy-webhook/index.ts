@@ -13,11 +13,20 @@ const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+// SECURITY FIX: Restrict CORS to only iDenfy webhook origins
+// Prevents CSRF and unauthorized webhook attempts
+const ALLOWED_ORIGINS = [
+  'https://api.idenfy.com',
+  'https://ivs.idenfy.com',
+  'https://manual.idenfy.com',
+];
+
+const getCorsHeaders = (origin: string | null) => ({
+  'Access-Control-Allow-Origin':
+    origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, x-idenfy-signature',
-};
+});
 
 /**
  * Verify HMAC-SHA256 signature from iDenfy
@@ -65,6 +74,10 @@ interface IdenfyPayload {
 }
 
 serve(async (req: Request) => {
+  // Get origin for CORS validation
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

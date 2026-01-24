@@ -32,6 +32,15 @@ import type { Moment } from '@/hooks/useMoments';
 
 const { width, height } = Dimensions.get('window');
 
+// SECURITY FIX: Use local fallback image instead of external placeholder URLs
+// External URLs like via.placeholder.com will fail in offline mode and App Store review
+const FALLBACK_MOMENT_IMAGE = Image.resolveAssetSource(
+  require('../../../../assets/icon.png')
+).uri;
+const FALLBACK_AVATAR_IMAGE = Image.resolveAssetSource(
+  require('../../../../assets/icon.png')
+).uri;
+
 // Props interface
 export interface ImmersiveMomentCardProps {
   item: Moment;
@@ -128,9 +137,9 @@ export const ImmersiveMomentCard = memo(
     priceDisplay,
     priceSecondary,
   }: ImmersiveMomentCardProps) => {
-    // Get the first image or use a placeholder
+    // Get the first image or use local fallback (no external URLs)
     const imageUrl =
-      item.images?.[0] || item.image || 'https://via.placeholder.com/400x800';
+      item.images?.[0] || item.image || FALLBACK_MOMENT_IMAGE;
 
     // Get location string
     const locationString =
@@ -176,7 +185,7 @@ export const ImmersiveMomentCard = memo(
           >
             <Image
               source={{
-                uri: item.hostAvatar || 'https://via.placeholder.com/40',
+                uri: item.hostAvatar || FALLBACK_AVATAR_IMAGE,
               }}
               style={styles.avatar}
             />

@@ -11,10 +11,28 @@ console.log("RevenueCat Webhook Function Initialized");
 
 serve(async (req) => {
   try {
-    // 1. Verify Authentication
+    // 1. Verify Authentication (MANDATORY - no bypass allowed)
+    // SECURITY FIX: The secret MUST be configured in production
+    if (!REVENUECAT_SECRET) {
+      console.error("CRITICAL: REVENUECAT_WEBHOOK_SECRET not configured!");
+      return new Response(
+        JSON.stringify({ error: "Server misconfigured" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const authHeader = req.headers.get("Authorization");
-    if (REVENUECAT_SECRET && authHeader !== REVENUECAT_SECRET) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
+    // Support both raw secret and Bearer token format
+    const authMatches = authHeader === REVENUECAT_SECRET ||
+                        authHeader === `Bearer ${REVENUECAT_SECRET}`;
+
+    if (!authMatches) {
+      console.warn("Unauthorized webhook attempt");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const { event, api_version } = await req.json();
