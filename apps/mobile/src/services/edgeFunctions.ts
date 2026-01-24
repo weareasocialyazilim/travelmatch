@@ -65,6 +65,11 @@ interface SignedUrlResponse {
   expires_at: string;
 }
 
+type InvokeOptions = Parameters<typeof supabase.functions.invoke>[1];
+type EdgeFunctionPayload = InvokeOptions extends { body?: infer B }
+  ? B
+  : unknown;
+
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
@@ -73,14 +78,19 @@ interface SignedUrlResponse {
  * Get current session token
  */
 async function getAccessToken(): Promise<string | null> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session?.access_token ?? null;
 }
 
 /**
  * Call an Edge Function with proper authentication
  */
-async function callEdgeFunction<TRequest, TResponse>(
+async function callEdgeFunction<
+  TRequest extends EdgeFunctionPayload,
+  TResponse,
+>(
   functionName: string,
   payload: TRequest,
 ): Promise<EdgeFunctionResponse<TResponse>> {
@@ -90,12 +100,15 @@ async function callEdgeFunction<TRequest, TResponse>(
       return { data: null, error: new Error('Not authenticated') };
     }
 
-    const { data, error } = await supabase.functions.invoke<TResponse>(functionName, {
-      body: payload,
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const { data, error } = await supabase.functions.invoke<TResponse>(
+      functionName,
+      {
+        body: payload,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (error) {
       logger.error(`[EdgeFunction] ${functionName} failed:`, error);
@@ -136,7 +149,9 @@ export async function approveGiftChat(
  * Delete user account (soft delete)
  * Replaces direct supabase.from('users').update({ deleted_at })
  */
-export async function deleteAccount(): Promise<EdgeFunctionResponse<DeleteAccountResponse>> {
+export async function deleteAccount(): Promise<
+  EdgeFunctionResponse<DeleteAccountResponse>
+> {
   logger.info('[EdgeFunction] Deleting account');
 
   return callEdgeFunction<Record<string, never>, DeleteAccountResponse>(
