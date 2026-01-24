@@ -65,10 +65,12 @@ interface SignedUrlResponse {
   expires_at: string;
 }
 
-type InvokeOptions = Parameters<typeof supabase.functions.invoke>[1];
-type EdgeFunctionPayload = InvokeOptions extends { body?: infer B }
-  ? B
-  : unknown;
+type EdgeFunctionPayload =
+  | string
+  | Record<string, any>
+  | ArrayBuffer
+  | FormData
+  | undefined;
 
 // =============================================================================
 // HELPER FUNCTIONS
