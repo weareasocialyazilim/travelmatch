@@ -76,31 +76,21 @@ serve(async (req) => {
 
     const coinAmount = packageData.coin_amount;
 
-    // 4. Check if transaction already processed
-    const { data: existingTx } = await supabase
-        .from('coin_transactions')
-        .select('id')
-        .eq('reference_id', transactionId) // Assuming reference_id stores the IAP transaction ID
-        .maybeSingle();
-
-    if (existingTx) {
-        return new Response(JSON.stringify({ message: "Transaction already processed" }), { status: 200 });
-    }
-
-    // 5. Credit User (Idempotent)
-    // Call the PostgreSQL function we created (handle_coin_transaction)
-    const { error: rpcError } = await supabase.rpc('handle_coin_transaction', {
+    // 4. Credit User (with built-in idempotency)
+    // The handle_coin_transaction RPC handles duplicate detection via idempotency_key
+    const { data: result, error: rpcError } = await supabase.rpc('handle_coin_transaction', {
         p_user_id: userId,
         p_amount: coinAmount,
         p_type: 'purchase',
-        p_description: `Purchase: ${packageData.name}`,
         p_reference_id: transactionId,
         p_metadata: {
+            package_name: packageData.name,
             revenuecat_event_id: event.id,
             price: price,
             currency: currency,
             store: event.store
-        }
+        },
+        p_idempotency_key: transactionId  // Use transaction ID for idempotency
     });
 
     if (rpcError) {
@@ -108,7 +98,19 @@ serve(async (req) => {
         return new Response(JSON.stringify({ error: "Failed to credit coins" }), { status: 500 });
     }
 
-    return new Response(JSON.stringify({ success: true, coins_added: coinAmount }), {
+    // Result is JSONB with success/error info
+    if (result && !result.success) {
+        console.error("Coin transaction failed:", result.error);
+        return new Response(JSON.stringify({ error: result.error }), { status: 500 });
+    }
+
+    console.log(`Successfully credited ${coinAmount} coins. New balance: ${result.new_balance}`);
+    return new Response(JSON.stringify({
+        success: true,
+        coins_added: coinAmount,
+        new_balance: result.new_balance,
+        was_duplicate: result.message?.includes('idempotent')
+    }), {
         headers: { "Content-Type": "application/json" },
         status: 200,
     });

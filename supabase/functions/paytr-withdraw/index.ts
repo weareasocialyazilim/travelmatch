@@ -80,8 +80,11 @@ const handler = createGuard(
     const requiresManualApproval = coinAmount > APPROVAL_THRESHOLD;
     const initialStatus = requiresManualApproval ? 'pending_approval' : 'pending_processing';
 
-    // 6. Burn Coins (Atomic Transaction)
-    const { error: coinIdxError } = await supabaseAdmin.rpc('handle_coin_transaction', {
+    // 6. Generate Settlement ID (used as idempotency key)
+    const settlementId = generateMerchantOid('WTH');
+
+    // 7. Burn Coins (Atomic Transaction with Idempotency)
+    const { data: coinTxResult, error: coinIdxError } = await supabaseAdmin.rpc('handle_coin_transaction', {
         p_user_id: userId,
         p_amount: -coinAmount,
         p_type: 'withdrawal_burn',
@@ -93,23 +96,47 @@ const handler = createGuard(
             rate: COIN_TO_TRY_RATE,
             tier: planId,
             bank_account: bankAccountId,
-            requires_approval: requiresManualApproval
-        }
+            requires_approval: requiresManualApproval,
+            settlement_id: settlementId
+        },
+        p_idempotency_key: settlementId  // Prevents duplicate burns
     });
 
     if (coinIdxError) {
         throw new Error('Coin düşümü başarısız: ' + coinIdxError.message);
     }
 
-    const mockSettlementId = generateMerchantOid('WTH');
-    
-    // 7. Log Withdrawal Request
+    // Check if this was a duplicate request
+    const isDuplicate = coinTxResult?.message?.includes('idempotent');
+    if (isDuplicate) {
+        // Return existing withdrawal request
+        const { data: existingRequest } = await supabaseAdmin
+            .from('withdrawal_requests')
+            .select('*')
+            .eq('paytr_settlement_id', settlementId)
+            .single();
+
+        if (existingRequest) {
+            return {
+                success: true,
+                settlementId: settlementId,
+                coins_deducted: coinAmount,
+                fiat_amount: fiatAmountNet,
+                commission: commissionAmount,
+                requires_approval: requiresManualApproval,
+                status: existingRequest.status,
+                duplicate_request: true
+            };
+        }
+    }
+
+    // 8. Log Withdrawal Request
     await supabaseAdmin.from('withdrawal_requests').insert({
         user_id: userId,
         amount: fiatAmountNet,
         currency: 'TRY',
         bank_account_id: bankAccountId,
-        paytr_settlement_id: mockSettlementId,
+        paytr_settlement_id: settlementId,
         status: initialStatus,
         withdrawal_approval_status: requiresManualApproval ? 'pending_approval' : 'approved',
         metadata: {
@@ -122,7 +149,7 @@ const handler = createGuard(
 
     return {
         success: true,
-        settlementId: mockSettlementId,
+        settlementId: settlementId,
         coins_deducted: coinAmount,
         fiat_amount: fiatAmountNet,
         commission: commissionAmount,

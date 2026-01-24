@@ -18,6 +18,7 @@ CREATE OR REPLACE FUNCTION handle_coin_transaction(
     p_user_id UUID,
     p_amount DECIMAL(20,2),  -- Changed from INTEGER
     p_type TEXT DEFAULT 'purchase',
+    p_description TEXT DEFAULT NULL,  -- Kept for backward compatibility
     p_reference_id TEXT DEFAULT NULL,
     p_metadata JSONB DEFAULT '{}'::jsonb,
     p_idempotency_key TEXT DEFAULT NULL
@@ -47,16 +48,14 @@ BEGIN
         END IF;
     END IF;
 
-    -- 2. Get or create wallet
+    -- 2. Get or create wallet (atomic, prevents race condition)
+    INSERT INTO wallets (user_id, currency, coins_balance, balance)
+    VALUES (p_user_id, 'LVND', 0, 0)
+    ON CONFLICT (user_id, currency) DO NOTHING;
+
     SELECT id INTO v_wallet_id
     FROM wallets
     WHERE user_id = p_user_id AND currency = 'LVND';
-
-    IF v_wallet_id IS NULL THEN
-        INSERT INTO wallets (user_id, currency, coins_balance, balance)
-        VALUES (p_user_id, 'LVND', 0, 0)
-        RETURNING id INTO v_wallet_id;
-    END IF;
 
     -- 3. Update wallet balance (with row-level lock to prevent race conditions)
     UPDATE wallets
