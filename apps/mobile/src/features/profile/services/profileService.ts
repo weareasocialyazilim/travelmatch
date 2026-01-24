@@ -1,9 +1,19 @@
 import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/logger';
 
 export interface UpdateProfileDto {
   full_name?: string;
   avatar_url?: string;
   bio?: string;
+}
+
+/**
+ * EK-P0-3: Generate secure random filename
+ * Uses crypto.randomUUID() to prevent enumeration attacks
+ */
+function generateSecureFilename(fileExt: string): string {
+  const uuid = crypto.randomUUID();
+  return `${uuid}.${fileExt}`;
 }
 
 /**
@@ -96,6 +106,11 @@ export const profileApi = {
 
   /**
    * Avatar upload
+   *
+   * EK-P0-3: Security improvements:
+   * - Uses UUID filename to prevent enumeration
+   * - Stores path instead of public URL in database
+   * - Uses signed URLs for retrieval
    */
   uploadAvatar: async (file: File) => {
     const {
@@ -103,22 +118,37 @@ export const profileApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    // EK-P0-3: Use secure random filename instead of predictable user.id-timestamp
+    const fileName = generateSecureFilename(fileExt);
     const filePath = `avatars/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false, // Don't overwrite - each upload is unique
+      });
 
     if (uploadError) throw uploadError;
 
-    const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    // EK-P0-3: Generate signed URL instead of public URL
+    // Signed URL expires in 1 hour (3600 seconds)
+    const { data: signedData, error: signError } = await supabase.storage
+      .from('avatars')
+      .createSignedUrl(filePath, 3600);
 
-    // Update profile with new avatar URL
-    await profileApi.update({ avatar_url: data.publicUrl });
+    if (signError) {
+      logger.error('[Profile] Failed to create signed URL:', signError);
+      throw signError;
+    }
 
-    return data.publicUrl;
+    // Store the path (not URL) in database
+    // The frontend will request fresh signed URLs when needed
+    await profileApi.update({ avatar_url: filePath });
+
+    // Return signed URL for immediate display
+    return signedData.signedUrl;
   },
 
   /**
@@ -241,6 +271,10 @@ export const profileApi = {
 
   /**
    * Yeni moment oluştur
+   *
+   * EK-P0-3: Security improvements:
+   * - Uses UUID filename to prevent enumeration
+   * - Stores path instead of public URL
    */
   createMoment: async (momentData: FormData) => {
     const {
@@ -253,19 +287,23 @@ export const profileApi = {
     let imageUrl = null;
 
     if (image) {
-      const fileExt = image.name.split('.').pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const fileExt = image.name.split('.').pop() || 'jpg';
+      // EK-P0-3: Use secure random filename
+      const fileName = generateSecureFilename(fileExt);
       const filePath = `moments/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('moments')
-        .upload(filePath, image);
+        .upload(filePath, image, {
+          cacheControl: '3600',
+          upsert: false,
+        });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from('moments').getPublicUrl(filePath);
-
-      imageUrl = data.publicUrl;
+      // EK-P0-3: Store path instead of public URL
+      // Frontend will generate signed URLs as needed
+      imageUrl = filePath;
     }
 
     const contentValue = momentData.get('content');

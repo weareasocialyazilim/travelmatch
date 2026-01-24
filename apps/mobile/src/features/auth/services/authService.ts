@@ -10,6 +10,7 @@ import { auth, isSupabaseConfigured } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import { VALUES } from '@/constants/values';
 import { secureStorage, StorageKeys } from '@/utils/secureStorage';
+import { edgeFunctions } from '@/services/edgeFunctions';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
 // ============================================
@@ -643,24 +644,32 @@ export const updateProfile = async (data: {
 
 /**
  * Delete account (soft delete)
+ *
+ * EK-P0-1: Now uses Edge Function instead of direct DB access
+ * This ensures:
+ * - Proper audit logging
+ * - Server-side validation
+ * - No direct client write to users.deleted_at
  */
 export const deleteAccount = async (): Promise<{ error: AuthError | null }> => {
   try {
     const { data: userData } = await auth.getUser();
-    if (userData?.user) {
-      await supabase
-        .from('users')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', userData.user.id);
+    if (!userData?.user) {
+      return { error: { message: 'Not authenticated' } as AuthError };
     }
 
-    const { error } = await auth.signOut();
-    if (error) {
-      logger.error('[Auth] Delete account error:', error);
-      return { error };
+    // EK-P0-1: Use Edge Function for secure account deletion
+    const { error: deleteError } = await edgeFunctions.deleteAccount();
+
+    if (deleteError) {
+      logger.error('[Auth] Delete account error:', deleteError);
+      return { error: { message: deleteError.message } as AuthError };
     }
 
-    logger.info('[Auth] Account deletion initiated');
+    // Edge Function handles sign out, but ensure local cleanup
+    await auth.signOut();
+
+    logger.info('[Auth] Account deletion completed');
     return { error: null };
   } catch (error) {
     logger.error('[Auth] Delete account exception:', error);
