@@ -318,8 +318,8 @@ class DeepLinkHandler {
       return { exists: false, expired: false, statusCode: response.status };
     } catch (error) {
       logger.error('[DeepLink] Existence check failed:', error);
-      // On network error, assume exists (fail-open)
-      return { exists: true, expired: false };
+      // SECURITY: Fail closed on network errors
+      return { exists: false, expired: false, networkError: true };
     }
   }
 
