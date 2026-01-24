@@ -31,7 +31,17 @@ module.exports = function (api) {
         },
       ],
       // Remove console logs in production for performance
-      ...(isProduction ? ['transform-remove-console'] : []),
+      // Keep console.error and console.warn for production debugging
+      ...(isProduction
+        ? [
+            [
+              'transform-remove-console',
+              {
+                exclude: ['error', 'warn'],
+              },
+            ],
+          ]
+        : []),
       // Reanimated MUST be last
       'react-native-reanimated/plugin',
     ],

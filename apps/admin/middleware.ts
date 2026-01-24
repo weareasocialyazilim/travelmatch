@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
@@ -24,7 +25,7 @@ export async function middleware(request: NextRequest) {
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';",
   );
 
-  const adminSession = request.cookies.get('admin_session');
+  const adminSessionToken = request.cookies.get('admin_session')?.value;
 
   // All protected dashboard routes - synchronized with sidebar navigation
   const protectedRoutes = [
@@ -94,22 +95,55 @@ export async function middleware(request: NextRequest) {
 
   // Root redirect
   if (request.nextUrl.pathname === '/') {
-    if (adminSession) {
+    if (adminSessionToken) {
       return NextResponse.redirect(new URL('/queue', request.url));
     } else {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
-  // Redirect unauthenticated users to login
-  if (isProtectedRoute && !adminSession) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+  // SECURITY FIX: Validate session token for protected routes
+  // Previously only checked cookie presence, now validates session is active and not expired
+  if (isProtectedRoute) {
+    if (!adminSessionToken) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Validate session token (lightweight check in middleware)
+    // Full validation happens in API routes via requireAdminAuth()
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (supabaseUrl && supabaseServiceKey) {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        const { data: session } = await supabase
+          .from('admin_sessions')
+          .select('id, expires_at')
+          .eq('token_hash', adminSessionToken)
+          .gt('expires_at', new Date().toISOString())
+          .single();
+
+        if (!session) {
+          // Session invalid or expired - redirect to login
+          const loginUrl = new URL('/login', request.url);
+          loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
+          loginUrl.searchParams.set('reason', 'session_expired');
+          return NextResponse.redirect(loginUrl);
+        }
+      }
+    } catch (error) {
+      // On error, allow through but let API routes handle full validation
+      // This prevents middleware from breaking if DB is temporarily unavailable
+      console.warn('Middleware session validation error:', error);
+    }
   }
 
   // Redirect authenticated users away from auth pages
-  if (isAuthRoute && adminSession) {
+  if (isAuthRoute && adminSessionToken) {
     const redirectUrl = new URL('/queue', request.url);
     return NextResponse.redirect(redirectUrl);
   }
