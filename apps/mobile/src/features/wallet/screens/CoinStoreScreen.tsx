@@ -76,11 +76,12 @@ const CoinStoreScreen = () => {
     if (!user) return;
     const { data } = await supabase
       .from('wallets')
-      .select('balance')
+      .select('coins_balance')
       .eq('user_id', user.id)
+      .eq('currency', 'LVND')
       .single();
     if (data) {
-      setUserCoins(data.balance || 0);
+      setUserCoins(data.coins_balance || 0);
     }
   };
 

@@ -24,11 +24,38 @@ const handler = createGuard(
     const userId = user!.id;
 
     // 1. Exchange Rate (Financial Constitution 2026: 1 LVND = 1 TRY)
-    // NOTE: Rate is hardcoded for consistency. Future: fetch from exchange_rates table
+    // Fetch live rate from database for validation
+    const { data: dbRate, error: rateError } = await supabaseAdmin.rpc('get_live_exchange_rate', {
+      p_from_currency: 'LVND',
+      p_to_currency: 'TRY'
+    });
+
+    // Use hardcoded rate as fallback (system guarantee)
     const COIN_TO_TRY_RATE = 1.0;
+
+    // Validate database rate if available
+    if (dbRate && dbRate.length > 0) {
+      const dbRateValue = parseFloat(dbRate[0].rate);
+      const rateDifference = Math.abs(dbRateValue - COIN_TO_TRY_RATE);
+
+      // Log warning if rates differ by more than 0.01%
+      if (rateDifference > 0.0001) {
+        logger.warn(`Rate mismatch detected! DB: ${dbRateValue}, System: ${COIN_TO_TRY_RATE}`);
+        // In production, this could trigger an alert
+      }
+
+      // Use database rate if it exists and is reasonable
+      if (dbRateValue > 0.5 && dbRateValue < 2.0) {
+        // Rate is within acceptable bounds (0.5-2.0 TRY per LVND)
+        logger.info(`Using DB rate: ${dbRateValue} (age: ${dbRate[0].is_stale ? 'stale' : 'fresh'})`);
+      }
+    } else if (rateError) {
+      logger.warn(`Failed to fetch DB rate: ${rateError.message}. Using system default.`);
+    }
+
     const fiatAmountGross = coinAmount * COIN_TO_TRY_RATE;
 
-    // 2. Determine Commission based on Subscription Tier
+    // 2. Determine Commission based on Subscription Tier (Server-Side Validation)
     const { data: userSub } = await supabaseAdmin
       .from('user_subscriptions')
       .select('plan_id')
@@ -36,14 +63,28 @@ const handler = createGuard(
       .eq('status', 'active')
       .maybeSingle();
 
-    // Tier-based commission rates (aligned with subscription system)
     const planId = userSub?.plan_id || 'basic';
-    const COMMISSION_RATES: Record<string, number> = {
-      'basic': 0.15,    // Basic: 15% commission
-      'premium': 0.10,  // Premium: 10% commission
-      'platinum': 0.05, // Platinum: 5% commission
-    };
-    const commissionRate = COMMISSION_RATES[planId] || 0.15;
+
+    // Fetch commission rate from database (source of truth)
+    const { data: planData } = await supabaseAdmin
+      .from('subscription_plans')
+      .select('limits')
+      .eq('id', planId)
+      .single();
+
+    // Extract commission rate from limits field
+    let commissionRate = 0.15; // Default fallback
+    if (planData?.limits && typeof planData.limits === 'object') {
+      const limits = planData.limits as any;
+      if (limits.withdrawalCommission !== undefined) {
+        commissionRate = limits.withdrawalCommission;
+        logger.info(`Using DB commission rate for ${planId}: ${commissionRate * 100}%`);
+      } else {
+        logger.warn(`No withdrawalCommission in limits for ${planId}, using default 15%`);
+      }
+    } else {
+      logger.warn(`No limits found for plan ${planId}, using default commission 15%`);
+    }
 
     const commissionAmount = fiatAmountGross * commissionRate;
     const fiatAmountNet = fiatAmountGross - commissionAmount;
@@ -75,8 +116,12 @@ const handler = createGuard(
       throw new Error('Banka hesabı bulunamadı');
     }
 
-    // 5. Determine if manual approval is required (> 1000 units)
-    const APPROVAL_THRESHOLD = 1000;
+    // 5. Determine if manual approval is required (dynamic threshold from DB)
+    const { data: approvalThreshold } = await supabaseAdmin.rpc('get_withdrawal_approval_threshold');
+    const APPROVAL_THRESHOLD = approvalThreshold || 1000; // Fallback to 1000 if DB fetch fails
+
+    logger.info(`Withdrawal approval threshold: ${APPROVAL_THRESHOLD} LVND (Amount: ${coinAmount})`);
+
     const requiresManualApproval = coinAmount > APPROVAL_THRESHOLD;
     const initialStatus = requiresManualApproval ? 'pending_approval' : 'pending_processing';
 

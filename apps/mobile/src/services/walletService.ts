@@ -184,14 +184,14 @@ class WalletService {
       // Fetch updated coins_balance from wallets table
       const { data: coinWallet } = await supabase
         .from('wallets')
-        .select('balance')
+        .select('coins_balance')
         .eq('user_id', user.id)
         .eq('currency', 'LVND')
         .single();
 
       const balance: WalletBalance = {
         available: result.available_balance,
-        coins: coinWallet?.balance || 0,
+        coins: coinWallet?.coins_balance || 0,
         pending: result.pending_balance,
         currency: result.currency || 'TRY',
       };
@@ -249,7 +249,7 @@ class WalletService {
 
     const { data: wallets, error } = await supabase
       .from('wallets')
-      .select('balance, currency')
+      .select('balance, coins_balance, currency')
       .eq('user_id', userId);
 
     if (error) throw error;
@@ -261,7 +261,7 @@ class WalletService {
 
     return {
       available: fiatWallet?.balance || 0,
-      coins: coinWallet?.balance || 0,
+      coins: coinWallet?.coins_balance || 0, // Use coins_balance for LVND
       pending: 0, // Pending balance not persisted in wallets table
       currency: fiatWallet?.currency || 'TRY',
     };
