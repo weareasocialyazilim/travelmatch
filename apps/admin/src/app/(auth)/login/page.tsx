@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,6 +39,17 @@ export default function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+
+  // Check for session expiration
+  useEffect(() => {
+    if (searchParams?.get('reason') === 'session_expired') {
+      toast.error('Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
+      // Clean up URL to prevent toast on refresh
+      window.history.replaceState({}, '', '/login');
+    }
+  }, [searchParams]);
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);

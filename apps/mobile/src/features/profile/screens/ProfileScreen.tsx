@@ -31,7 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useParallaxHeader } from '@/hooks/useParallaxHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { SkeletonList } from '@/components/ui';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import {
@@ -555,7 +555,7 @@ const ProfileScreen: React.FC = () => {
           {/* Moments Grid */}
           <View style={styles.momentsGrid}>
             {myMomentsLoading && myMoments.length === 0 ? (
-              <SkeletonList type="moment" count={4} />
+              <Skeleton type="list" listType="moment" count={4} />
             ) : displayedMoments.length > 0 ? (
               <FlashList
                 data={displayedMoments}

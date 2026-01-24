@@ -66,6 +66,7 @@ import {
   ContentReactiveGlow,
   LocationPermissionPrompt,
 } from '@/components/ui';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { LocationModal } from '../components/LocationModal';
 import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
