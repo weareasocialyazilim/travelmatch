@@ -44,7 +44,7 @@ import { userService } from '@/services/userService';
 type IconName = React.ComponentProps<typeof Icon>['name'];
 
 const INTERESTS: { id: string; name: string; icon: IconName }[] = [
-  { id: '1', name: 'Travel', icon: 'airplane' },
+  { id: '1', name: 'Experiences', icon: 'star' },
   { id: '2', name: 'Food', icon: 'food' },
   { id: '3', name: 'Adventure', icon: 'hiking' },
   { id: '4', name: 'Culture', icon: 'domain' },

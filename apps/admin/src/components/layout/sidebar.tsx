@@ -2,7 +2,7 @@
 
 /**
  * Lovendo Admin Sidebar
- * "Cinematic Travel + Trust Jewelry" Design
+ * "Cinematic Experience + Trust Jewelry" Design
  */
 
 import { useRef, useEffect, useCallback, memo, useState } from 'react';

@@ -63,7 +63,7 @@ export const USER_STORIES: UserStory[] = [
         id: 's3-1',
         imageUrl:
           'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800',
-        title: 'Street Art Tour',
+        title: 'Street Art Experience',
         description: 'Discover hidden murals and graffiti art',
         location: 'Bushwick, NY',
         distance: '3.2 km',
@@ -105,7 +105,7 @@ export const USER_STORIES: UserStory[] = [
         id: 's4-1',
         imageUrl:
           'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
-        title: 'Food Market Tour',
+        title: 'Food Market Experience',
         description: 'Taste the best local cuisines',
         location: 'Queens, NY',
         distance: '5.0 km',
@@ -187,7 +187,7 @@ export const USER_STORIES: UserStory[] = [
         id: 's7-2',
         imageUrl:
           'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800',
-        title: 'Boutique Tour',
+        title: 'Boutique Experience',
         description: 'Discover unique local designers',
         location: 'Nolita, NY',
         distance: '1.8 km',

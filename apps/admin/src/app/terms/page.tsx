@@ -28,7 +28,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p className="text-muted-foreground">
-              Welcome to our proof-based social gifting platform for travel
+              Welcome to our proof-based social experience platform
               moments. These Terms of Service (&quot;Terms&quot;) govern your
               use of our services, connecting travelers and supporters through
               escrow-protected, verified gestures. By accessing or using our
@@ -59,7 +59,7 @@ export default function TermsPage() {
             <p className="text-muted-foreground">
               All gifts contributed by supporters are held in a secure escrow
               account. Funds are released to the traveler only after they have
-              provided valid proof of completing the specified travel moment.
+              provided valid proof of completing the specified moment.
               Our platform acts as a neutral third party to ensure the integrity
               of each transaction.
             </p>

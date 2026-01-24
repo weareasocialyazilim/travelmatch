@@ -39,7 +39,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">2. Location Use</h2>
             <p className="text-muted-foreground">
-              To verify your travel moments, we require access to your
+              To verify your moments, we require access to your
               device&apos;s location data. This information is used solely for
               the purpose of confirming that you are at the location you claim
               to be, which is essential for the proof-based nature of our
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
               3. Photos & Proof Data
             </h2>
             <p className="text-muted-foreground">
-              When you upload photos or other media as proof of a travel moment,
+              When you upload photos or other media as proof of a moment,
               we store this data securely. This content is used to validate your
               experience and is shared with your designated supporters. We do
               not use your photos for any purpose other than the core
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
               transactions. Your payment information is encrypted and
               transmitted directly to the processor; we do not store your full
               credit card details on our servers. All funds are held in a secure
-              escrow system until the travel moment is successfully verified.
+              escrow system until the moment is successfully verified.
             </p>
           </section>
 

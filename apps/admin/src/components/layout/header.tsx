@@ -2,7 +2,7 @@
 
 /**
  * Lovendo Admin Header
- * "Cinematic Travel + Trust Jewelry" Design
+ * "Cinematic Experience + Trust Jewelry" Design
  */
 
 import { useCallback, useEffect } from 'react';

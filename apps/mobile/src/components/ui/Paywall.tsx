@@ -60,7 +60,7 @@ const FEATURE_CONFIG: Record<
     icon: 'image-multiple',
     title: 'Moment Limit Reached',
     description:
-      "You've used all your moments this month. Upgrade to create more travel experiences.",
+      "You've used all your moments this month. Upgrade to create more experiences.",
     requiredPlan: 'first_class',
   },
   messages: {

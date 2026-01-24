@@ -38,7 +38,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
     type: 'micro-kindness',
     title: 'Coffee for a Stranger',
     description:
-      'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about travel and kindness. Small gestures can make a big difference! 💙',
+      'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about life and kindness. Small gestures can make a big difference! 💙',
     date: '2024-01-15',
     location: 'Starbucks, 5th Avenue, New York',
     amount: 5,

@@ -2,7 +2,7 @@
 
 /**
  * User Lifecycle Management
- * Comprehensive user journey tracking from onboarding to retention
+ * Comprehensive user flow tracking from onboarding to retention
  * With AI-powered churn prediction and lifecycle analytics
  */
 

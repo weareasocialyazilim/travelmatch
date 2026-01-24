@@ -165,7 +165,7 @@ const realtimeActivity = [
   {
     time: '14:26',
     type: 'moment',
-    message: 'Yeni moment olusturuldu: Bosphorus Tour',
+    message: 'Yeni moment olusturuldu: Bosphorus Experience',
     user: 'Deniz K.',
     status: 'success',
   },

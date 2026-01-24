@@ -42,7 +42,7 @@ const DOCUMENT_OPTIONS = [
   {
     id: 'passport' as DocumentType,
     label: 'Pasaport',
-    description: 'Uluslararası seyahat belgesi',
+    description: 'Uluslararası kimlik belgesi',
     icon: 'passport' as const,
     accentColor: COLORS.primary,
   },

@@ -56,7 +56,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
       icon: 'share-variant',
       title: 'Share Your Plans',
       description:
-        'Let a friend or family member know your travel plans, including who you are meeting and where.',
+        'Let a friend or family member know your plans, including who you are meeting and where.',
     },
     {
       id: 'trust',

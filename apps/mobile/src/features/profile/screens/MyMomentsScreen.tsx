@@ -219,7 +219,7 @@ const MyMomentsScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={handleCreateMoment}
-          {...a11y.button('Create new moment', 'Add a new travel moment')}
+          {...a11y.button('Create new moment', 'Add a new moment')}
         >
           <MaterialCommunityIcons
             name="plus"
