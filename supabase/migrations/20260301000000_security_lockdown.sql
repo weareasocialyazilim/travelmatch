@@ -27,12 +27,12 @@ REVOKE DELETE ON gifts FROM authenticated;
 
 REVOKE UPDATE ON users FROM authenticated;
 GRANT UPDATE (
-    full_name, 
-    avatar_url, 
-    bio, 
-    location, 
-    gender, 
-    birthdate,
+    full_name,
+    avatar_url,
+    bio,
+    location,
+    gender,
+    date_of_birth,
     updated_at
 ) ON users TO authenticated;
 

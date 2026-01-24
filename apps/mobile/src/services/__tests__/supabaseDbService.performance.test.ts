@@ -261,9 +261,6 @@ describe('Supabase Query Performance Optimization', () => {
         expect.stringContaining('id'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('email'),
-      );
-      expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining('full_name'),
       );
 

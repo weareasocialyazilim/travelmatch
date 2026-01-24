@@ -22,6 +22,7 @@ jest.mock('../../config/supabase', () => ({
       getUser: jest.fn(),
       getSession: jest.fn(),
     },
+    rpc: jest.fn(),
     from: jest.fn(),
   },
 }));
@@ -45,6 +46,24 @@ jest.mock('../cacheInvalidationService', () => ({
   setCachedWallet: jest.fn().mockResolvedValue(undefined),
   invalidateWallet: jest.fn().mockResolvedValue(undefined),
   invalidateAllPaymentCache: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('../walletService', () => ({
+  walletService: {
+    getBalance: jest.fn().mockResolvedValue({
+      available: 500,
+      coins: 500,
+      pending: 0,
+      currency: 'USD',
+    }),
+    requestCoinWithdrawal: jest.fn().mockImplementation((args) => {
+      // Simulate slow response if needed by test, otherwise fast
+      return Promise.resolve({
+        settlementId: 'set-123',
+        fiatAmount: 100,
+      });
+    }),
+  },
 }));
 
 const mockSupabase = supabase as any;
@@ -291,6 +310,18 @@ describe('PaymentService - Timeout Edge Cases', () => {
         moment_id: null,
         metadata: {},
       };
+
+      // Mock user profile RPC (for balance check)
+      mockSupabase.rpc.mockReturnValue({
+        single: jest.fn().mockResolvedValue({
+          data: {
+            id: 'user-123',
+            coins_balance: 500,
+            balance: 500,
+          },
+          error: null,
+        }),
+      });
 
       // Mock wallet balance
       mockSupabase.from.mockImplementation(((tableName: string) => {

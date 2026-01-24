@@ -46,7 +46,7 @@ export const usersService = {
       // This ensures we never expose PII (email, phone, balance, etc.)
       const { data, error } = await supabase
         .from('public_profiles')
-        .select('*')
+        .select(SAFE_PUBLIC_COLUMNS)
         .eq('id', id)
         .single();
 

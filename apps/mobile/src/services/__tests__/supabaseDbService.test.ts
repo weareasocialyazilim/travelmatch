@@ -74,7 +74,7 @@ describe('supabaseDbService', () => {
 
         expect(result.data).toEqual(mockUser);
         expect(result.error).toBeNull();
-        expect(supabase.from).toHaveBeenCalledWith('users');
+        expect(supabase.from).toHaveBeenCalledWith('public_profiles');
         // Implementation uses explicit column selection (security best practice)
         expect(mockSelect).toHaveBeenCalledWith(expect.stringContaining('id'));
         expect(mockEq).toHaveBeenCalledWith('id', 'user-123');
@@ -175,14 +175,14 @@ describe('supabaseDbService', () => {
     // Note: follow/unfollow tests removed - feature was deprecated
 
     describe('search', () => {
-      it('should search users by name and email', async () => {
+      it('should search users by name', async () => {
         const mockUsers = [
           { id: 'user-1', full_name: 'John Doe', email: 'john@example.com' },
           { id: 'user-2', full_name: 'Jane Doe', email: 'jane@example.com' },
         ];
 
         const mockSelect = jest.fn().mockReturnThis();
-        const mockOr = jest.fn().mockReturnThis();
+        const mockIlike = jest.fn().mockReturnThis();
         const mockLimit = jest.fn().mockResolvedValue({
           data: mockUsers,
           count: 2,
@@ -192,20 +192,23 @@ describe('supabaseDbService', () => {
         supabase.from.mockReturnValue({
           select: mockSelect,
         });
-        mockSelect.mockReturnValue({ or: mockOr });
-        mockOr.mockReturnValue({ limit: mockLimit });
+        mockSelect.mockReturnValue({ ilike: mockIlike });
+        mockIlike.mockReturnValue({ limit: mockLimit });
 
         const result = await usersService.search('doe', 10);
 
         expect(result.data).toHaveLength(2);
         expect(result.count).toBe(2);
-        expect(mockOr).toHaveBeenCalledWith(expect.stringContaining('doe'));
+        expect(mockIlike).toHaveBeenCalledWith(
+          'full_name',
+          expect.stringContaining('doe'),
+        );
         expect(mockLimit).toHaveBeenCalledWith(10);
       });
 
       it('should handle search with custom limit', async () => {
         const mockSelect = jest.fn().mockReturnThis();
-        const mockOr = jest.fn().mockReturnThis();
+        const mockIlike = jest.fn().mockReturnThis();
         const mockLimit = jest.fn().mockResolvedValue({
           data: [],
           count: 0,
@@ -215,8 +218,8 @@ describe('supabaseDbService', () => {
         supabase.from.mockReturnValue({
           select: mockSelect,
         });
-        mockSelect.mockReturnValue({ or: mockOr });
-        mockOr.mockReturnValue({ limit: mockLimit });
+        mockSelect.mockReturnValue({ ilike: mockIlike });
+        mockIlike.mockReturnValue({ limit: mockLimit });
 
         await usersService.search('test', 25);
 

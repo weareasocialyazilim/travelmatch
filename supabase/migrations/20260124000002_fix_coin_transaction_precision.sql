@@ -110,4 +110,4 @@ $$;
 -- ==============================================================
 
 COMMENT ON COLUMN coin_transactions.amount IS 'Transaction amount in LVND (supports fractional coins like 50.50)';
-COMMENT ON FUNCTION handle_coin_transaction IS 'Updated to support fractional LVND amounts (DECIMAL precision)';
+COMMENT ON FUNCTION handle_coin_transaction(UUID, DECIMAL, TEXT, TEXT, TEXT, JSONB, TEXT) IS 'Updated to support fractional LVND amounts (DECIMAL precision)';

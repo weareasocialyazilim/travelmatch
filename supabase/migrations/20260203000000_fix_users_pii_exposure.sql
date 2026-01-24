@@ -45,6 +45,8 @@ END $$;
 -- =====================================================
 -- This view contains ONLY safe, non-PII columns for cross-user queries
 -- NO email, phone, date_of_birth, balance, push_token, kyc_status, etc.
+DROP VIEW IF EXISTS public_profiles CASCADE;
+
 CREATE OR REPLACE VIEW public_profiles AS
 SELECT
   id,

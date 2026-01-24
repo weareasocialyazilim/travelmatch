@@ -3,6 +3,7 @@
 
 -- 1. Create Public Profiles View
 -- This view exposes only safe fields that are meant to be public
+DROP VIEW IF EXISTS public_profiles;
 CREATE OR REPLACE VIEW public_profiles AS
 SELECT 
     id,
@@ -15,12 +16,12 @@ SELECT
     (
         SELECT count(*) 
         FROM reviews r 
-        WHERE r.reviewed_user_id = users.id
+        WHERE r.reviewed_id = users.id
     ) as reviews_count,
     (
         SELECT coalesce(avg(rating), 0) 
         FROM reviews r 
-        WHERE r.reviewed_user_id = users.id
+        WHERE r.reviewed_id = users.id
     ) as rating
 FROM users
 WHERE deleted_at IS NULL;

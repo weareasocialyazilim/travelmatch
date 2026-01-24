@@ -66,7 +66,6 @@ END $$;
 -- Note: PostgreSQL requires table-level GRANT before column-level REVOKE
 REVOKE UPDATE (
   balance,
-  role,
   email,
   verified,
   kyc_status,
@@ -74,12 +73,7 @@ REVOKE UPDATE (
   deleted_at,
   idenfy_status,
   idenfy_scan_ref,
-  verified_at,
-  email_bounced,
-  email_bounced_at,
-  email_unsubscribed,
-  email_unsubscribed_at,
-  email_unsubscribe_reason
+  verified_at
 ) ON users FROM authenticated;
 
 -- Create safe profile update function
@@ -204,7 +198,7 @@ CREATE OR REPLACE FUNCTION create_notification(
   p_user_id UUID,
   p_type TEXT,
   p_title TEXT,
-  p_body TEXT,
+  p_body TEXT DEFAULT NULL,
   p_data JSONB DEFAULT '{}'
 )
 RETURNS UUID
