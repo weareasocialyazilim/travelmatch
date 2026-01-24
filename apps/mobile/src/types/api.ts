@@ -135,7 +135,7 @@ export type TransactionResponse = ApiResponse<Transaction>;
  */
 export interface Notification {
   id: string;
-  type: 'message' | 'booking' | 'payment' | 'review' | 'system';
+  type: 'message' | 'request' | 'payment' | 'review' | 'system';
   title: string;
   body: string;
   data?: Record<string, unknown>;
@@ -182,7 +182,7 @@ export type SearchResponse = ApiResponse<SearchResult>;
  */
 export interface AnalyticsData {
   totalViews: number;
-  totalBookings: number;
+  totalRequests: number;
   revenue: number;
   period: string;
   breakdown: Record<string, number>;

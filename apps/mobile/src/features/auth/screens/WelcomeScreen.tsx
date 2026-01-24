@@ -106,7 +106,7 @@ const AnimatedLogo: React.FC = () => {
 
       {/* Logo */}
       <Reanimated.View style={[styles.logoInner, logoStyle]}>
-        <Text style={styles.logoEmoji}>{'\u{1F381}'}</Text>
+        <MaterialCommunityIcons name="gift" size={48} color={COLORS.text.inverse} />
       </Reanimated.View>
     </View>
   );
@@ -458,9 +458,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 24,
     elevation: 12,
-  },
-  logoEmoji: {
-    fontSize: 48,
   },
   appName: {
     ...TYPE_SCALE.display.h1,

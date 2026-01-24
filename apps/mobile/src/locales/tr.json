@@ -66,7 +66,7 @@
     "settings": "Ayarlar",
     "notifications": "Bildirimler",
     "favorites": "Favoriler",
-    "bookings": "Taleplerim",
+    "requests": "Taleplerim",
     "wallet": "Cüzdan",
     "createMoment": "Yeni an oluştur",
     "discoverTab": "Anlar sekmesi",
@@ -112,22 +112,22 @@
       "premium": "Premium"
     }
   },
-  "booking": {
-    "bookNow": "Hemen Katıl",
-    "bookingRequest": "Deneyim Talebi",
-    "bookingConfirmed": "Talep Onaylandı",
-    "bookingCancelled": "Talep İptal Edildi",
-    "bookingPending": "Talep Beklemede",
+  "request": {
+    "joinNow": "Hemen Katıl",
+    "experienceRequest": "Deneyim Talebi",
+    "requestConfirmed": "Talep Onaylandı",
+    "requestCancelled": "Talep İptal Edildi",
+    "requestPending": "Talep Beklemede",
     "guests": "Misafirler",
     "totalPrice": "Toplam Fiyat",
-    "bookingDate": "Talep Tarihi",
-    "confirmBooking": "Talebi Onayla",
-    "cancelBooking": "Talebi İptal Et",
-    "bookingSuccess": "Talep gönderildi!",
-    "bookingError": "Talep başarısız. Lütfen tekrar deneyin.",
-    "noBookingsFound": "Talep bulunamadı",
-    "upcomingBookings": "Yaklaşan Deneyimler",
-    "pastBookings": "Geçmiş Deneyimler"
+    "requestDate": "Talep Tarihi",
+    "confirmRequest": "Talebi Onayla",
+    "cancelRequest": "Talebi İptal Et",
+    "requestSuccess": "Talep gönderildi!",
+    "requestError": "Talep başarısız. Lütfen tekrar deneyin.",
+    "noRequestsFound": "Talep bulunamadı",
+    "upcomingExperiences": "Yaklaşan Deneyimler",
+    "pastExperiences": "Geçmiş Deneyimler"
   },
   "chat": {
     "messages": "Mesajlar",
@@ -574,8 +574,8 @@
     "notifications": "Bildirimler",
     "markAllAsRead": "Tümünü Okundu İşaretle",
     "noNotifications": "Bildirim yok",
-    "newBooking": "Yeni eşleşme talebi",
-    "bookingConfirmed": "Talep onaylandı",
+    "newRequest": "Yeni eşleşme talebi",
+    "requestConfirmed": "Talep onaylandı",
     "newMessage": "{{name}} adlı kişiden yeni mesaj",
     "momentLiked": "{{name}} anınızı beğendi",
     "newReview": "{{name}} adlı kişiden yeni yorum"

@@ -78,7 +78,7 @@ export interface UserPreferences {
 
   // Features
   autoAcceptRequests: boolean;
-  instantBooking: boolean;
+  instantRequest: boolean;
 }
 
 export interface UpdateProfileData {
@@ -509,7 +509,7 @@ export const userService = {
       timezone: privacySettings.timezone || 'UTC',
 
       autoAcceptRequests: privacySettings.autoAcceptRequests ?? false,
-      instantBooking: privacySettings.instantBooking ?? false,
+      instantRequest: privacySettings.instantRequest ?? false,
     };
 
     return { preferences };
@@ -553,8 +553,8 @@ export const userService = {
     if (data.timezone !== undefined) currentPrivacy.timezone = data.timezone;
     if (data.autoAcceptRequests !== undefined)
       currentPrivacy.autoAcceptRequests = data.autoAcceptRequests;
-    if (data.instantBooking !== undefined)
-      currentPrivacy.instantBooking = data.instantBooking;
+    if (data.instantRequest !== undefined)
+      currentPrivacy.instantRequest = data.instantRequest;
 
     if (Object.keys(currentPrivacy).length > 0)
       updates.privacy_settings = currentPrivacy;
@@ -587,7 +587,7 @@ export const userService = {
       timezone: newPrivacy.timezone || 'UTC',
 
       autoAcceptRequests: newPrivacy.autoAcceptRequests ?? false,
-      instantBooking: newPrivacy.instantBooking ?? false,
+      instantRequest: newPrivacy.instantRequest ?? false,
     };
 
     return { preferences };

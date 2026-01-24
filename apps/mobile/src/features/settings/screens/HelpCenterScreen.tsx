@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     id: 2,
-    q: 'Can I cancel a booking?',
+    q: 'Can I cancel a request?',
     a: 'Yes, you can cancel up to 24 hours before the scheduled time for a full refund.',
   },
   {

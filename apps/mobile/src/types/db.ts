@@ -236,7 +236,7 @@ export interface PrivacySettings {
   allowMessages?: 'everyone' | 'followers' | 'none';
   timezone?: string;
   autoAcceptRequests?: boolean;
-  instantBooking?: boolean;
+  instantRequest?: boolean;
   [key: string]: string | boolean | undefined;
 }
 

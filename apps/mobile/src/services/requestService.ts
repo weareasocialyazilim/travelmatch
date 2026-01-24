@@ -1,6 +1,6 @@
 /**
  * Request Service
- * Gift requests, bookings, and related operations
+ * Gift requests, experience requests, and related operations
  */
 
 import { supabase } from '../config/supabase';
@@ -28,7 +28,7 @@ export type RequestStatus =
   | 'completed'
   | 'expired';
 
-export type RequestType = 'gift_request' | 'booking' | 'collaboration';
+export type RequestType = 'gift_request' | 'experience_request' | 'collaboration';
 
 export interface GiftRequest {
   id: string;
