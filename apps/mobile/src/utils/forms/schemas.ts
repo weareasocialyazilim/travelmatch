@@ -50,7 +50,8 @@ export const passwordValidation = z
   .min(8, 'forms.validation.password.min')
   .regex(/[A-Z]/, 'forms.validation.password.uppercase')
   .regex(/[a-z]/, 'forms.validation.password.lowercase')
-  .regex(/[0-9]/, 'forms.validation.password.number');
+  .regex(/[0-9]/, 'forms.validation.password.number')
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'forms.validation.password.special');
 
 export const optionalPasswordValidation = z
   .string()
@@ -58,6 +59,7 @@ export const optionalPasswordValidation = z
   .regex(/[A-Z]/, 'forms.validation.password.uppercase')
   .regex(/[a-z]/, 'forms.validation.password.lowercase')
   .regex(/[0-9]/, 'forms.validation.password.number')
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'forms.validation.password.special')
   .optional()
   .or(z.literal(''));
 
