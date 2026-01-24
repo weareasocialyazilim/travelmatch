@@ -68,7 +68,9 @@ export const usersService = {
     }
 
     try {
-      const { data, error } = await supabase.rpc('get_own_profile').single();
+      const { data, error } = await supabase
+        .rpc('get_own_profile' as any)
+        .single();
 
       if (error) throw error;
       return okSingle<Tables['users']['Row']>(data);

@@ -188,10 +188,13 @@ class WalletService {
         .eq('user_id', user.id)
         .eq('currency', 'LVND')
         .single();
+      const coinWalletRow = coinWallet as unknown as {
+        coins_balance?: number | null;
+      } | null;
 
       const balance: WalletBalance = {
         available: result.available_balance,
-        coins: coinWallet?.coins_balance || 0,
+        coins: coinWalletRow?.coins_balance || 0,
         pending: result.pending_balance,
         currency: result.currency || 'TRY',
       };
@@ -254,8 +257,14 @@ class WalletService {
 
     if (error) throw error;
 
-    const coinWallet = wallets?.find((w) => w.currency === 'LVND');
-    const fiatWallet = wallets?.find(
+    const walletRows = wallets as unknown as Array<{
+      balance?: number | null;
+      coins_balance?: number | null;
+      currency?: string | null;
+    }> | null;
+
+    const coinWallet = walletRows?.find((w) => w.currency === 'LVND');
+    const fiatWallet = walletRows?.find(
       (w) => w.currency !== 'LVND', // Assume non-LVND is fiat (TRY/USD)
     );
 

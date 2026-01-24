@@ -265,7 +265,12 @@ class DeepLinkHandler {
   private async checkResourceExists(
     type: DeepLinkType,
     id: string,
-  ): Promise<{ exists: boolean; expired: boolean; statusCode?: number }> {
+  ): Promise<{
+    exists: boolean;
+    expired: boolean;
+    statusCode?: number;
+    networkError?: boolean;
+  }> {
     try {
       // Get valid token
       const token = await sessionManager.getValidToken();

@@ -80,8 +80,9 @@ const CoinStoreScreen = () => {
       .eq('user_id', user.id)
       .eq('currency', 'LVND')
       .single();
-    if (data) {
-      setUserCoins(data.coins_balance || 0);
+    const walletData = data as { coins_balance?: number | null } | null;
+    if (walletData) {
+      setUserCoins(walletData.coins_balance || 0);
     }
   };
 
