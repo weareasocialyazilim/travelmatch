@@ -103,7 +103,7 @@ async function callEdgeFunction<
     const { data, error } = await supabase.functions.invoke<TResponse>(
       functionName,
       {
-        body: payload,
+        body: payload as EdgeFunctionPayload,
         headers: {
           Authorization: `Bearer ${token}`,
         },
