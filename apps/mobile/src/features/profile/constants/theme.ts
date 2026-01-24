@@ -1,5 +1,5 @@
 /**
- * Lovendo Profile - Awwwards Edition Theme
+ * Lovendo Profile - Edition Theme
  *
  * Twilight Zinc & Neon Energy aesthetic for the profile experience.
  * Premium dark theme with liquid glass and constellation effects.

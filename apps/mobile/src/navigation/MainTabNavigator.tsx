@@ -40,7 +40,7 @@ const MapScreenWrapper: React.FC = () => (
 );
 
 /**
- * MainTabNavigator - Awwwards Edition
+ * MainTabNavigator - Edition
  *
  * Uses the FloatingDock component for a premium
  * Liquid Glass navigation experience.

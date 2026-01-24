@@ -1,4 +1,4 @@
-// KYC Document Type Selection Screen - Awwwards standard glass cards
+// KYC Document Type Selection Screen - Standard glass cards
 // Featuring silky glass effects and neon selection highlights
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';

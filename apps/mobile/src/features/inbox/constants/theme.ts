@@ -1,5 +1,5 @@
 /**
- * Lovendo Vibe Room - Awwwards Edition Theme
+ * Lovendo Vibe Room - Edition Theme
  *
  * Twilight Zinc & Neon Energy aesthetic for the inbox experience.
  * Premium dark theme with liquid glass and neon accents.

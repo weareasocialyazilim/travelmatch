@@ -1,4 +1,4 @@
-// KYC Ceremony Progress Bar - Awwwards standard animated progress
+// KYC Ceremony Progress Bar - Standard animated progress
 // Features neon glow, step indicators, and silky animations
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';

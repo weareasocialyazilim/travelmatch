@@ -1,5 +1,5 @@
 /**
- * KYC Verification - Awwwards Edition Theme
+ * KYC Verification - Edition Theme
  *
  * Twilight Zinc & Neon Energy aesthetic for identity verification.
  * Premium dark theme with ceremonial glass effects.

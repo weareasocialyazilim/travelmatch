@@ -1,7 +1,7 @@
 // components/ui/NeonPulseMarker.tsx
 // Lovendo Ultimate Design System 2026
 // Neon Pulse Marker - GenZ "Breathing Neon" animation for map moments
-// Awwwards standard animated marker component
+// Standard animated marker component
 
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
@@ -52,7 +52,7 @@ interface NeonPulseMarkerProps {
  * NeonPulseMarker
  *
  * Harita üzerindeki Moment'leri temsil eden parlayan marker.
- * Awwwards standardında "Breathing Neon" animasyonu içerir.
+ * Standardında "Breathing Neon" animasyonu içerir.
  * GenZ estetiğine uygun pulse/glow efekti.
  *
  * @example

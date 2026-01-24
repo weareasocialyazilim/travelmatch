@@ -1,5 +1,5 @@
 /**
- * FormStepIndicator Component - Awwwards Edition
+ * FormStepIndicator Component - Edition
  *
  * Premium progress indicators for multi-step forms.
  * Includes both classic labeled steps and minimalist liquid variants.
@@ -532,7 +532,7 @@ const LiquidLine: React.FC<LiquidLineProps> = memo(
 LiquidLine.displayName = 'LiquidLine';
 
 /**
- * Awwwards-quality minimalist form progress indicator.
+ * High-quality minimalist form progress indicator.
  * Uses neon glow effect on the active step with Liquid Form aesthetic.
  */
 export const LiquidStepIndicator: React.FC<LiquidStepIndicatorProps> = memo(

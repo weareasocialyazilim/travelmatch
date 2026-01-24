@@ -1,7 +1,7 @@
 /**
  * MessageBubble - Premium Futuristic Chat Bubbles
  *
- * Awwwards-quality message bubbles with:
+ * High-quality message bubbles with:
  * - Neon gradient for own messages
  * - Glass effect for received messages
  * - Premium proof cards with trust indicators

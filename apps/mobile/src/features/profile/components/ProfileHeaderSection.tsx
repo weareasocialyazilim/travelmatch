@@ -1,5 +1,5 @@
 /**
- * Lovendo Awwwards Design System 2026 - Profile Header
+ * Lovendo Design System - Profile Header
  *
  * Modern profile header with:
  * - Large avatar with animated trust ring
@@ -7,7 +7,6 @@
  * - Floating edit button
  * - Gradient background
  *
- * Designed for Awwwards Best UI nomination
  */
 
 import React, { useCallback, useEffect, memo } from 'react';

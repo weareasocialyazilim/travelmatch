@@ -1,13 +1,11 @@
 /**
- * Lovendo Awwwards Design System 2026 - Welcome Screen
+ * Welcome Screen
  *
- * Elegant simplicity with:
- * - Breathing logo animation
- * - Glow pulse effect
- * - Staggered button animations
- * - Ambient gradient orbs
- *
- * Designed for Awwwards Best UI/UX nomination
+ * Features:
+ * - Animated logo with breathing effect
+ * - Glow pulse animation
+ * - Staggered button entrance
+ * - Gradient background orbs
  */
 
 import React, { useEffect, useCallback } from 'react';

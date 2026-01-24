@@ -1,7 +1,7 @@
 /**
  * GlassCategorySelector Component
  *
- * Awwwards-standard category selector with glass texture chips and neon selection highlights.
+ * Standard category selector with glass texture chips and neon selection highlights.
  * Selecting categories feels like an interactive game for users.
  *
  * Features:
@@ -124,7 +124,7 @@ const GlassChip: React.FC<{
 };
 
 /**
- * Awwwards-standard glass category selector.
+ * Standard glass category selector.
  * Features neon glow on selected items and silky glass texture.
  */
 export const GlassCategorySelector: React.FC<GlassCategorySelectorProps> = ({

@@ -1,5 +1,5 @@
 /**
- * StatsRow Component - Awwwards Edition
+ * StatsRow Component - Edition
  *
  * Premium stats display with Twilight Zinc dark theme.
  */

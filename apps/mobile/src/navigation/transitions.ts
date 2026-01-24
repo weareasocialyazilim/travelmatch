@@ -1,5 +1,5 @@
 /**
- * Lovendo Awwwards Design System 2026 - Navigation Transitions
+ * Lovendo Design System - Navigation Transitions
  *
  * Premium page transitions for Awwwards-level polish:
  * - Modal slide from bottom

@@ -361,11 +361,11 @@
   "onboarding": {
     "page1": {
       "title": "Lovendo'ya Hoş Geldiniz",
-      "description": "Doğrulanmış, içten hediyelerle gezginlere benzersiz yolculuklarında bağlantı kurun ve destek olun."
+      "description": "Doğrulanmış, içten hediyelerle insanlara benzersiz anlarında bağlantı kurun ve destek olun."
     },
     "page2": {
-      "title": "Yolculuğunuzu Paylaşın",
-      "description": "Seyahatlerinizden anlar oluşturun ve dünyanın dört bir yanındaki destekçilerden hediyeler alın."
+      "title": "Deneyimlerinizi Paylaşın",
+      "description": "Anlarınızı oluşturun ve dünyanın dört bir yanındaki destekçilerden hediyeler alın."
     },
     "page3": {
       "title": "Birlikte Güven Oluşturun",
@@ -373,7 +373,7 @@
     },
     "page4": {
       "title": "Maceranıza Başlayın",
-      "description": "Anlamlı hediyeler ve özgün deneyimlerle bağlantı kuran binlerce gezgine katılın."
+      "description": "Anlamlı hediyeler ve özgün deneyimlerle bağlantı kuran binlerce insana katılın."
     },
     "slides": {
       "1": {
@@ -527,7 +527,7 @@
       "coffee": "Kahve",
       "food": "Yemek",
       "culture": "Kültür",
-      "tours": "Turlar",
+      "tours": "Keşif",
       "nightlife": "Gece Hayatı",
       "shopping": "Alışveriş",
       "music": "Müzik",

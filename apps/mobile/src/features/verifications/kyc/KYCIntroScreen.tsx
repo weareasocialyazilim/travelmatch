@@ -1,4 +1,4 @@
-// KYC Intro Screen - Awwwards standard "Güven Seremonisi" experience
+// KYC Intro Screen - Standard "Güven Seremonisi" experience
 // Featuring silky glass effects and neon accents
 import React, { useEffect, useState } from 'react';
 import {

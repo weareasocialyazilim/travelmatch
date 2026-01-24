@@ -53,7 +53,7 @@ const getPendingNotificationCount = (): number => {
 /**
  * FloatingDock - Liquid Glass Navigation Bar
  *
- * Awwwards-quality floating navigation dock with:
+ * High-quality floating navigation dock with:
  * - Glassmorphism blur effect
  * - Neon glow on active state
  * - Silky smooth spring animations

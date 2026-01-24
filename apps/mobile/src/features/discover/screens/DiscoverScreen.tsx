@@ -1,7 +1,7 @@
 /**
  * DiscoverScreen - Lovendo: The Rebirth
  *
- * Awwwards standardında keşfet ekranı.
+ * Standardında keşfet ekranı.
  * "Soft Minimalist & Premium" tasarım diliyle güncellendi.
  *
  * Features:

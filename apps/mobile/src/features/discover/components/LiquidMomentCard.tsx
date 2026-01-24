@@ -80,7 +80,7 @@ export interface LiquidMomentCardProps {
 }
 
 /**
- * Awwwards standardında Liquid Moment Card.
+ * Standardında Liquid Moment Card.
  * Görsel derinlik ve ipeksi glass paneller içerir.
  * Creator-set price ile "🎁 X ile Destekle" butonu gösterir.
  * Subscription tier badge ile premium host gösterimi.

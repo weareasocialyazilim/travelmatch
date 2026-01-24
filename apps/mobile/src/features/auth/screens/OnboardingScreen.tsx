@@ -425,7 +425,7 @@ interface AwwwardsOnboardingScreenProps {
 /**
  * AwwwardsOnboardingScreen - İlk Etki Deneyimi
  *
- * Awwwards-quality onboarding with:
+ * High-quality onboarding with:
  * - Dynamic neon glow ball that follows scroll position
  * - Animated pagination dots with scale and opacity
  * - 48px display title with heading font

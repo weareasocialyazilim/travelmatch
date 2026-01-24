@@ -1,5 +1,5 @@
 /**
- * Lovendo Inbox Screen - Awwwards Edition
+ * Lovendo Inbox Screen - Edition
  *
  * Premium inbox experience with:
  * - Twilight Zinc dark theme

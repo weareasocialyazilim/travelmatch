@@ -21,7 +21,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 
 /**
- * Awwwards standardında Kayıt Ekranı - "Liquid Register Screen"
+ * Standardında Kayıt Ekranı - "Liquid Register Screen"
  * Prestijli Katılım: Kullanıcının "The Guest List"e dahil olduğu hissini veren
  * ferah bir tasarım.
  *

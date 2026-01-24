@@ -28,7 +28,7 @@ interface LiquidInputProps extends Omit<TextInputProps, 'style'> {
 }
 
 /**
- * Awwwards standardında interaktif Liquid Input bileşeni.
+ * Standardında interaktif Liquid Input bileşeni.
  * Odaklandığında neon lime parlaması verir ve ipeksi glass dokusu kullanır.
  */
 export const LiquidInput: React.FC<LiquidInputProps> = ({

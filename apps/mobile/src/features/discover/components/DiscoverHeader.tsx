@@ -1,7 +1,7 @@
 /**
  * DiscoverHeader Component
  *
- * Awwwards standardında Discover Header.
+ * Standardında Discover Header.
  * Minimalist hiyerarşi ve premium boşluk kullanımı.
  *
  * 40+ yaş: Yüksek okunabilirlik, net hiyerarşi

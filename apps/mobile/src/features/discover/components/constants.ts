@@ -6,7 +6,7 @@ export const CATEGORIES: Category[] = [
   { id: 'coffee', label: 'Coffee', emoji: '☕' },
   { id: 'food', label: 'Food', emoji: '🍕' },
   { id: 'culture', label: 'Culture', emoji: '🎭' },
-  { id: 'tour', label: 'Tours', emoji: '🏛️' },
+  { id: 'explore', label: 'Explore', emoji: '🏛️' },
   { id: 'nightlife', label: 'Nightlife', emoji: '🌙' },
   { id: 'shopping', label: 'Shopping', emoji: '🛍️' },
   { id: 'music', label: 'Music', emoji: '🎵' },

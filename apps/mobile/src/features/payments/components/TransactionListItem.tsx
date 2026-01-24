@@ -1,7 +1,7 @@
 /**
  * TransactionListItem Component
  *
- * Awwwards-standard transaction list item with glass effects and status indicators.
+ * Standard transaction list item with glass effects and status indicators.
  * Used in the wallet screen to display transaction history.
  *
  * Features:

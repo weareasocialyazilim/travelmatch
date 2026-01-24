@@ -79,8 +79,8 @@ export interface User {
   interests?: string[];
   createdAt?: string | null;
   lastActive?: string | null;
-  travelDays?: number;
-  visitingUntil?: string | null;
+  momentDuration?: number; // Duration in days for moment availability
+  availableUntil?: string | null;
 }
 
 export interface GiftItem {

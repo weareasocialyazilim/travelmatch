@@ -1,7 +1,7 @@
 // components/ui/EmptyState.tsx
 // Lovendo Ultimate Design System 2026
 // "Liquid Empty State System" - Zarif Boşluklar
-// Awwwards-standard premium empty state with neon particles
+// Standard premium empty state with neon particles
 
 import React, { useEffect, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';

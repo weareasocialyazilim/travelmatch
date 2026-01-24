@@ -1,5 +1,5 @@
 /**
- * ProfileScreen - Awwwards Edition
+ * ProfileScreen - Edition
  *
  * Premium profile experience with Twilight Zinc dark theme.
  * Features:

@@ -1,5 +1,5 @@
 // EditProfileScreen - Liquid Glass Identity Management
-// Awwwards standard profile editing with glass effects and neon accents
+// Standard profile editing with glass effects and neon accents
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
