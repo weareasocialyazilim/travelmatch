@@ -41,8 +41,19 @@ async function resetPassword(email: string, newPassword: string) {
   }
 }
 
-const email = process.argv[2] || 'kemal@weareasocial.com';
-const password =
-  process.argv[3] || process.env.ADMIN_PASSWORD || 'Kemal!Lovendo!Kemal!19875';
+const email = process.argv[2];
+const password = process.argv[3] || process.env.ADMIN_PASSWORD;
+
+if (!email) {
+  console.error('❌ Error: Email is required');
+  console.error('Usage: npx ts-node scripts/reset-admin-password.ts <email> [password]');
+  process.exit(1);
+}
+
+if (!password) {
+  console.error('❌ Error: Password is required');
+  console.error('Provide password as second argument or set ADMIN_PASSWORD env var');
+  process.exit(1);
+}
 
 resetPassword(email, password);

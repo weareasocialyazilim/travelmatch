@@ -63,9 +63,10 @@ async function verifySignature(
   signature: string,
   timestamp: string
 ): Promise<boolean> {
+  // FAIL-CLOSED: If no verification key configured, reject all requests
   if (!SENDGRID_WEBHOOK_VERIFICATION_KEY) {
-    logger.warn('[SendGrid Webhook] No verification key configured - skipping signature check');
-    return true; // Allow in development if not configured
+    logger.error('[SendGrid Webhook] SENDGRID_WEBHOOK_VERIFICATION_KEY not configured - rejecting request');
+    return false;
   }
 
   try {
@@ -95,9 +96,8 @@ async function verifySignature(
     return isValid;
   } catch (error) {
     logger.error('[SendGrid Webhook] Signature verification error:', error);
-    // In case of verification failure, allow the request if no key is configured
-    // This is for development/testing purposes
-    return !SENDGRID_WEBHOOK_VERIFICATION_KEY;
+    // FAIL-CLOSED: Reject on any verification error
+    return false;
   }
 }
 
