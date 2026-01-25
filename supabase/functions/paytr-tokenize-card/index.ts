@@ -2,51 +2,24 @@ import { Logger } from '..//_shared/logger.ts';
 const logger = new Logger();
 
 /**
- * ⚠️ DEPRECATED - APPLE IAP COMPLIANCE ⚠️
- * 
- * This PayTR Card Tokenization Edge Function is DISABLED.
- * Saving credit cards is not allowed under Apple/Google IAP rules.
- * All purchases must go through RevenueCat/IAP.
- * PayTR is now ONLY used for withdrawals (paytr-withdraw function).
+ * PayTR Card Tokenization Edge Function
  *
- * This function returns 410 Gone to indicate it's no longer available.
+ * Tokenizes card details for saved card payments.
+ * Card data is forwarded directly to PayTR - NEVER stored on our servers.
+ *
+ * PCI-DSS Compliance:
+ * - Card data is immediately forwarded to PayTR
+ * - Only token is stored in our database
+ * - Original card data is never logged or persisted
+ *
+ * POST /paytr-tokenize-card
  */
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { getCorsHeaders } from '../_shared/cors.ts';
-
-serve(async (req: Request) => {
-  const origin = req.headers.get('origin');
-  const corsHeaders = getCorsHeaders(origin);
-
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
-  logger.warn('DEPRECATED: paytr-tokenize-card called but is disabled for Apple IAP compliance');
-
-  return new Response(
-    JSON.stringify({
-      success: false,
-      error: 'Kart kaydetme özelliği artık kullanılamıyor. Uygulama içi satın alma kullanın.',
-      code: 'FEATURE_DEPRECATED',
-    }),
-    {
-      status: 410,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    },
-  );
-});
-
-/*
- * ============================================================================
- * ARCHIVED CODE - Original implementation kept for reference
- * DO NOT UNCOMMENT - Apple/Google will reject the app
- * ============================================================================
-
 import { createSupabaseClients, requireAuth } from '../_shared/supabase.ts';
 import { getPayTRConfig } from '../_shared/paytr.ts';
 import { createHash } from 'https://deno.land/std@0.177.0/crypto/mod.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 // =============================================================================
 // TYPES

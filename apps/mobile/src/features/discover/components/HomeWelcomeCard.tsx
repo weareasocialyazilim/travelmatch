@@ -19,12 +19,11 @@ interface HomeWelcomeCardProps {
  * - Personalized information and quick access to main features
  */
 export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
-  userName = '',
+  userName = 'Explorer',
   onSetupProfile,
   onExplore,
 }) => {
-  const firstName = userName.trim().split(' ')[0];
-  const titleText = firstName ? `Welcome, ${firstName}!` : 'Welcome!';
+  const firstName = userName.split(' ')[0];
 
   return (
     <View style={styles.container}>
@@ -43,7 +42,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
               color={COLORS.utility.white}
             />
           </View>
-          <Text style={styles.welcomeTitle}>{titleText}</Text>
+          <Text style={styles.welcomeTitle}>Welcome, {firstName}!</Text>
           <Text style={styles.welcomeSubtitle}>
             İpeksi anları keşfetmeye hazır mısın? Unique moments and gifts await
             you.

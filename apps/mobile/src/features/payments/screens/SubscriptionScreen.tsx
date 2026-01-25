@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,13 +18,10 @@ import { PLANS } from '../constants/plans';
 import { VALUES } from '@/constants/values';
 import { subscriptionsService } from '@/services/supabase';
 import { logger } from '@/utils/logger';
-import { formatCurrency } from '@/utils/currencyFormatter';
-import { showAlert } from '@/stores/modalStore';
 import type { SubscriptionPlan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { ComponentProps } from 'react';
-import type { CurrencyCode } from '@/constants/currencies';
 
 type IconName = ComponentProps<typeof Icon>['name'];
 
@@ -49,10 +47,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const [selectedPlan, setSelectedPlan] = useState<string>('first_class');
   const [plans, setPlans] = useState<SubscriptionPlan[]>(PLANS);
   const [loading, setLoading] = useState(false);
-  const allowedPlanIds = React.useMemo(
-    () => new Set(PLANS.map((plan) => plan.id)),
-    [],
-  );
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -61,47 +55,30 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         const { data, error } = await subscriptionsService.getPlans();
         if (!error && data && data.length > 0) {
           // Map API plans to SubscriptionPlan structure
-          const mappedPlans: SubscriptionPlan[] = data
-            .map((apiPlan: any) => {
-              // Find matching static plan for features/limits
-              const staticPlan = PLANS.find((p) => p.id === apiPlan.id);
-              const apiFeatures = Array.isArray(apiPlan.features)
-                ? apiPlan.features
-                    .map((feature: any) => {
-                      if (typeof feature === 'string') {
-                        return { text: feature, included: true };
-                      }
-                      return {
-                        text: feature?.text || feature?.title || '',
-                        included: feature?.included ?? true,
-                      };
-                    })
-                    .filter((feature: any) => feature.text)
-                : undefined;
-              return {
-                id: apiPlan.id,
-                name: apiPlan.name,
-                tagline: staticPlan?.tagline || apiPlan.description || '',
-                price: Number(apiPlan.price) || 0,
-                currency: apiPlan.currency || 'USD',
-                interval: apiPlan.interval || 'month',
-                features: apiFeatures || staticPlan?.features || [],
-                limits: staticPlan?.limits || {
-                  momentsPerMonth: 3,
-                  messagesPerDay: 20,
-                  giftsPerMonth: 1,
-                  savedMoments: 10,
-                  photoPerMoment: 5,
-                },
-                popular: apiPlan.is_popular || false,
-                icon: apiPlan.icon || staticPlan?.icon || 'star-four-points',
-                color:
-                  apiPlan.color || staticPlan?.color || COLORS.brand.primary,
-              };
-            })
-            .filter((plan) => allowedPlanIds.has(plan.id));
-
-          setPlans(mappedPlans.length > 0 ? mappedPlans : PLANS);
+          const mappedPlans: SubscriptionPlan[] = data.map((apiPlan: any) => {
+            // Find matching static plan for features/limits
+            const staticPlan = PLANS.find((p) => p.id === apiPlan.id);
+            return {
+              id: apiPlan.id,
+              name: apiPlan.name,
+              tagline: staticPlan?.tagline || apiPlan.description || '',
+              price: Number(apiPlan.price) || 0,
+              currency: apiPlan.currency || 'USD',
+              interval: apiPlan.interval || 'month',
+              features: apiPlan.features || staticPlan?.features || [],
+              limits: staticPlan?.limits || {
+                momentsPerMonth: 3,
+                messagesPerDay: 20,
+                giftsPerMonth: 1,
+                savedMoments: 10,
+                photoPerMoment: 5,
+              },
+              popular: apiPlan.is_popular || false,
+              icon: apiPlan.icon || staticPlan?.icon || 'star-four-points',
+              color: apiPlan.color || staticPlan?.color || COLORS.brand.primary,
+            };
+          });
+          setPlans(mappedPlans);
         } else {
           // Fallback to static plans if API fails
           logger.debug('Using static plans (API returned empty or error)');
@@ -127,10 +104,11 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       return;
     }
 
-    showAlert({
-      title: 'Üyelik satın alma',
-      message: 'Üyelik satın alma akışı şu anda kapalı. Yakında aktif olacak.',
-      buttons: [{ text: 'Tamam' }],
+    // Navigate to checkout with selected plan
+    navigation.navigate('Checkout', {
+      momentId: planId, // Use momentId for plan identifier
+      title: plan.name,
+      amount: plan.price,
     });
   };
 
@@ -138,11 +116,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const isSelected = selectedPlan === plan.id;
     const planColor = plan.color || COLORS.brand.primary;
     const isFree = plan.price === 0;
-    const priceLabel = isFree
-      ? 'Ücretsiz'
-      : formatCurrency(plan.price, plan.currency as CurrencyCode);
-    const intervalLabel =
-      plan.interval === 'year' ? '/yıl' : plan.interval ? '/ay' : '';
 
     return (
       <TouchableOpacity
@@ -157,7 +130,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       >
         {plan.popular && (
           <View style={[styles.popularBadge, { backgroundColor: planColor }]}>
-            <Text style={styles.popularText}>EN POPÜLER</Text>
+            <Text style={styles.popularText}>MOST POPULAR</Text>
           </View>
         )}
 
@@ -173,15 +146,14 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <Text style={styles.planTagline}>{plan.tagline}</Text>
 
         <View style={styles.priceContainer}>
-          <Text style={styles.priceText}>{priceLabel}</Text>
-          {!!intervalLabel && (
-            <Text style={styles.interval}>{intervalLabel}</Text>
-          )}
+          <Text style={styles.currency}>$</Text>
+          <Text style={styles.price}>{plan.price}</Text>
+          <Text style={styles.interval}>/month</Text>
         </View>
 
         <View style={styles.featuresContainer}>
-          {plan.features.slice(0, 6).map((feature, index) => (
-            <View key={`${plan.id}-${index}`} style={styles.featureRow}>
+          {plan.features.slice(0, 6).map((feature) => (
+            <View key={`${plan.id}-${feature.text}`} style={styles.featureRow}>
               <Icon
                 name={feature.included ? 'check-circle' : 'close-circle'}
                 size={16}
@@ -193,7 +165,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   !feature.included && styles.featureDisabled,
                 ]}
               >
-                {feature.text || ''}
+                {feature.text}
               </Text>
             </View>
           ))}
@@ -221,7 +193,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               end={{ x: 1, y: 0 }}
             >
               <Text style={styles.subscribeText}>
-                {isSelected ? `${plan.name} Seçili` : 'Planı Seç'}
+                {isSelected ? 'Get ' + plan.name : 'Select Plan'}
               </Text>
             </LinearGradient>
           )}
@@ -270,6 +242,17 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           plans.map(renderPlanCard)
         )}
 
+        {/* Info Card */}
+        <View style={styles.infoCard}>
+          <Icon name="information" size={24} color={COLORS.feedback.info} />
+          <View style={styles.infoContent}>
+            <Text style={styles.infoTitle}>Flexible Billing</Text>
+            <Text style={styles.infoText}>
+              Cancel anytime. All plans include 14-day money-back guarantee.
+            </Text>
+          </View>
+        </View>
+
         {/* Benefits Summary */}
         <View style={styles.benefitsCard}>
           <Text style={styles.benefitsTitle}>Neden Yükselt? 💎</Text>
@@ -308,6 +291,130 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
           </View>
         </View>
+
+        {/* Plan Comparison Table */}
+        <View style={styles.comparisonCard}>
+          <Text style={styles.comparisonTitle}>Plan Comparison</Text>
+
+          {/* Table Header */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Feature
+            </Text>
+            <Text style={[styles.comparisonCell, styles.comparisonHeader]}>
+              Momentum
+            </Text>
+            <Text style={[styles.comparisonCell, styles.comparisonHeader]}>
+              Premium
+            </Text>
+            <Text
+              style={[
+                styles.comparisonCell,
+                styles.comparisonHeader,
+                styles.comparisonPlatinum,
+              ]}
+            >
+              Platinum
+            </Text>
+          </View>
+
+          {/* Moments per month */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Moments/month
+            </Text>
+            <Text style={styles.comparisonCell}>3</Text>
+            <Text style={styles.comparisonCell}>10</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ∞
+            </Text>
+          </View>
+
+          {/* Gifts per month */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Gifts/month
+            </Text>
+            <Text style={styles.comparisonCell}>5</Text>
+            <Text style={styles.comparisonCell}>25</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ∞
+            </Text>
+          </View>
+
+          {/* Verified badge */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Verified badge
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>✓</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Priority support */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Priority support
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>✓</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Offer above price */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Offer above price
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Silver shimmer */}
+          <View style={[styles.comparisonRow, styles.comparisonLastRow]}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Silver shimmer
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+        </View>
+
+        {/* Biometric Payment Hint */}
+        <View style={styles.biometricHint}>
+          <Icon
+            name={Platform.OS === 'ios' ? 'face-recognition' : 'fingerprint'}
+            size={24}
+            color={COLORS.brand.primary}
+          />
+          <View style={styles.biometricContent}>
+            <Text style={styles.biometricTitle}>Quick & Secure Checkout</Text>
+            <Text style={styles.biometricText}>
+              Use {Platform.OS === 'ios' ? 'Face ID' : 'Fingerprint'} for fast
+              payment verification
+            </Text>
+          </View>
+        </View>
+
+        {/* FAQ Link */}
+        <TouchableOpacity
+          style={styles.faqButton}
+          onPress={() => navigation.navigate('FAQ')}
+        >
+          <Icon name="help-circle" size={20} color={COLORS.brand.primary} />
+          <Text style={styles.faqText}>View Frequently Asked Questions</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -322,7 +429,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   currency: {
-    color: COLORS.text.onLight,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginRight: LAYOUT.padding / 4,
@@ -338,7 +445,7 @@ const styles = StyleSheet.create({
   },
   planTagline: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.onLightSecondary,
+    color: COLORS.text.secondary,
     marginBottom: LAYOUT.padding,
   },
   moreFeatures: {
@@ -371,20 +478,99 @@ const styles = StyleSheet.create({
     color: COLORS.text.primary,
     flex: 1,
   },
+  comparisonCard: {
+    backgroundColor: COLORS.utility.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+  comparisonTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    marginBottom: LAYOUT.padding * 1.5,
+    textAlign: 'center',
+  },
+  comparisonRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.default,
+    paddingVertical: LAYOUT.padding,
+  },
+  comparisonLastRow: {
+    borderBottomWidth: 0,
+  },
+  comparisonCell: {
+    flex: 1,
+    textAlign: 'center',
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.primary,
+  },
+  comparisonFeature: {
+    flex: 1.5,
+    textAlign: 'left',
+    fontWeight: '500',
+  },
+  comparisonHeader: {
+    fontWeight: '700',
+    color: COLORS.text.secondary,
+  },
+  comparisonPlatinum: {
+    color: COLORS.brand.primary,
+    fontWeight: '600',
+  },
+  biometricHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.utility.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    gap: LAYOUT.padding,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+  biometricContent: {
+    flex: 1,
+  },
+  biometricTitle: {
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    marginBottom: LAYOUT.padding / 4,
+  },
+  biometricText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.secondary,
+  },
+  faqButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  faqText: {
+    color: COLORS.brand.primary,
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
   featureRow: {
     alignItems: 'center',
     flexDirection: 'row',
     marginBottom: LAYOUT.padding,
   },
   featureText: {
-    color: COLORS.text.onLight,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     marginLeft: LAYOUT.padding,
   },
   featureDisabled: {
-    color: COLORS.text.onLightSecondary,
+    color: COLORS.text.secondary,
     textDecorationLine: 'line-through',
   },
   featuresContainer: {
@@ -398,7 +584,7 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   freeButtonText: {
-    color: COLORS.text.onLightSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
@@ -429,28 +615,23 @@ const styles = StyleSheet.create({
     marginLeft: LAYOUT.padding,
   },
   infoText: {
-    color: COLORS.text.onLightSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     fontWeight: '400',
     lineHeight: 18,
   },
   infoTitle: {
-    color: COLORS.text.onLight,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 4,
   },
   interval: {
     alignSelf: 'flex-end',
-    color: COLORS.text.onLightSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
     marginBottom: LAYOUT.padding / 2,
-  },
-  priceText: {
-    color: COLORS.text.onLight,
-    fontSize: 34,
-    fontWeight: '800',
   },
   planCard: {
     backgroundColor: COLORS.utility.white,
@@ -471,7 +652,7 @@ const styles = StyleSheet.create({
     width: 64,
   },
   planName: {
-    color: COLORS.text.onLight,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '800',
     marginBottom: LAYOUT.padding,
@@ -490,11 +671,15 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
   },
+  price: {
+    color: COLORS.text.primary,
+    fontSize: 48,
+    fontWeight: '800',
+  },
   priceContainer: {
     alignItems: 'flex-start',
     flexDirection: 'row',
     marginBottom: LAYOUT.padding / 2,
-    gap: 6,
   },
   scrollContent: {
     paddingBottom: LAYOUT.padding * 4,

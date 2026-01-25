@@ -11,6 +11,9 @@ export { VerifyPhoneScreen } from './screens/VerifyPhoneScreen';
 
 // Auth flow screens - Unified Auth (Master 2026)
 export { UnifiedAuthScreen } from './screens/UnifiedAuthScreen';
+export { PhoneAuthScreen } from './screens/PhoneAuthScreen';
+export { EmailAuthScreen } from './screens/EmailAuthScreen';
+export { RegisterScreen } from './screens/RegisterScreen';
 export { SetPasswordScreen } from './screens/SetPasswordScreen';
 export { TwoFactorSetupScreen } from './screens/TwoFactorSetupScreen';
 export { VerifyCodeScreen } from './screens/VerifyCodeScreen';

@@ -1,0 +1,76 @@
+# Empty State Flow - P1 Regression
+# Validates: Empty states show meaningful guidance, not generic errors
+# Risk covered: Poor UX, missing CTAs, broken empty state rendering
+
+appId: com.lovendo.app
+name: "P1: Empty State Verification"
+tags:
+  - regression
+  - p1
+  - ux
+
+---
+
+# Note: This flow requires an authenticated user with no moments in their area
+# In real CI, use a test account that is authenticated but has no nearby content
+
+- launchApp
+
+# Wait for app to load
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          id: "screen-discover"
+      - visible:
+          id: "empty-moments"
+      - visible:
+          id: "screen-welcome"
+    timeout: 20000
+
+# If we see welcome screen, we're not authenticated - this flow needs auth
+# Skip the rest if not authenticated
+- runFlow:
+    when:
+      visible:
+        id: "screen-welcome"
+    file: "auth_email_otp.yaml"
+    optional: true
+
+# Now check for empty state on Discover screen
+# The empty state should appear if there are no moments nearby
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          id: "empty-moments"
+      - visible:
+          id: "list-moments"
+    timeout: 15000
+
+# If empty state is visible, verify it has proper content
+- runFlow:
+    when:
+      visible:
+        id: "empty-moments"
+    commands:
+      # Verify empty state has a title (not generic)
+      - assertVisible:
+          id: "text-empty-title"
+
+      # Verify there's a CTA button
+      - assertVisible:
+          id: "btn-create-moment-empty"
+
+      # Take screenshot for visual verification
+      - takeScreenshot: "empty_state_discover"
+
+      # Tap the CTA to verify it navigates
+      - tapOn:
+          id: "btn-create-moment-empty"
+
+      # Should navigate to Create Moment
+      - extendedWaitUntil:
+          visible:
+            text: ".*Moment.*"
+          timeout: 5000
+
+# SUCCESS: Empty state has proper guidance and functional CTA

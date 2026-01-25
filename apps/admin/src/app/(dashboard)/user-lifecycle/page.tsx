@@ -2,7 +2,7 @@
 
 /**
  * User Lifecycle Management
- * Comprehensive user flow tracking from onboarding to retention
+ * Comprehensive user journey tracking from onboarding to retention
  * With AI-powered churn prediction and lifecycle analytics
  */
 
@@ -117,7 +117,7 @@ const onboardingFunnel = [
     color: 'bg-green-400 dark:bg-green-500',
   },
   {
-    stage: 'İlk Talep',
+    stage: 'İlk Rezervasyon',
     count: 1275,
     percentage: 15,
     color: 'bg-orange-500 dark:bg-orange-600',
@@ -185,7 +185,7 @@ const healthMetrics = [
   { metric: 'Profil Tamamlama', value: 87, target: 95, unit: '%' },
   { metric: 'Haftalık Aktivite', value: 4.2, target: 5, unit: 'gün' },
   { metric: 'Yanıt Oranı', value: 72, target: 80, unit: '%' },
-  { metric: 'Talep Oranı', value: 23, target: 30, unit: '%' },
+  { metric: 'Rezervasyon Oranı', value: 23, target: 30, unit: '%' },
   { metric: 'NPS Skoru', value: 42, target: 50, unit: '' },
 ];
 
@@ -632,7 +632,7 @@ export default function UserLifecyclePage() {
           <CanvaCard className="admin-card">
             <CanvaCardHeader>
               <CanvaCardTitle>Onboarding Hunisi</CanvaCardTitle>
-              <CanvaCardSubtitle>Kayıttan ilk talepa</CanvaCardSubtitle>
+              <CanvaCardSubtitle>Kayıttan ilk rezervasyona</CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-3">
@@ -681,7 +681,7 @@ export default function UserLifecyclePage() {
               {
                 title: 'Ortalama Süre',
                 value: '4.2 gün',
-                description: 'İlk talepa kadar',
+                description: 'İlk rezervasyona kadar',
                 icon: Clock,
                 trend: '-0.5 gün',
               },

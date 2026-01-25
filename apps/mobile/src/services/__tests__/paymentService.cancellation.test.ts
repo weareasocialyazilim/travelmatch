@@ -35,7 +35,7 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as any;
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockTransactionsService = transactionsService as jest.Mocked<
   typeof transactionsService
 >;
@@ -149,9 +149,6 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
-        moment_id: null,
-        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -201,9 +198,6 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
-        moment_id: null,
-        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -248,9 +242,6 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
-        moment_id: null,
-        escrow_status: null,
       };
 
       const mockRefundTransaction = {
@@ -263,8 +254,6 @@ describe('PaymentService - Payment Cancellation', () => {
         created_at: new Date().toISOString(),
         description: 'Refund for tx-123',
         metadata: { originalTransactionId: 'tx-123' },
-        moment_id: null,
-        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -308,9 +297,6 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
-        moment_id: null,
-        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -353,9 +339,6 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
-        moment_id: null,
-        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -365,7 +348,7 @@ describe('PaymentService - Payment Cancellation', () => {
 
       mockTransactionsService.update.mockResolvedValue({
         data: null,
-        error: { name: 'Error', message: 'Cleanup failed' },
+        error: { message: 'Cleanup failed' },
       });
 
       await paymentService.processPayment({

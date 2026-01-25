@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { getAdminSession, hasPermission } from '@/lib/auth';
 import type { Database } from '@/types/database';
 
 type NotificationCampaignStatus =
@@ -11,16 +10,6 @@ type NotificationCampaignType =
 
 export async function GET(request: NextRequest) {
   try {
-    // SECURITY FIX: Require admin authentication
-    const session = await getAdminSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (!hasPermission(session, 'notifications', 'view')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const supabase = createServiceClient();
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status') as NotificationCampaignStatus | null;
@@ -57,16 +46,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // SECURITY FIX: Require admin authentication
-    const session = await getAdminSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (!hasPermission(session, 'notifications', 'create')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const supabase = createServiceClient();
     const body = await request.json();
 
@@ -79,7 +58,7 @@ export async function POST(request: NextRequest) {
         target_audience: body.target_audience,
         scheduled_at: body.scheduled_at,
         status: body.scheduled_at ? 'scheduled' : 'draft',
-        created_by: session.admin_id, // Use authenticated admin ID
+        created_by: body.created_by,
       })
       .select()
       .single();

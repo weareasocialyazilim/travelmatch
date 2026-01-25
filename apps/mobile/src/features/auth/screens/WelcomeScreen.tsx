@@ -1,11 +1,13 @@
 /**
- * Welcome Screen
+ * Lovendo Awwwards Design System 2026 - Welcome Screen
  *
- * Features:
- * - Animated logo with breathing effect
- * - Glow pulse animation
- * - Staggered button entrance
- * - Gradient background orbs
+ * Elegant simplicity with:
+ * - Breathing logo animation
+ * - Glow pulse effect
+ * - Staggered button animations
+ * - Ambient gradient orbs
+ *
+ * Designed for Awwwards Best UI/UX nomination
  */
 
 import React, { useEffect, useCallback } from 'react';
@@ -35,7 +37,7 @@ import { logger } from '../../../utils/logger';
 // ============================================
 interface WelcomeScreenProps {
   navigation: {
-    navigate: (screen: string, params?: Record<string, unknown>) => void;
+    navigate: (screen: string) => void;
   };
 }
 
@@ -104,7 +106,7 @@ const AnimatedLogo: React.FC = () => {
 
       {/* Logo */}
       <Reanimated.View style={[styles.logoInner, logoStyle]}>
-        <MaterialCommunityIcons name="gift" size={48} color={COLORS.text.inverse} />
+        <Text style={styles.logoEmoji}>{'\u{1F381}'}</Text>
       </Reanimated.View>
     </View>
   );
@@ -122,6 +124,7 @@ interface AnimatedButtonProps {
   accessibilityHint?: string;
   disabled?: boolean;
   showComingSoon?: boolean;
+  testID?: string;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -133,6 +136,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   accessibilityHint,
   disabled = false,
   showComingSoon = false,
+  testID,
 }) => {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -195,6 +199,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         accessibilityHint={accessibilityHint}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
+        testID={testID}
       >
         <View style={styles.buttonContent}>{children}</View>
         {showComingSoon && (
@@ -256,15 +261,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   }, [socialAuth]);
 
   const handleCreateAccount = useCallback(() => {
-    navigation.navigate('UnifiedAuth', { initialMode: 'register' });
+    navigation.navigate('UnifiedAuth');
   }, [navigation]);
 
   const handleLogin = useCallback(() => {
-    navigation.navigate('UnifiedAuth', { initialMode: 'login' });
+    navigation.navigate('UnifiedAuth');
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <View testID="screen-welcome" style={styles.container}>
       {/* Ambient Background */}
       <LinearGradient
         colors={[COLORS.bg.primary, COLORS.bg.tertiary]}
@@ -315,6 +320,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={600}
             accessibilityLabel="Apple ile devam et"
             accessibilityHint="Apple hesabınızla giriş yaparsınız"
+            testID="btn-apple-signin"
           >
             <MaterialCommunityIcons
               name="apple"
@@ -326,13 +332,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             </Text>
           </AnimatedButton>
 
-          {/* Google login enabled via Generic OAuth */}
-          <AnimatedButton
+{/* Google login hidden until implementation is complete */}
+          {/* <AnimatedButton
             variant="google"
             onPress={handleGoogleLogin}
             delay={700}
             accessibilityLabel="Google ile devam et"
             accessibilityHint="Google ile giriş yapın"
+            disabled={true}
+            showComingSoon={false}
           >
             <MaterialCommunityIcons
               name="google"
@@ -342,7 +350,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             <Text style={styles.socialButtonText}>
               {t('welcome.continueWithGoogle')}
             </Text>
-          </AnimatedButton>
+          </AnimatedButton> */}
 
           {/* Divider */}
           <View style={styles.divider}>
@@ -358,6 +366,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={800}
             accessibilityLabel="Hesap oluştur"
             accessibilityHint="Yeni bir hesap oluşturmak için kayıt sayfasına gider"
+            testID="btn-create-account"
           >
             <LinearGradient
               colors={GRADIENTS.gift}
@@ -377,6 +386,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={900}
             accessibilityLabel="Giriş yap"
             accessibilityHint="Mevcut hesabınızla giriş sayfasına gider"
+            testID="btn-login"
           >
             <Text style={styles.secondaryButtonText}>{t('welcome.login')}</Text>
           </AnimatedButton>
@@ -456,6 +466,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 24,
     elevation: 12,
+  },
+  logoEmoji: {
+    fontSize: 48,
   },
   appName: {
     ...TYPE_SCALE.display.h1,

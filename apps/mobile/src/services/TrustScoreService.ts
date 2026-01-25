@@ -1,7 +1,7 @@
 /**
  * TrustScore Service
  * Handles TrustScore calculations, limits, and financial advantages.
- *
+ * 
  * "TrustScore is no longer just a social score; it's a Credit Note that determines limits and commissions."
  */
 
@@ -29,7 +29,7 @@ class TrustScoreService {
         .select('verified, coins_balance')
         .eq('id', userId)
         .single();
-
+      
       if (userError) throw userError;
 
       const { data: subscription } = await supabase
@@ -75,29 +75,19 @@ class TrustScoreService {
    * Get subscription tier for user
    */
   async getSubscriptionTier(userId: string): Promise<UserTier> {
-    try {
-      const { data: subscription, error } = await supabase
-        .from('user_subscriptions')
-        .select('status, plan:subscription_plans(name)')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .single();
+    const { data: subscription } = await supabase
+      .from('user_subscriptions')
+      .select('status, plan:subscription_plans(name)')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .single();
 
-      if (error) throw error;
-      if (!subscription || !subscription.plan) return 'Free';
-
-      const planName = String(
-        (subscription.plan as any).name || '',
-      ).toLowerCase();
-      if (planName.includes('platinum') || planName.includes('elite'))
-        return 'Elite';
-      if (planName.includes('premium') || planName.includes('pro'))
-        return 'Pro';
-      return 'Free';
-    } catch (error) {
-      logger.warn('[TrustScore] Subscription tier fallback:', error);
-      return 'Free';
-    }
+    if (!subscription || !subscription.plan) return 'Free';
+    
+    const planName = (subscription.plan as any).name;
+    if (planName.toLowerCase().includes('platinum') || planName.toLowerCase().includes('elite')) return 'Elite';
+    if (planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('pro')) return 'Pro';
+    return 'Free';
   }
 
   /**
@@ -106,15 +96,10 @@ class TrustScoreService {
   async getBenefits(userId: string): Promise<TrustScoreBenefits> {
     const score = await this.calculateTrustScore(userId);
     const tier = await this.getSubscriptionTier(userId);
-    const { data: user } = await supabase
-      .from('users')
-      .select('verified')
-      .eq('id', userId)
-      .single();
+    const { data: user } = await supabase.from('users').select('verified').eq('id', userId).single();
 
     let commission = 15; // Free: 15%
-    if (tier === 'Elite')
-      commission = 5; // Elite: 5%
+    if (tier === 'Elite') commission = 5; // Elite: 5%
     else if (tier === 'Pro') commission = 10; // Pro: 10%
 
     let dailyLimit = 1000;

@@ -13,5 +13,10 @@
   },
   "include": [],
   "exclude": ["**/*"],
-  "references": [{ "path": "./job-queue" }, { "path": "./payment" }, { "path": "./shared" }]
+  "references": [
+    { "path": "./job-queue" },
+    { "path": "./payment" },
+    { "path": "./ml" },
+    { "path": "./shared" }
+  ]
 }

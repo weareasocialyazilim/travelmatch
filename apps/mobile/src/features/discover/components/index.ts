@@ -14,7 +14,11 @@ export { CategoryFilter } from './CategoryFilter';
 export { GlassCategorySelector } from './GlassCategorySelector';
 
 // Header & Search
-export { DiscoverHeader, AnimatedDiscoverHeader } from './DiscoverHeader';
+export {
+  DiscoverHeader,
+  AwwwardsDiscoverHeader,
+  AnimatedDiscoverHeader,
+} from './DiscoverHeader';
 export { EnhancedSearchBar } from './EnhancedSearchBar';
 
 // Filters & Modals

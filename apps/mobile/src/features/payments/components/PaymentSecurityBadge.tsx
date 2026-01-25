@@ -28,7 +28,7 @@ interface PaymentSecurityBadgeProps {
 /**
  * PaymentSecurityBadge - Premium Payment Security Indicator
  *
- * High-quality component that visualizes payment security.
+ * Awwwards-quality component that visualizes payment security.
  * Features:
  * - Glassmorphism card with neon glow
  * - Animated shield icon for ESCROW mode

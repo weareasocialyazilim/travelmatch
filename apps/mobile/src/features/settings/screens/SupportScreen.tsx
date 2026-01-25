@@ -57,7 +57,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
       showAlert({
         title: 'Success',
         message:
-          'Your support request has been submitted. We will get back to you within 72 hours.',
+          'Your support request has been submitted. We will get back to you within 24 hours.',
         buttons: [{ text: 'OK', onPress: () => navigation.goBack() }],
       });
     }, 1500);
@@ -75,6 +75,12 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     Linking.openURL('mailto:support@lovendo.xyz?subject=Support Request');
   };
 
+  const handleWhatsApp = () => {
+    Linking.openURL(
+      'https://wa.me/905551234567?text=Hello, I need help with Lovendo',
+    );
+  };
+
   const handleCallSupport = () => {
     Linking.openURL('tel:+905551234567');
   };
@@ -86,6 +92,13 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
       title: 'Email Support',
       description: 'support@lovendo.xyz',
       action: handleEmailSupport,
+    },
+    {
+      id: '2',
+      icon: 'whatsapp',
+      title: 'WhatsApp',
+      description: 'Chat with us on WhatsApp',
+      action: handleWhatsApp,
     },
     {
       id: '3',
@@ -135,7 +148,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             </View>
             <Text style={styles.heroTitle}>How can we help you?</Text>
             <Text style={styles.heroSubtitle}>
-              We&apos;ll respond within 72 hours
+              We&apos;re here to assist you 24/7
             </Text>
           </View>
 
@@ -295,7 +308,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             />
             <Text style={styles.infoText}>
               Average response time:{' '}
-              <Text style={styles.infoBold}>up to 72 hours</Text>
+              <Text style={styles.infoBold}>2-4 hours</Text>
             </Text>
           </View>
 

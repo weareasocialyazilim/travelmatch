@@ -84,14 +84,7 @@ class WalletService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
-        return {
-          available: 0,
-          coins: 0,
-          pending: 0,
-          currency: 'LVND',
-        };
-      }
+      if (!user) throw new Error('Not authenticated');
 
       // Try cache first
       const cached = await getCachedWallet(user.id);
@@ -129,14 +122,7 @@ class WalletService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
-        return {
-          available: 0,
-          coins: 0,
-          pending: 0,
-          currency: 'LVND',
-        };
-      }
+      if (!user) throw new Error('Not authenticated');
 
       // Check if we should use cached data (within TTL)
       const now = Date.now();
@@ -181,20 +167,16 @@ class WalletService {
         return await this.getDatabaseBalance(user.id);
       }
 
-      // Fetch updated coins_balance from wallets table
-      const { data: coinWallet } = await supabase
-        .from('wallets')
+      // Fetch updated coins_balance from database since Auth user doesn't have it
+      const { data: dbUser } = await supabase
+        .from('users')
         .select('coins_balance')
-        .eq('user_id', user.id)
-        .eq('currency', 'LVND')
+        .eq('id', user.id)
         .single();
-      const coinWalletRow = coinWallet as unknown as {
-        coins_balance?: number | null;
-      } | null;
 
       const balance: WalletBalance = {
         available: result.available_balance,
-        coins: coinWalletRow?.coins_balance || 0,
+        coins: (dbUser as any)?.coins_balance || 0,
         pending: result.pending_balance,
         currency: result.currency || 'TRY',
       };
@@ -208,16 +190,15 @@ class WalletService {
         currency: balance.currency,
       });
 
-      // Sync to wallets table for offline fallback (Fiat)
-      await supabase.from('wallets').upsert(
-        {
-          user_id: user.id,
-          currency: balance.currency,
+      // Sync to database for offline fallback
+      await supabase
+        .from('users')
+        .update({
           balance: balance.available,
-          last_synced_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id, currency' },
-      );
+          pending_balance: balance.pending,
+          balance_last_synced: new Date().toISOString(),
+        })
+        .eq('id', user.id);
 
       logger.info('PayTR balance fetched:', {
         available: balance.available,
@@ -235,44 +216,26 @@ class WalletService {
    * Fallback: Get balance from database (used when PayTR API unavailable)
    */
   private async getDatabaseBalance(userId: string): Promise<WalletBalance> {
-    const { data: userRow, error: userError } = await supabase
+    const { data, error } = await supabase
       .from('users')
-      .select('balance, currency, coins_balance, pending_balance')
+      .select('balance, coins_balance, pending_balance, currency')
       .eq('id', userId)
       .single();
 
-    if (!userError && userRow) {
-      return {
-        available: (userRow as { balance?: number }).balance || 0,
-        coins: (userRow as { coins_balance?: number }).coins_balance || 0,
-        pending: (userRow as { pending_balance?: number }).pending_balance || 0,
-        currency: (userRow as { currency?: string }).currency || 'TRY',
-      };
-    }
-
-    const { data: wallets, error } = await supabase
-      .from('wallets')
-      .select('balance, coins_balance, currency')
-      .eq('user_id', userId);
-
     if (error) throw error;
 
-    const walletRows = wallets as unknown as Array<{
-      balance?: number | null;
-      coins_balance?: number | null;
-      currency?: string | null;
-    }> | null;
-
-    const coinWallet = walletRows?.find((w) => w.currency === 'LVND');
-    const fiatWallet = walletRows?.find(
-      (w) => w.currency !== 'LVND', // Assume non-LVND is fiat (TRY/USD)
-    );
+    const dbData = data as unknown as {
+      balance?: number;
+      coins_balance?: number;
+      pending_balance?: number;
+      currency?: string;
+    };
 
     return {
-      available: fiatWallet?.balance || 0,
-      coins: coinWallet?.coins_balance || 0, // Use coins_balance for LVND
-      pending: 0, // Pending balance not persisted in wallets table
-      currency: fiatWallet?.currency || 'TRY',
+      available: dbData.balance || 0,
+      coins: dbData.coins_balance || 0,
+      pending: dbData.pending_balance || 0,
+      currency: dbData.currency || 'TRY',
     };
   }
 

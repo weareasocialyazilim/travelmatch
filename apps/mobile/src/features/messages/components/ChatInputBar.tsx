@@ -43,12 +43,6 @@ interface ChatInputBarProps {
   onTextChange: (text: string) => void;
   onSend: () => void;
   onAttachPress: () => void;
-  /** Disable input (e.g. guest users) */
-  isDisabled?: boolean;
-  /** Message shown when input is disabled */
-  disabledMessage?: string;
-  /** Action to trigger when disabled input is pressed */
-  onDisabledPress?: () => void;
   /** Open gift flow with preset amount from moment */
   onGiftPress?: (momentContext: LinkedMomentContext) => void;
   /** Linked moment for gift flow preset */
@@ -64,9 +58,6 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onTextChange,
   onSend,
   onAttachPress,
-  isDisabled = false,
-  disabledMessage = 'Sohbet için üye olmalısın.',
-  onDisabledPress,
   onGiftPress,
   linkedMoment,
   isTyping,
@@ -108,7 +99,6 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
    * Handle text change with typing broadcast
    */
   const handleTextChange = (text: string) => {
-    if (isDisabled) return;
     onTextChange(text);
 
     if (text.length > 0 && isConnected) {
@@ -120,10 +110,6 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
    * Handle gift button press - preset moment's requested amount
    */
   const handleGiftPress = () => {
-    if (isDisabled) {
-      onDisabledPress?.();
-      return;
-    }
     if (!linkedMoment) {
       logger.warn('No linked moment for gift flow');
       return;
@@ -140,17 +126,6 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
   const InputContent = () => (
     <View style={[styles.inputWrapper, { paddingBottom: insets.bottom + 12 }]}>
-      {isDisabled && (
-        <TouchableOpacity
-          style={styles.disabledBanner}
-          onPress={onDisabledPress}
-          activeOpacity={0.85}
-          accessibilityRole="button"
-          accessibilityLabel="Giriş gereklidir"
-        >
-          <Text style={styles.disabledText}>{disabledMessage}</Text>
-        </TouchableOpacity>
-      )}
       <View style={styles.inputInner}>
         <TouchableOpacity
           style={styles.attachButton}
@@ -159,7 +134,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             logger.debug('Attach button pressed - opening attachment sheet');
             onAttachPress();
           }}
-          disabled={!isConnected || isDisabled}
+          disabled={!isConnected}
           activeOpacity={0.6}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           accessibilityLabel="Attach file"
@@ -198,11 +173,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         <TextInput
           style={styles.input}
           placeholder={
-            isDisabled
-              ? disabledMessage
-              : isConnected
-                ? 'Bir mesaj yaz...'
-                : 'Çevrimdışı - Gönderilemiyor'
+            isConnected ? 'Bir mesaj yaz...' : 'Çevrimdışı - Gönderilemiyor'
           }
           placeholderTextColor={COLORS.text.muted}
           value={messageText}
@@ -211,7 +182,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
           maxLength={1000}
           returnKeyType="default"
           blurOnSubmit={false}
-          editable={isConnected && !isDisabled}
+          editable={isConnected}
           accessibilityLabel="Message input"
           accessibilityHint="Type your message here"
         />
@@ -227,18 +198,14 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
           style={[
             styles.sendButton,
             messageText.trim().length > 0 && styles.sendButtonActive,
-            (!isConnected || isSending || isDisabled) &&
-              styles.sendButtonDisabled,
+            (!isConnected || isSending) && styles.sendButtonDisabled,
           ]}
           onPress={() => {
             HapticManager.messageSent();
             onSend();
           }}
           disabled={
-            !isConnected ||
-            isSending ||
-            isDisabled ||
-            messageText.trim().length === 0
+            !isConnected || isSending || messageText.trim().length === 0
           }
           accessibilityLabel={isSending ? 'Sending message' : 'Send message'}
           accessibilityRole="button"
@@ -284,21 +251,6 @@ const styles = StyleSheet.create({
   inputWrapper: {
     paddingTop: 12,
     paddingHorizontal: 16,
-  },
-  disabledBanner: {
-    backgroundColor: COLORS.feedback.warningLight,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: COLORS.feedback.warning,
-  },
-  disabledText: {
-    color: COLORS.text.primary,
-    fontFamily: FONTS.body.medium,
-    fontSize: FONT_SIZES.caption,
-    textAlign: 'center',
   },
   inputInner: {
     flexDirection: 'row',

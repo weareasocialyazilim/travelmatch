@@ -158,7 +158,7 @@ const activeCampaigns = [
   },
   {
     id: 'camp-003',
-    name: 'İlk Talep Teşviki',
+    name: 'İlk Rezervasyon Teşviki',
     channel: 'In-App',
     status: 'active',
     audience: 28000,
@@ -218,7 +218,7 @@ const templates = [
   },
   {
     id: 'tpl-2',
-    name: 'Talep Onayı',
+    name: 'Rezervasyon Onayı',
     channel: 'Push',
     usage: 128000,
     openRate: 78.5,
@@ -251,7 +251,7 @@ const abTests = [
   },
   {
     id: 'ab-2',
-    campaign: 'İlk Talep Teşviki',
+    campaign: 'İlk Rezervasyon Teşviki',
     variantA: { name: '%20 İndirim', sent: 14000, opened: 7200, rate: 51.4 },
     variantB: {
       name: 'Ücretsiz Deneme',
@@ -722,7 +722,7 @@ export default function CampaignBuilderPage() {
                 <div className="p-4 border rounded-lg space-y-2">
                   <h4 className="font-medium">Davranış Bazlı</h4>
                   <p className="text-sm text-muted-foreground">
-                    Son giriş, aktivite, tamamlanan talep sayısı
+                    Son giriş, aktivite, tamamlanan rezervasyon sayısı
                   </p>
                 </div>
                 <div className="p-4 border rounded-lg space-y-2">

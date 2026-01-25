@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS coin_packages (
 );
 
 -- 3. Coin Transactions (Audit Trail)
-CREATE TABLE IF NOT EXISTS coin_balance_history (
+CREATE TABLE IF NOT EXISTS coin_transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   amount INTEGER NOT NULL, -- Positive = Credit, Negative = Debit
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS coin_balance_history (
 );
 
 -- 4. Indexes
-CREATE INDEX IF NOT EXISTS idx_coin_balance_history_user ON coin_balance_history(user_id);
-CREATE INDEX IF NOT EXISTS idx_coin_balance_history_type ON coin_balance_history(type);
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_user ON coin_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_type ON coin_transactions(type);
 CREATE INDEX IF NOT EXISTS idx_coin_packages_active ON coin_packages(is_active);
 
 -- 5. RLS Policies
@@ -59,10 +59,10 @@ CREATE POLICY "Anyone can view active coin packages"
   USING (is_active = true);
 
 -- Coin Transactions: Users see their own
-ALTER TABLE coin_balance_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coin_transactions ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view own coin transactions" 
-  ON coin_balance_history FOR SELECT 
+  ON coin_transactions FOR SELECT 
   USING (auth.uid() = user_id);
 
 -- Users: Allow users to view own coin balance (covered by existing users select policy, but ensuring update protection)
@@ -104,7 +104,7 @@ BEGIN
   WHERE id = p_user_id;
 
   -- Record Transaction
-  INSERT INTO coin_balance_history (
+  INSERT INTO coin_transactions (
     user_id, amount, type, reference_id, description, metadata
   ) VALUES (
     p_user_id, p_amount, p_type, p_reference_id, p_description, p_metadata

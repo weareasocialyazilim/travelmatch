@@ -6,7 +6,7 @@
  *
  * Features:
  * - Soft Dark tema ile uyumlu spacing ve hiyerarşi
- * - Story şeridi için özel styling
+ * - Canlı deneyimler için özel styling
  * - Premium spacing (20px horizontal padding)
  *
  * Part of Lovendo "Cinematic Trust Jewelry" Design System.
@@ -37,7 +37,7 @@ interface StoriesRowProps {
   stories: UserStory[];
   onStoryPress: (story: UserStory, index: number) => void;
   onCreatePress: () => void;
-  /** Section title (optional) */
+  /** Section title (default: "Canlı Deneyimler") */
   sectionTitle?: string;
   /** Hide section title */
   hideTitle?: boolean;
@@ -48,8 +48,8 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
     stories,
     onStoryPress,
     onCreatePress,
-    sectionTitle,
-    hideTitle = true,
+    sectionTitle = 'Canlı Deneyimler',
+    hideTitle = false,
   }) => {
     return (
       <View style={styles.storiesSection}>
@@ -63,12 +63,11 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
         >
           {/* Create Story Button */}
           <TouchableOpacity
-            style={[styles.storyItem, styles.createStoryItem]}
+            style={styles.storyItem}
             onPress={onCreatePress}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Yeni anı oluştur"
-            accessibilityHint="Anını paylaşmak için yeni bir hikaye oluştur"
+            accessibilityLabel="Create new moment"
           >
             <View style={styles.createStoryRing}>
               <View style={styles.createStoryInner}>
@@ -79,6 +78,7 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                 />
               </View>
             </View>
+            <Text style={styles.storyName}>Create</Text>
           </TouchableOpacity>
 
           {/* User Stories */}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   // Container - "Enerji bandı" background
   storiesSection: {
     backgroundColor: COLORS.bg.primary,
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
 
   // Section Title - Uppercase label
@@ -161,9 +161,6 @@ const styles = StyleSheet.create({
   storyItem: {
     alignItems: 'center',
     width: 72,
-  },
-  createStoryItem: {
-    marginTop: 0,
   },
 
   // Create button - dashed border

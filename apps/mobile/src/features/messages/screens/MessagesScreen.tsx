@@ -13,7 +13,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HapticManager } from '@/services/HapticManager';
-import { SPACING } from '@/constants/spacing';
 import { ErrorState, EmptyState } from '@/components';
 import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
@@ -22,14 +21,12 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/hooks/useAuth';
 import type { MessageEvent } from '@/context/RealtimeContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Conversation } from '@/services/messageService';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { NetworkGuard } from '../../../components/NetworkGuard';
-import { showLoginPrompt } from '@/stores/modalStore';
 
 // Format time ago
 const formatTimeAgo = (dateString: string): string => {
@@ -51,7 +48,6 @@ const formatTimeAgo = (dateString: string): string => {
 const MessagesScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
-  const { user, isGuest } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Use messages hook
@@ -74,12 +70,6 @@ const MessagesScreen: React.FC = () => {
   useEffect(() => {
     refreshConversations();
   }, [refreshConversations]);
-
-  useEffect(() => {
-    if (isGuest || !user) {
-      showLoginPrompt({ action: 'chat' });
-    }
-  }, [isGuest, user]);
 
   // Listen for new messages to refresh list
   useRealtimeEvent<MessageEvent>(
@@ -295,25 +285,6 @@ const MessagesScreen: React.FC = () => {
     [navigation, t],
   );
 
-  if (isGuest || !user) {
-    return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.container}>
-          <EmptyState
-            title={t('messages.loginRequiredTitle', 'Giriş gerekli')}
-            description={t(
-              'messages.loginRequiredMessage',
-              'Mesajlara erişmek için giriş yapmanız gerekir.',
-            )}
-            actionLabel={t('messages.loginNow', 'Giriş Yap')}
-            onAction={() => showLoginPrompt({ action: 'chat' })}
-            style={styles.loginRequiredEmptyState}
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   // Loading state - show skeleton
   if (isLoading && conversations.length === 0) {
     return (
@@ -440,10 +411,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
-  safeArea: {
-    backgroundColor: COLORS.bg.primary,
-    flex: 1,
-  },
   lastMessage: {
     color: COLORS.text.secondary,
     flex: 1,
@@ -540,9 +507,6 @@ const styles = StyleSheet.create({
   },
   emptyStateContainer: {
     paddingTop: 80,
-  },
-  loginRequiredEmptyState: {
-    paddingBottom: SPACING.bottomNavHeight,
   },
 });
 

@@ -5,6 +5,7 @@
  */
 
 import type { NavigatorScreenParams } from '@react-navigation/native';
+import type { VerificationData as KYCVerificationData } from '../features/verifications/kyc/types';
 import type { SuccessType } from '../features/payments/types/success.types';
 import type { Moment, User, SelectedGiver } from '../types';
 
@@ -30,6 +31,9 @@ export type RootStackParamList = {
   Onboarding: undefined;
   // UnifiedAuth - Master 2026 Liquid Auth Flow (replaces Login)
   UnifiedAuth: { initialMode?: 'login' | 'register' } | undefined;
+  Register: undefined;
+  PhoneAuth: undefined;
+  EmailAuth: undefined;
   ForgotPassword: undefined;
   VerifyCode: { phone?: string; email?: string } | undefined;
   SuccessConfirmation: undefined;
@@ -219,19 +223,13 @@ export type RootStackParamList = {
   HiddenItems: undefined;
   ArchivedChats: undefined;
 
-  // Identity Verification (iDenfy flow)
-  IdentityVerification: { returnTo?: string } | undefined;
-  KYCPending:
-    | {
-        status?:
-          | 'not_started'
-          | 'pending'
-          | 'in_review'
-          | 'verified'
-          | 'rejected';
-        returnTo?: string;
-      }
-    | undefined;
+  // Identity Verification (modular KYC flow)
+  IdentityVerification: undefined;
+  KYCDocumentType: { data: KYCVerificationData };
+  KYCDocumentCapture: { data: KYCVerificationData };
+  KYCSelfie: { data: KYCVerificationData };
+  KYCReview: { data: KYCVerificationData };
+  KYCPending: undefined;
 
   // Social & Invite
   InviteFriends: undefined;
@@ -260,6 +258,8 @@ export type RootStackParamList = {
     | undefined;
 
   // Payment Methods
+  PaymentMethods: undefined;
+  AddCard: undefined;
 
   // Checkout
   Checkout:
@@ -332,11 +332,21 @@ export type RootStackParamList = {
   SessionExpired: undefined;
   PaymentFailed: { transactionId?: string; error?: string };
 
+  // PayTR WebView for secure payment
+  PayTRWebView: {
+    iframeToken: string;
+    merchantOid: string;
+    amount: number;
+    currency: 'TRY' | 'EUR' | 'USD';
+    giftId?: string;
+    isTestMode?: boolean;
+  };
+
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;
 
-  // NEW: Gift Success Screen
+  // NEW: Gift Success Screen (PayTR Güvenceli)
   GiftSuccess: {
     giftId: string;
     momentId: string;

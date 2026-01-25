@@ -35,6 +35,9 @@ import {
   OnboardingScreen,
   CompleteProfileScreen,
   VerifyPhoneScreen,
+  PhoneAuthScreen,
+  EmailAuthScreen,
+  RegisterScreen,
   UnifiedAuthScreen,
   SetPasswordScreen,
   TwoFactorSetupScreen,
@@ -201,6 +204,8 @@ const MomentCommentsScreen = lazyLoad(() =>
 // PAYMENTS FEATURE SCREENS
 // ===================================
 import {
+  PaymentMethodsScreen,
+  AddCardScreen,
   TransactionDetailScreen,
   TransactionHistoryScreen,
   PaymentsKYCScreen,
@@ -210,11 +215,16 @@ import {
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
+  // PayTRWebViewScreen removed for Apple Compliance (backend only)
   PromoCodeScreen,
   UnifiedGiftFlowScreen,
   SubscriberOfferModal,
   // KYC Screens
   KYCIntroScreen,
+  KYCDocumentTypeScreen,
+  KYCDocumentCaptureScreen,
+  KYCSelfieScreen,
+  KYCReviewScreen,
   KYCPendingScreen,
 } from '../features/payments';
 
@@ -492,6 +502,11 @@ const AppNavigator = () => {
               component={WelcomeScreen}
               options={{ animation: 'fade' }}
             />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{ animation: 'fade' }}
+            />
             {/* UnifiedAuth - Master 2026 Liquid Auth Flow */}
             <Stack.Screen
               name="UnifiedAuth"
@@ -505,6 +520,8 @@ const AppNavigator = () => {
             <Stack.Screen name="LinkNotFound" component={LinkNotFoundScreen} />
             <Stack.Screen name="LinkExpired" component={LinkExpiredScreen} />
             <Stack.Screen name="LinkInvalid" component={LinkInvalidScreen} />
+            <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
+            <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
             <Stack.Screen
               name="ForgotPassword"
               component={ForgotPasswordScreen}
@@ -691,6 +708,16 @@ const AppNavigator = () => {
               name="IdentityVerification"
               component={KYCIntroScreen}
             />
+            <Stack.Screen
+              name="KYCDocumentType"
+              component={KYCDocumentTypeScreen}
+            />
+            <Stack.Screen
+              name="KYCDocumentCapture"
+              component={KYCDocumentCaptureScreen}
+            />
+            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
+            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
             <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
             {/* Social & Invite */}
@@ -736,6 +763,11 @@ const AppNavigator = () => {
             />
 
             {/* Payment Methods */}
+            <Stack.Screen
+              name="PaymentMethods"
+              component={PaymentMethodsScreen}
+            />
+            <Stack.Screen name="AddCard" component={AddCardScreen} />
 
             {/* Gift & Offer Flows */}
             <Stack.Screen
@@ -791,6 +823,7 @@ const AppNavigator = () => {
             {/* Ticket */}
             <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
+            {/* <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} /> */}
 
             {/* Footer Pages */}
             <Stack.Screen name="Safety" component={SafetyScreen} />

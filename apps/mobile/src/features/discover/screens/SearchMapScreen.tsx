@@ -1,7 +1,7 @@
 /**
  * SearchMapScreen - Immersive Map Experience
  *
- * Standard map view with:
+ * Awwwards-standard map view with:
  * - Dark mode optimized theme
  * - Liquid Glass overlays
  * - Neon pulse markers with Platinum shimmer

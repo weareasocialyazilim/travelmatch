@@ -25,6 +25,9 @@ import {
   ImageBackground,
   Animated as RNAnimated,
   TouchableOpacity,
+  PanResponder,
+  type GestureResponderEvent,
+  type PanResponderGestureState,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -56,22 +59,22 @@ const SLIDES = [
     id: '1',
     image:
       'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
-    title: 'Ne yaşamak istiyorsun?',
-    desc: 'Bir kahve, bir sergi, bir akşam yemeği.\nİnsanlar bunu senin için gerçekleştirsin.',
+    title: 'Discover Local Vibes',
+    desc: 'Find exclusive moments curated by locals. From hidden bars to sunset dinners.',
   },
   {
     id: '2',
     image:
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
-    title: 'Para asla boşa gitmez.',
-    desc: 'Deneyim gerçekleşene kadar paran güvende tutulur.',
+    title: 'Connect & Support',
+    desc: 'Connect with creators who share your vibe and support them with a gift.',
   },
   {
     id: '3',
     image:
       'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200',
-    title: 'Gerçekleştiğinde kanıtlanır.',
-    desc: 'An yaşanır, onaylanır, tamamlanır.',
+    title: 'Secure & Cashless',
+    desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
   },
 ];
 
@@ -106,7 +109,49 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       enableHaptics: true,
     });
 
-  const flatListRef = useRef<FlatList>(null);
+  // Swipe gesture handler for navigating between slides
+  const handleSwipe = useCallback(
+    (direction: 'left' | 'right') => {
+      if (direction === 'left' && activeIndex < SLIDES.length - 1) {
+        // Swipe left = next slide
+        setActiveIndex(activeIndex + 1);
+        HapticManager.swipe();
+      } else if (direction === 'right' && activeIndex > 0) {
+        // Swipe right = previous slide
+        setActiveIndex(activeIndex - 1);
+        HapticManager.swipe();
+      }
+    },
+    [activeIndex],
+  );
+
+  // PanResponder for swipe gestures
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (
+        _evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState,
+      ) => {
+        // Only respond to horizontal swipes
+        return (
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+          Math.abs(gestureState.dx) > 10
+        );
+      },
+      onPanResponderRelease: (
+        _evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState,
+      ) => {
+        const SWIPE_THRESHOLD = 50;
+        if (gestureState.dx < -SWIPE_THRESHOLD) {
+          handleSwipe('left');
+        } else if (gestureState.dx > SWIPE_THRESHOLD) {
+          handleSwipe('right');
+        }
+      },
+    }),
+  ).current;
 
   const handleNext = useCallback(async () => {
     logger.debug('OnboardingScreen handleNext called', {
@@ -123,7 +168,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
       // Update state to show next slide
       setActiveIndex(nextIndex);
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
 
       analytics.trackEvent('onboarding_page_view', {
         screen: 'onboarding',
@@ -187,28 +231,25 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   });
 
   return (
-    <View style={styles.container}>
-      {/* Background Swipable Slides */}
-      <FlatList
-        ref={flatListRef}
-        data={SLIDES}
-        renderItem={_renderItem}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
-        style={StyleSheet.absoluteFillObject}
-        onMomentumScrollEnd={(event) => {
-          const newIndex = Math.round(
-            event.nativeEvent.contentOffset.x / width,
-          );
-          if (newIndex !== activeIndex) {
-            setActiveIndex(newIndex);
-            HapticManager.swipe();
+    <View style={styles.container} {...panResponder.panHandlers}>
+      {/* Background Image - with fallback color */}
+      <View style={[StyleSheet.absoluteFillObject, styles.backgroundFallback]}>
+        <ImageBackground
+          source={{ uri: currentSlide.image }}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
+          onLoad={() => logger.info('🖼️ Image loaded', { id: currentSlide.id })}
+          onError={(e) =>
+            logger.error('🖼️ Image error', { error: e.nativeEvent })
           }
-        }}
-      />
+        >
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+            locations={[0.3, 0.6, 1]}
+            style={StyleSheet.absoluteFillObject}
+          />
+        </ImageBackground>
+      </View>
 
       {/* Content overlay - full screen touchable area */}
       <View
@@ -236,46 +277,38 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           </View>
 
           {/* Next Button with Magnetic Physics - Apple Vision Pro style */}
-          <View style={styles.ctaContainer}>
-            <GestureDetector gesture={panGestureHandler}>
-              <Animated.View
-                style={[styles.magneticButtonContainer, magneticStyle]}
-                onLayout={(event) => {
-                  const {
-                    x,
-                    y,
-                    width: w,
-                    height: h,
-                  } = event.nativeEvent.layout;
-                  // Set button center for magnetic attraction calculations
-                  setButtonCenter(x + w / 2, y + h / 2);
-                }}
-              >
-                {/* Glow layer - appears when finger approaches */}
-                <Animated.View style={[styles.buttonGlow, glowStyle]} />
+          <GestureDetector gesture={panGestureHandler}>
+            <Animated.View
+              style={[styles.magneticButtonContainer, magneticStyle]}
+              onLayout={(event) => {
+                const { x, y, width: w, height: h } = event.nativeEvent.layout;
+                // Set button center for magnetic attraction calculations
+                setButtonCenter(x + w / 2, y + h / 2);
+              }}
+            >
+              {/* Glow layer - appears when finger approaches */}
+              <Animated.View style={[styles.buttonGlow, glowStyle]} />
 
-                <Pressable
-                  onPress={() => {
-                    logger.info('🔘 BUTTON PRESSED!', { activeIndex });
-                    HapticManager.primaryAction();
-                    handleNext();
-                  }}
-                  style={({ pressed }) => [
-                    styles.nextButton,
-                    pressed && styles.nextButtonPressed,
-                  ]}
+              <Pressable
+                onPress={() => {
+                  logger.info('🔘 BUTTON PRESSED!', { activeIndex });
+                  HapticManager.primaryAction();
+                  handleNext();
+                }}
+                style={({ pressed }) => [
+                  styles.nextButton,
+                  pressed && styles.nextButtonPressed,
+                ]}
+              >
+                <LinearGradient
+                  colors={[COLORS.brand.primary, '#A2FF00']}
+                  style={styles.nextButtonGradient}
                 >
-                  <LinearGradient
-                    colors={[COLORS.brand.primary, '#A2FF00']}
-                    style={styles.nextButtonGradient}
-                  >
-                    <Ionicons name="arrow-forward" size={24} color="black" />
-                  </LinearGradient>
-                </Pressable>
-              </Animated.View>
-            </GestureDetector>
-            <Text style={styles.ctaText}>İlk moment’ini oluştur</Text>
-          </View>
+                  <Ionicons name="arrow-forward" size={24} color="black" />
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+          </GestureDetector>
         </View>
       </View>
     </View>
@@ -354,15 +387,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaContainer: {
-    alignItems: 'center',
-  },
-  ctaText: {
-    marginTop: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
-  },
   magneticButtonContainer: {
     position: 'relative',
     alignItems: 'center',
@@ -400,20 +424,20 @@ export default OnboardingScreen;
 const AWWWARDS_SLIDES = [
   {
     id: '1',
-    title: 'Ne yaşamak\nistiyorsun?',
-    desc: 'Bir kahve, bir sergi, bir akşam yemeği. İnsanlar bunu senin için gerçekleştirsin.',
+    title: 'Eşsiz Anları\nKeşfet',
+    desc: 'Dünyanın dört bir yanından doğrulanmış ve ipeksi deneyimlere tanıklık et.',
     color: COLORS.primary,
   },
   {
     id: '2',
-    title: 'Para asla\nboşa gitmez.',
-    desc: 'Deneyim gerçekleşene kadar paran güvende tutulur.',
+    title: 'Güvenle\nPaylaş',
+    desc: 'Trust Score sistemimizle sadece en güvenilir kullanıcılarla bağ kur.',
     color: COLORS.secondary,
   },
   {
     id: '3',
-    title: 'Gerçekleştiğinde\nkanıtlanır.',
-    desc: 'An yaşanır, onaylanır, tamamlanır.',
+    title: 'Hediye Et,\nİz Bırak',
+    desc: 'Sevdiklerine unutulmaz anlar hediye ederek sosyal ağını genişlet.',
     color: COLORS.accent.primary,
   },
 ];
@@ -425,7 +449,7 @@ interface AwwwardsOnboardingScreenProps {
 /**
  * AwwwardsOnboardingScreen - İlk Etki Deneyimi
  *
- * High-quality onboarding with:
+ * Awwwards-quality onboarding with:
  * - Dynamic neon glow ball that follows scroll position
  * - Animated pagination dots with scale and opacity
  * - 48px display title with heading font
@@ -560,7 +584,7 @@ export const AwwwardsOnboardingScreen: React.FC<
         <Button
           title={
             currentIndex === AWWWARDS_SLIDES.length - 1
-              ? 'İlk moment’ini oluştur'
+              ? 'Hadi Başlayalım'
               : 'Devam Et'
           }
           variant="primary"

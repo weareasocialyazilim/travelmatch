@@ -6,7 +6,6 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { useAuthStore } from '@/stores/auth-store';
-import { logger } from '@/lib/logger';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -35,7 +34,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (error) {
-        logger.error('Session check failed', error);
+        console.error('Session check failed:', error);
       }
 
       // No valid session from server

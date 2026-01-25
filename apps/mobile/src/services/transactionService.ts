@@ -41,9 +41,7 @@ class TransactionService {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
-        return [];
-      }
+      if (!user) throw new Error('Not authenticated');
 
       // Build cache key with params
       const cacheKey = `${user.id}:${JSON.stringify(filters || {})}`;

@@ -14,8 +14,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  type NativeSyntheticEvent,
-  type TextInputKeyPressEventData,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
@@ -23,12 +21,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  useNavigation,
-  useRoute,
-  type RouteProp,
-} from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/routeParams';
+import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HapticManager } from '@/services/HapticManager';
@@ -42,7 +35,7 @@ import Reanimated, {
   SlideOutLeft,
 } from 'react-native-reanimated';
 
-import { COLORS, PALETTE } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPE_SCALE, FONTS } from '@/constants/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -51,7 +44,6 @@ import { Button } from '@/components/ui/Button';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import { resendVerificationEmail } from '@/features/auth/services/authService';
 
 // ============================================
 // TYPES
@@ -76,28 +68,6 @@ const detectIdentifierType = (value: string): IdentifierType | null => {
   return null;
 };
 
-const mapAuthErrorMessage = (message?: string) => {
-  if (!message) return 'İşlem başarısız.';
-
-  const normalized = message.toLowerCase();
-
-  if (
-    normalized.includes('password is known to be weak') ||
-    normalized.includes('password is too weak')
-  ) {
-    return 'Şifre çok zayıf. Daha güçlü bir şifre seç.';
-  }
-
-  if (
-    normalized.includes('email not confirmed') ||
-    normalized.includes('email_not_confirmed')
-  ) {
-    return 'E-posta doğrulanmadı. Lütfen e-postanı kontrol et.';
-  }
-
-  return message;
-};
-
 // ============================================
 // ANIMATED INPUT COMPONENT
 // ============================================
@@ -112,14 +82,7 @@ interface LiquidInputProps {
   autoFocus?: boolean;
   error?: string;
   accessibilityLabel: string;
-  inputRef?: React.RefObject<TextInput | null>;
-  returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
-  blurOnSubmit?: boolean;
-  onSubmitEditing?: () => void;
-  onKeyPress?: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
-  rightIcon?: string;
-  onRightIconPress?: () => void;
-  rightIconAccessibilityLabel?: string;
+  testID?: string;
 }
 
 const LiquidInput: React.FC<LiquidInputProps> = ({
@@ -133,14 +96,7 @@ const LiquidInput: React.FC<LiquidInputProps> = ({
   autoFocus = false,
   error,
   accessibilityLabel,
-  inputRef,
-  returnKeyType,
-  blurOnSubmit,
-  onSubmitEditing,
-  onKeyPress,
-  rightIcon,
-  onRightIconPress,
-  rightIconAccessibilityLabel,
+  testID,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const borderColor = useSharedValue<string>(COLORS.border.default);
@@ -183,32 +139,12 @@ const LiquidInput: React.FC<LiquidInputProps> = ({
           keyboardType={keyboardType}
           secureTextEntry={secureTextEntry}
           autoCapitalize={autoCapitalize}
-          autoCorrect={false}
-          keyboardAppearance="dark"
           autoFocus={autoFocus}
           onFocus={handleFocus}
           onBlur={handleBlur}
           accessibilityLabel={accessibilityLabel}
-          ref={inputRef}
-          returnKeyType={returnKeyType}
-          blurOnSubmit={blurOnSubmit}
-          onSubmitEditing={onSubmitEditing}
-          onKeyPress={onKeyPress}
+          testID={testID}
         />
-        {rightIcon && (
-          <TouchableOpacity
-            style={styles.inputRightIconButton}
-            onPress={onRightIconPress}
-            accessibilityRole="button"
-            accessibilityLabel={rightIconAccessibilityLabel}
-          >
-            <MaterialCommunityIcons
-              name={rightIcon as any}
-              size={20}
-              color={COLORS.text.muted}
-            />
-          </TouchableOpacity>
-        )}
       </Reanimated.View>
       {error && (
         <Reanimated.Text
@@ -229,30 +165,9 @@ const LiquidInput: React.FC<LiquidInputProps> = ({
 export const UnifiedAuthScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const route = useRoute<RouteProp<RootStackParamList, 'UnifiedAuth'>>();
-  const initialMode = route.params?.initialMode;
-
-  const { login, register, socialAuth } = useAuth();
+  const { login, register } = useAuth();
   const { showToast } = useToast();
   const { props: a11y } = useAccessibility();
-
-  // Handle Social Login (Apple/Google)
-  const handleSocialLogin = async (provider: 'apple' | 'google') => {
-    HapticManager.buttonPress();
-    setIsLoading(true);
-    try {
-      const result = await socialAuth({ provider, token: '' });
-      if (!result.success && result.error) {
-        HapticManager.error();
-        showToast(result.error, 'error');
-      }
-    } catch (error) {
-      HapticManager.error();
-      logger.error(`[UnifiedAuth] ${provider} login error:`, error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // State
   const [step, setStep] = useState<AuthStep>('identifier');
@@ -262,18 +177,10 @@ export const UnifiedAuthScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingUser, setIsCheckingUser] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // For secureTextEntry toggle
-  const [authError, setAuthError] = useState<string | null>(null);
-  const confirmPasswordError =
-    password && confirmPassword && password !== confirmPassword
-      ? 'Şifreler eşleşmiyor'
-      : undefined;
+  const [showPassword] = useState(false); // For secureTextEntry toggle
 
   // Refs
-  const passwordRef = useRef<TextInput | null>(null);
-  const nameRef = useRef<TextInput | null>(null);
-  const registerPasswordRef = useRef<TextInput | null>(null);
-  const confirmPasswordRef = useRef<TextInput | null>(null);
+  const passwordRef = useRef<TextInput>(null);
 
   // Animation values
   const titleOpacity = useSharedValue(1);
@@ -282,7 +189,7 @@ export const UnifiedAuthScreen: React.FC = () => {
   const getStepTitle = (): string => {
     switch (step) {
       case 'identifier':
-        return initialMode === 'register' ? 'Hesap Oluştur' : 'Hoş Geldin';
+        return 'Hoş Geldin';
       case 'password':
         return 'Tekrar Hoş Geldin';
       case 'register':
@@ -312,7 +219,6 @@ export const UnifiedAuthScreen: React.FC = () => {
 
   // Handle identifier submission
   const handleIdentifierSubmit = async () => {
-    setAuthError(null);
     const type = detectIdentifierType(identifier);
 
     if (!type) {
@@ -348,14 +254,10 @@ export const UnifiedAuthScreen: React.FC = () => {
       // Email flow - check if user exists
       setIsCheckingUser(true);
       try {
-        // Check initialMode to determine flow
-        if (initialMode === 'register') {
-          setStep('register');
-        } else {
-          // Default to login flow and let the user choose register if needed
-          setStep('password');
-          setTimeout(() => passwordRef.current?.focus(), 300);
-        }
+        // Simple approach: try to check if email exists
+        // For security, we'll default to login flow and let the user choose register
+        setStep('password');
+        setTimeout(() => passwordRef.current?.focus(), 300);
       } finally {
         setIsCheckingUser(false);
       }
@@ -371,7 +273,6 @@ export const UnifiedAuthScreen: React.FC = () => {
     }
 
     setIsLoading(true);
-    setAuthError(null);
     Keyboard.dismiss();
 
     try {
@@ -385,36 +286,11 @@ export const UnifiedAuthScreen: React.FC = () => {
         });
       } else {
         HapticManager.error();
-        const errorMessage = result.error || 'Giriş başarısız';
-        const isEmailNotConfirmed =
-          errorMessage.toLowerCase().includes('email not confirmed') ||
-          errorMessage.toLowerCase().includes('email_not_confirmed') ||
-          errorMessage.toLowerCase().includes('email doğrulanmadı') ||
-          errorMessage.toLowerCase().includes('doğrulanmamış');
-
-        if (isEmailNotConfirmed && isEmail(identifier)) {
-          const { error: resendError } =
-            await resendVerificationEmail(identifier);
-          if (resendError) {
-            showToast('Doğrulama e-postası gönderilemedi', 'error');
-            setAuthError('E-posta doğrulanamadı. Tekrar deneyin.');
-          } else {
-            showToast(
-              'E-posta doğrulanmamış. Doğrulama e-postası yeniden gönderildi.',
-              'warning',
-            );
-            setAuthError('E-posta doğrulanmadı. Lütfen e-postanı kontrol et.');
-          }
-          return;
-        }
-
-        setAuthError(errorMessage);
-        showToast(errorMessage, 'error');
+        showToast(result.error || 'Giriş başarısız', 'error');
       }
     } catch (error) {
       HapticManager.error();
       logger.error('[UnifiedAuth] Login error:', error);
-      setAuthError('Giriş yapılırken bir hata oluştu');
       showToast('Giriş yapılırken bir hata oluştu', 'error');
     } finally {
       setIsLoading(false);
@@ -442,7 +318,6 @@ export const UnifiedAuthScreen: React.FC = () => {
     }
 
     setIsLoading(true);
-    setAuthError(null);
     Keyboard.dismiss();
 
     try {
@@ -457,25 +332,15 @@ export const UnifiedAuthScreen: React.FC = () => {
         showToast('Hesap oluşturuldu!', 'success');
         navigation.reset({
           index: 0,
-          routes: [
-            {
-              name: 'CompleteProfile' as never,
-              params: { fullName: name.trim(), email: identifier },
-            },
-          ],
+          routes: [{ name: 'CompleteProfile' as never }],
         });
       } else {
         HapticManager.error();
-        const errorMessage = mapAuthErrorMessage(
-          result.error || 'Kayıt başarısız',
-        );
-        setAuthError(errorMessage);
-        showToast(errorMessage, 'error');
+        showToast(result.error || 'Kayıt başarısız', 'error');
       }
     } catch (error) {
       HapticManager.error();
       logger.error('[UnifiedAuth] Register error:', error);
-      setAuthError('Kayıt olurken bir hata oluştu');
       showToast('Kayıt olurken bir hata oluştu', 'error');
     } finally {
       setIsLoading(false);
@@ -493,36 +358,23 @@ export const UnifiedAuthScreen: React.FC = () => {
     HapticManager.buttonPress();
     if (step === 'identifier') {
       navigation.goBack();
-      return;
-    }
-
-    if (step === 'register' && initialMode === 'register') {
-      navigation.goBack();
-      return;
-    }
-
-    if (step === 'register' && initialMode !== 'register') {
-      setStep('password');
     } else {
       setStep('identifier');
+      setPassword('');
+      setConfirmPassword('');
+      setName('');
     }
-
-    setPassword('');
-    setConfirmPassword('');
-    setName('');
   };
 
   // Switch to register mode
   const switchToRegister = () => {
     HapticManager.buttonPress();
-    setAuthError(null);
     setStep('register');
   };
 
   // Switch to login mode
   const switchToLogin = () => {
     HapticManager.buttonPress();
-    setAuthError(null);
     setStep('password');
   };
 
@@ -531,22 +383,8 @@ export const UnifiedAuthScreen: React.FC = () => {
     opacity: titleOpacity.value,
   }));
 
-  const handleTabFocus =
-    (
-      currentRef: React.RefObject<TextInput | null>,
-      nextRef?: React.RefObject<TextInput | null>,
-    ) =>
-    (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-      if (event.nativeEvent.key !== 'Tab') return;
-      if (nextRef?.current) {
-        nextRef.current.focus();
-      } else if (currentRef?.current) {
-        setTimeout(() => currentRef.current?.focus(), 0);
-      }
-    };
-
   return (
-    <View style={styles.container}>
+    <View testID="screen-unified-auth" style={styles.container}>
       {/* Background Gradient */}
       <LinearGradient
         colors={[COLORS.bg.primary, COLORS.bg.tertiary]}
@@ -560,22 +398,20 @@ export const UnifiedAuthScreen: React.FC = () => {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 12 : 0}
       >
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 120 },
+            { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 },
           ]}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
-          contentInsetAdjustmentBehavior="always"
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           {/* Back Button */}
           <TouchableOpacity
             style={styles.backButton}
             onPress={handleBack}
+            testID="btn-back"
             {...a11y.button('Geri dön')}
           >
             <MaterialCommunityIcons
@@ -617,6 +453,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   keyboardType="email-address"
                   autoFocus
                   accessibilityLabel="E-posta veya telefon numarası"
+                  testID="input-identifier"
                 />
 
                 <Button
@@ -626,42 +463,10 @@ export const UnifiedAuthScreen: React.FC = () => {
                   disabled={!identifier || isCheckingUser}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-continue"
                 >
                   {isCheckingUser ? 'Kontrol ediliyor...' : 'Devam Et'}
                 </Button>
-
-                <View style={styles.divider}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>VEYA</Text>
-                  <View style={styles.dividerLine} />
-                </View>
-
-                {/* Social Login Buttons */}
-                <View style={styles.socialRow}>
-                  <TouchableOpacity
-                    style={[styles.socialButton, styles.appleButton]}
-                    onPress={() => handleSocialLogin('apple')}
-                    accessibilityLabel="Apple ile giriş yap"
-                  >
-                    <MaterialCommunityIcons
-                      name="apple"
-                      size={24}
-                      color="white"
-                    />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.socialButton, styles.googleButton]}
-                    onPress={() => handleSocialLogin('google')}
-                    accessibilityLabel="Google ile giriş yap"
-                  >
-                    <MaterialCommunityIcons
-                      name="google"
-                      size={24}
-                      color="white"
-                    />
-                  </TouchableOpacity>
-                </View>
               </Reanimated.View>
             )}
 
@@ -695,14 +500,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   secureTextEntry={!showPassword}
                   autoFocus
                   accessibilityLabel="Şifre"
-                  inputRef={passwordRef}
-                  returnKeyType="done"
-                  onSubmitEditing={handleLogin}
-                  rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  onRightIconPress={() => setShowPassword((prev) => !prev)}
-                  rightIconAccessibilityLabel={
-                    showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'
-                  }
+                  testID="input-password"
                 />
 
                 <TouchableOpacity
@@ -720,14 +518,15 @@ export const UnifiedAuthScreen: React.FC = () => {
                   disabled={!password}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-login"
                 >
                   Giriş Yap
                 </Button>
-                {authError && <Text style={styles.errorText}>{authError}</Text>}
 
                 <TouchableOpacity
                   style={styles.switchMode}
                   onPress={switchToRegister}
+                  testID="btn-switch-to-register"
                 >
                   <Text style={styles.switchModeText}>
                     Hesabın yok mu?{' '}
@@ -767,11 +566,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   autoCapitalize="words"
                   autoFocus
                   accessibilityLabel="Ad Soyad"
-                  inputRef={nameRef}
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => registerPasswordRef.current?.focus()}
-                  onKeyPress={handleTabFocus(nameRef, registerPasswordRef)}
+                  testID="input-name"
                 />
 
                 <LiquidInput
@@ -781,24 +576,8 @@ export const UnifiedAuthScreen: React.FC = () => {
                   icon="lock-outline"
                   secureTextEntry={!showPassword}
                   accessibilityLabel="Şifre"
-                  inputRef={registerPasswordRef}
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-                  onKeyPress={handleTabFocus(
-                    registerPasswordRef,
-                    confirmPasswordRef,
-                  )}
-                  rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  onRightIconPress={() => setShowPassword((prev) => !prev)}
-                  rightIconAccessibilityLabel={
-                    showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'
-                  }
+                  testID="input-register-password"
                 />
-
-                <Text style={styles.passwordHint}>
-                  En az 8 karakter • Harf ve rakam önerilir
-                </Text>
 
                 <LiquidInput
                   value={confirmPassword}
@@ -807,16 +586,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   icon="lock-check-outline"
                   secureTextEntry={!showPassword}
                   accessibilityLabel="Şifreyi onayla"
-                  inputRef={confirmPasswordRef}
-                  returnKeyType="done"
-                  onSubmitEditing={handleRegister}
-                  onKeyPress={handleTabFocus(confirmPasswordRef)}
-                  rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  onRightIconPress={() => setShowPassword((prev) => !prev)}
-                  rightIconAccessibilityLabel={
-                    showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'
-                  }
-                  error={confirmPasswordError}
+                  testID="input-confirm-password"
                 />
 
                 <View style={styles.policySection}>
@@ -835,18 +605,13 @@ export const UnifiedAuthScreen: React.FC = () => {
                   variant="primary"
                   onPress={handleRegister}
                   size="lg"
-                  disabled={
-                    !name ||
-                    !password ||
-                    !confirmPassword ||
-                    !!confirmPasswordError
-                  }
+                  disabled={!name || !password || !confirmPassword}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-register"
                 >
                   Hesabımı Oluştur
                 </Button>
-                {authError && <Text style={styles.errorText}>{authError}</Text>}
 
                 <TouchableOpacity
                   style={styles.switchMode}
@@ -916,19 +681,19 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: -6,
-    marginBottom: 12,
+    marginLeft: -8,
+    marginBottom: 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 40,
   },
   title: {
     fontSize: 32,
@@ -946,47 +711,6 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
   },
-  // Social Buttons
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginBottom: 24,
-  },
-  socialButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  appleButton: {
-    backgroundColor: 'black',
-  },
-  googleButton: {
-    backgroundColor: '#DB4437',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border.default,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: COLORS.text.muted,
-    fontSize: 12,
-    fontFamily: FONTS.body.medium,
-  },
   inputContainer: {
     marginBottom: 16,
   },
@@ -1001,23 +725,12 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginRight: 12,
   },
-  inputRightIconButton: {
-    padding: 6,
-    marginLeft: 8,
-  },
   input: {
     flex: 1,
     fontSize: 16,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.primary,
     paddingVertical: 16,
-  },
-  passwordHint: {
-    ...TYPE_SCALE.body.caption,
-    color: COLORS.text.muted,
-    marginTop: -4,
-    marginBottom: 12,
-    marginLeft: 6,
   },
   errorText: {
     fontSize: 12,
@@ -1050,8 +763,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitButton: {
-    height: 52,
-    borderRadius: 26,
+    height: 56,
+    borderRadius: 28,
     marginBottom: 16,
   },
   switchMode: {

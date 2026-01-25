@@ -1,5 +1,5 @@
 /**
- * Lovendo Design System - Bottom Navigation
+ * Lovendo Awwwards Design System 2026 - Bottom Navigation
  *
  * Premium navigation with:
  * - Glassmorphism background
@@ -7,6 +7,7 @@
  * - Floating create button with gradient
  * - Spring animations on tap
  *
+ * Designed for Awwwards Best UI nomination
  */
 
 import React, { memo, useCallback } from 'react';

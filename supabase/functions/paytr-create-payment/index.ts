@@ -2,63 +2,24 @@ import { Logger } from '..//_shared/logger.ts';
 const logger = new Logger();
 
 /**
- * ⚠️ DEPRECATED - APPLE IAP COMPLIANCE ⚠️
+ * PayTR Create Payment Edge Function
  *
- * This PayTR Create Payment Edge Function is DISABLED.
- * All purchases must go through RevenueCat/IAP (Apple/Google In-App Purchase).
- * PayTR is now ONLY used for withdrawals (paytr-withdraw function).
+ * Creates a PayTR payment token for iFrame checkout.
+ * Handles commission calculation and escrow setup.
  *
- * This function returns 410 Gone to indicate it's no longer available.
- * The code is kept for reference but will never execute payment logic.
- *
- * For coin purchases, use: RevenueCat SDK (coinService.ts)
- * For withdrawals, use: paytr-withdraw function
+ * POST /paytr-create-payment
  */
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createSupabaseClients, requireAuth } from '../_shared/supabase.ts';
+import {
+  getPayTRConfig,
+  getPaymentToken,
+  toKurus,
+  generateMerchantOid,
+  createBasketItem,
+} from '../_shared/paytr.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
-
-serve(async (req: Request) => {
-  const origin = req.headers.get('origin');
-  const corsHeaders = getCorsHeaders(origin);
-
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
-  // Log deprecation warning
-  logger.warn(
-    'DEPRECATED: paytr-create-payment called but is disabled for Apple IAP compliance',
-  );
-
-  // Return 410 Gone - this endpoint is permanently disabled
-  return new Response(
-    JSON.stringify({
-      success: false,
-      error:
-        'Bu ödeme yöntemi artık kullanılamıyor. Lütfen uygulama içi satın alma (IAP) kullanın.',
-      code: 'PAYMENT_METHOD_DEPRECATED',
-      migration: {
-        message:
-          'Direct PayTR payments are disabled for Apple/Google compliance.',
-        alternative:
-          'Use RevenueCat/IAP for coin purchases, then spend coins in-app.',
-        documentation: 'https://docs.lovendo.app/payments/iap-migration',
-      },
-    }),
-    {
-      status: 410, // Gone - permanently unavailable
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    },
-  );
-});
-
-/*
- * ============================================================================
- * ARCHIVED CODE - Original implementation kept for reference
- * DO NOT UNCOMMENT - Apple/Google will reject the app
- * ============================================================================
 
 // =============================================================================
 // TYPES
@@ -490,4 +451,3 @@ serve(async (req: Request) => {
     );
   }
 });
-*/

@@ -1,5 +1,5 @@
 // AchievementsScreen - Digital Badge Collection
-// Standard achievements display with neon glow and collection aesthetics
+// Awwwards standard achievements display with neon glow and collection aesthetics
 import React, { useEffect } from 'react';
 import {
   View,

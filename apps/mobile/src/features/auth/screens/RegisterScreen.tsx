@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -22,7 +21,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 
 /**
- * Standardında Kayıt Ekranı - "Liquid Register Screen"
+ * Awwwards standardında Kayıt Ekranı - "Liquid Register Screen"
  * Prestijli Katılım: Kullanıcının "The Guest List"e dahil olduğu hissini veren
  * ferah bir tasarım.
  *
@@ -30,13 +29,9 @@ import { Button } from '@/components/ui/Button';
  */
 export const RegisterScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { register } = useAuth();
   const { showToast } = useToast();
-
-  useEffect(() => {
-    navigation.replace('UnifiedAuth', { initialMode: 'register' });
-  }, [navigation]);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

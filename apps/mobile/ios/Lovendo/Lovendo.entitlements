@@ -9,9 +9,5 @@
       <string>applinks:www.lovendo.xyz</string>
       <string>applinks:lovendo.xyz</string>
     </array>
-    <key>com.apple.developer.in-app-payments</key>
-    <array>
-      <string>merchant.xyz.lovendo</string>
-    </array>
   </dict>
 </plist>

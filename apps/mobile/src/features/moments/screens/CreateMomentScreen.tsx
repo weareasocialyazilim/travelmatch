@@ -50,7 +50,6 @@ import { COLORS, GRADIENTS } from '@/constants/colors';
 import { ESCROW_THRESHOLDS } from '@/constants/values';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
-import { navigate } from '@/services/navigationService';
 import {
   FormStepIndicator,
   type FormStep,
@@ -375,6 +374,20 @@ const CreateMomentScreen: React.FC = () => {
     [step],
   );
 
+  // GUEST LOOP FIX: Block guests at component mount
+  // This prevents guests from filling out the entire form before being asked to login
+  useEffect(() => {
+    if (isGuest || !user) {
+      // Show login prompt immediately when guest tries to create a moment
+      showLoginPrompt({
+        action: 'create_moment',
+        onSuccess: () => {
+          // User logged in successfully, form will render
+        },
+      });
+    }
+  }, [isGuest, user]);
+
   // If guest, don't render the form - waiting for login redirect
   // NOTE: This conditional return must come AFTER all hooks are defined
   if (isGuest || !user) {
@@ -399,35 +412,6 @@ const CreateMomentScreen: React.FC = () => {
               'Anı oluşturmak için giriş yapmanız gerekiyor.',
             )}
           </Text>
-          <View style={styles.guestActions}>
-            <TouchableOpacity
-              style={styles.guestPrimaryButton}
-              onPress={() =>
-                navigate('UnifiedAuth', { initialMode: 'register' })
-              }
-              accessibilityRole="button"
-              accessibilityLabel="Ücretsiz üye ol"
-            >
-              <LinearGradient
-                colors={[COLORS.brand.primary, COLORS.brand.accent]}
-                style={styles.guestPrimaryGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.guestPrimaryText}>Ücretsiz Üye Ol</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.guestSecondaryButton}
-              onPress={() => navigate('UnifiedAuth', { initialMode: 'login' })}
-              accessibilityRole="button"
-              accessibilityLabel="Giriş yap"
-            >
-              <Text style={styles.guestSecondaryText}>
-                Zaten üye misin? Giriş yap
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     );
@@ -534,11 +518,11 @@ const CreateMomentScreen: React.FC = () => {
           {/* STEP: DETAILS (Title & Experience Category) */}
           {step === 'details' && (
             <Animated.View entering={SlideInDown} exiting={SlideOutDown}>
-              <Text style={styles.label}>Ne yaşamak istiyorsun?</Text>
+              <Text style={styles.label}>SET THE VIBE</Text>
 
               <TextInput
                 style={styles.titleInput}
-                placeholder="Örn: Paris’te sakin bir kahvaltı"
+                placeholder="Dinner at Hotel Costes..."
                 placeholderTextColor="rgba(255,255,255,0.5)"
                 value={title}
                 onChangeText={setTitle}
@@ -550,7 +534,6 @@ const CreateMomentScreen: React.FC = () => {
                 keyboardType="default"
                 accessibilityLabel={t('screens.createMoment.a11y.momentTitle')}
               />
-              <Text style={styles.stepHint}>Sonradan düzenleyebilirsin.</Text>
 
               <View style={styles.categoryGrid}>
                 {EXPERIENCE_CATEGORIES.map((cat) => (
@@ -1023,37 +1006,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',
     lineHeight: 22,
-  },
-  guestActions: {
-    width: '100%',
-    marginTop: 8,
-    gap: 12,
-  },
-  guestPrimaryButton: {
-    width: '100%',
-    height: 54,
-    borderRadius: 28,
-    overflow: 'hidden',
-  },
-  guestPrimaryGradient: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guestPrimaryText: {
-    fontSize: 16,
-    fontFamily: FONTS.body.semibold,
-    color: COLORS.text.inverse,
-  },
-  guestSecondaryButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 6,
-  },
-  guestSecondaryText: {
-    fontSize: 14,
-    fontFamily: FONTS.body.semibold,
-    color: COLORS.brand.primary,
   },
   background: {
     flex: 1,

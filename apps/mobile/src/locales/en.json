@@ -66,7 +66,7 @@
     "settings": "Settings",
     "notifications": "Notifications",
     "favorites": "Favorites",
-    "myRequests": "My Requests",
+    "bookings": "My Support",
     "wallet": "Wallet",
     "createMoment": "Create new moment",
     "discoverTab": "Moments tab",
@@ -112,22 +112,22 @@
       "premium": "Premium"
     }
   },
-  "request": {
-    "joinNow": "Join Now",
-    "experienceRequest": "Experience Request",
-    "requestConfirmed": "Request Accepted",
-    "requestCancelled": "Request Cancelled",
-    "requestPending": "Request Pending",
+  "booking": {
+    "bookNow": "Join Now",
+    "bookingRequest": "Experience Request",
+    "bookingConfirmed": "Request Accepted",
+    "bookingCancelled": "Request Cancelled",
+    "bookingPending": "Request Pending",
     "guests": "Guests",
     "totalPrice": "Total Price",
-    "requestDate": "Request Date",
-    "confirmRequest": "Accept Request",
-    "cancelRequest": "Cancel Request",
-    "requestSuccess": "Request sent!",
-    "requestError": "Request failed. Please try again.",
-    "noRequestsFound": "No requests found",
-    "upcomingExperiences": "Upcoming Experiences",
-    "pastExperiences": "Past Experiences"
+    "bookingDate": "Request Date",
+    "confirmBooking": "Accept Request",
+    "cancelBooking": "Cancel Request",
+    "bookingSuccess": "Request sent!",
+    "bookingError": "Request failed. Please try again.",
+    "noBookingsFound": "No requests found",
+    "upcomingBookings": "Upcoming Experiences",
+    "pastBookings": "Past Experiences"
   },
   "chat": {
     "messages": "Messages",
@@ -180,56 +180,6 @@
     "savedMoments": "Saved Moments",
     "offlineTitle": "No internet connection",
     "offlineMessage": "Internet connection required to view profile."
-  },
-
-  "trust": {
-    "factors": {
-      "identity": "Identity",
-      "social": "Social",
-      "experience": "Experience",
-      "response": "Response",
-      "score": "Score"
-    },
-    "garden": {
-      "title": "Trust Garden",
-      "factorsTitle": "Trust Factors",
-      "howToImprove": "How to improve:",
-      "levelsTitle": "Trust Levels",
-      "points": "points",
-      "levels": {
-        "sprout": "Sprout",
-        "developing": "Developing",
-        "growing": "Growing",
-        "blooming": "Blooming"
-      },
-      "identityVerification": "Identity Verification",
-      "identityDesc": "KYC verification status",
-      "socialConnections": "Social Connections",
-      "socialDesc": "Linked accounts",
-      "completedExperiences": "Completed Experiences",
-      "experienceDesc": "Completed moments count",
-      "responseRate": "Response Rate",
-      "responseDesc": "Quick responses to requests",
-      "receivedRatings": "Received Ratings",
-      "ratingsDesc": "Average rating score",
-      "tips": {
-        "verifyId": "Verify your identity",
-        "addAddress": "Add your address",
-        "completeKyc": "Complete KYC",
-        "connectInstagram": "Connect Instagram",
-        "connectTwitter": "Connect X (Twitter)",
-        "addWebsite": "Add your website",
-        "completeMoments": "Complete more moments",
-        "getHighRatings": "Get higher ratings",
-        "respondQuickly": "Reply faster",
-        "respondIn2h": "Respond within 2 hours",
-        "acceptQuickly": "Accept requests quickly",
-        "keepCalendarUpdated": "Keep your calendar updated",
-        "offerUnique": "Offer unique experiences",
-        "clearCommunication": "Communicate clearly",
-        "exceedExpectations": "Exceed expectations"
-      }
-    }
   },
 
   "payment": {
@@ -527,7 +477,7 @@
       "coffee": "Coffee",
       "food": "Food",
       "culture": "Culture",
-      "tours": "Explore",
+      "tours": "Tours",
       "nightlife": "Nightlife",
       "shopping": "Shopping",
       "music": "Music",
@@ -574,8 +524,8 @@
     "notifications": "Notifications",
     "markAllAsRead": "Mark All as Read",
     "noNotifications": "No notifications",
-    "newRequest": "New experience request",
-    "requestConfirmed": "Request accepted",
+    "newBooking": "New experience request",
+    "bookingConfirmed": "Request accepted",
     "newMessage": "New message from {{name}}",
     "momentLiked": "{{name}} liked your moment",
     "newReview": "New review from {{name}}"
@@ -839,9 +789,9 @@
     "failed": "Failed {{count}} time(s)"
   },
   "emptyState": {
-    "noMomentsNearby": "No moments here yet.",
-    "tryIncreasingDistance": "What do you want to experience today? Be the first to start a moment.",
-    "createMoment": "Create your first moment",
+    "noMomentsNearby": "No moments nearby 🗺️",
+    "tryIncreasingDistance": "Try increasing your distance filter or\nbe the first to create a moment!",
+    "createMoment": "Create Moment",
     "discoveringMoments": "Discovering moments...",
     "tapToRetry": "Tap to retry"
   },

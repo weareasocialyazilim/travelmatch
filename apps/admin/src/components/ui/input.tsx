@@ -4,22 +4,43 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Show error styling */
   error?: boolean;
+  /** Error message for screen readers (also sets aria-describedby) */
+  errorMessage?: string;
+  /** Helper text ID for aria-describedby */
+  helperId?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, error, ...props }, ref) => {
+  ({ className, type, error, errorMessage, helperId, id, ...props }, ref) => {
+    // Generate unique ID for error message if needed
+    const errorId = errorMessage ? `${id || 'input'}-error` : undefined;
+
+    // Combine aria-describedby references
+    const describedBy = [helperId, errorId].filter(Boolean).join(' ') || undefined;
+
     return (
-      <input
-        type={type}
-        className={cn(
-          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          error && 'border-destructive focus-visible:ring-destructive',
-          className,
+      <>
+        <input
+          type={type}
+          id={id}
+          className={cn(
+            'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+            error && 'border-destructive focus-visible:ring-destructive',
+            className,
+          )}
+          ref={ref}
+          aria-invalid={error || undefined}
+          aria-describedby={describedBy}
+          {...props}
+        />
+        {errorMessage && (
+          <span id={errorId} className="sr-only">
+            {errorMessage}
+          </span>
         )}
-        ref={ref}
-        {...props}
-      />
+      </>
     );
   },
 );

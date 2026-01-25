@@ -10,7 +10,6 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { Button } from '@/components/ui/Button';
 
 interface InfoItem {
   id: string;
@@ -41,7 +40,7 @@ const INFO_ITEMS: InfoItem[] = [
     id: '4',
     title: 'Güvenli Ödemeler',
     description:
-      'Satın almalar yalnızca Apple/Google IAP ile yapılır. Kart bilgisi toplanmaz.',
+      'Kart bilgileriniz bizde saklanmaz. Tüm işlemler PCI-DSS uyumlu PayTR altyapısı üzerinden gerçekleştirilir.',
   },
   {
     id: '5',
@@ -87,14 +86,13 @@ export default function PaymentsKYCScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Main Title */}
-        <Text style={styles.mainTitle}>Ödemeler ve Doğrulama</Text>
+        <Text style={styles.mainTitle}>Ödemeler, Escrow ve Doğrulama</Text>
 
         {/* Trust Badge */}
         <Text style={styles.disclaimer}>
-          Lovendo, finansal güvenliğinizi en üst düzeyde korur. Satın almalar
-          App Store / Google Play IAP üzerinden yapılır; PayTR yalnızca para
-          çekme (withdrawal) süreçlerinde kullanılır. Kimlik doğrulama süreci
-          iDenfy'nin kendi ekranlarında yürütülür.
+          Lovendo, finansal güvenliğinizi en üst düzeyde korur. PayTR altyapısı
+          ile PCI-DSS uyumlu, BDDK lisanslı güvenli ödeme sistemi
+          kullanılmaktadır.
         </Text>
 
         {/* Info Items List */}
@@ -108,15 +106,6 @@ export default function PaymentsKYCScreen({
               </View>
             </View>
           ))}
-        </View>
-
-        <View style={styles.ctaContainer}>
-          <Button
-            title="Kimliğini Doğrula"
-            variant="primary"
-            onPress={() => navigation.navigate('IdentityVerification')}
-            size="lg"
-          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -175,9 +164,6 @@ const styles = StyleSheet.create({
   },
   itemsList: {
     gap: 16,
-  },
-  ctaContainer: {
-    marginTop: 28,
   },
   item: {
     flexDirection: 'row',

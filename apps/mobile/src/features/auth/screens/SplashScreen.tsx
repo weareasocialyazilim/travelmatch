@@ -90,11 +90,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
       <Animated.View style={[styles.textContainer, textStyle]}>
         <Animated.Text style={styles.brandName}>
-          LOVENDO
-          <Animated.Text style={styles.brandHighlight}>.</Animated.Text>
+          TRAVEL
+          <Animated.Text style={styles.brandHighlight}>MATCH.</Animated.Text>
         </Animated.Text>
         <Animated.Text style={styles.tagline}>
-          Share Moments, Make Connections.
+          Gift Moments, Collect Memories.
         </Animated.Text>
       </Animated.View>
     </View>

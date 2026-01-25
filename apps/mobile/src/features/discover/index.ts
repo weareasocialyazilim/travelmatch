@@ -1,7 +1,7 @@
 /**
  * Discover Feature - Barrel Exports
  *
- * Moment discovery, experience requests, escrow management
+ * Moment discovery, booking, escrow yönetimi
  *
  * NOTE: SearchMapScreen is NOT exported here to prevent Mapbox TurboModule
  * from being initialized at module load time. Import it directly from

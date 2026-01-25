@@ -23,49 +23,33 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     <Animated.View entering={FadeInDown.delay(200).springify()}>
       <GlassCard style={styles.container} hasBorder>
         <View style={styles.header}>
-          <MaterialCommunityIcons
-            name="star-circle"
-            size={24}
-            color={PROFILE_COLORS.neon.lime}
-          />
-          <Text style={styles.title}>
-            {t('profile.creatorHub', 'VIP Creator Hub')}
-          </Text>
+          <MaterialCommunityIcons name="star-circle" size={24} color={PROFILE_COLORS.neon.lime} />
+          <Text style={styles.title}>{t('profile.creatorHub', 'VIP Creator Hub')}</Text>
         </View>
 
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>
-              {t('profile.availableEarnings', 'Available Balance')}
-            </Text>
-            <Text style={styles.statValue}>
-              {balance.toLocaleString('tr-TR')} LVND
-            </Text>
+            <Text style={styles.statLabel}>{t('profile.availableEarnings', 'Available Balance')}</Text>
+            <Text style={styles.statValue}>{balance.toLocaleString('tr-TR')} TL</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>
-              {t('profile.pendingGifts', 'Escrowed Payouts')}
-            </Text>
-            <Text style={styles.pendingValue}>
-              +{pendingBalance.toLocaleString('tr-TR')} LVND
-            </Text>
+            <Text style={styles.statLabel}>{t('profile.pendingGifts', 'Escrowed Payouts')}</Text>
+            <Text style={styles.pendingValue}>+{pendingBalance.toLocaleString('tr-TR')} TL</Text>
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={onWithdraw}
+        <TouchableOpacity 
+          onPress={onWithdraw} 
           style={styles.withdrawButton}
           activeOpacity={0.8}
         >
           <Ionicons name="cash-outline" size={20} color="black" />
-          <Text style={styles.withdrawButtonText}>
-            {t('profile.withdrawNow', 'Nakit Çek')}
-          </Text>
+          <Text style={styles.withdrawButtonText}>{t('profile.withdrawNow', 'Nakit Çek')}</Text>
         </TouchableOpacity>
 
         <Text style={styles.infoText}>
-          {t('profile.creatorInfo', 'Bakiyeniz LVND olarak tutulur.')}
+          {t('profile.creatorInfo', 'Bakiyeniz 1:1 yerel kur üzerinden hesaplanmıştır.')}
         </Text>
       </GlassCard>
     </Animated.View>

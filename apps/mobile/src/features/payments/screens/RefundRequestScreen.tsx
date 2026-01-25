@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
 
 /**
- * RefundRequestScreen - İtiraz/İade Akışı
+ * RefundRequestScreen - PayTR Escrow İtiraz Akışı
  *
  * Gönderici (Giver) bu ekrandan itiraz açabilir:
  * - Kanıt (Proof) sahte veya yüklenmedi
@@ -101,7 +101,7 @@ export const RefundRequestScreen = () => {
               size={14}
               color={COLORS.brand.primary}
             />
-            <Text style={styles.escrowText}>Güvenli Hediye Koruması</Text>
+            <Text style={styles.escrowText}>PayTR Escrow Koruması</Text>
           </View>
         </View>
 
@@ -165,7 +165,7 @@ export const RefundRequestScreen = () => {
             color={COLORS.brand.primary}
           />
           <Text style={styles.infoText}>
-            Onaylanan iadeler mağaza/iade politikasına göre işlenir.
+            Onaylanan iadeler PayTR üzerinden 3-5 iş günü içinde
             kartına/hesabına yansır.
           </Text>
         </View>

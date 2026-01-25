@@ -44,7 +44,6 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { logger } from '@/lib/logger';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuth } from '@/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -228,15 +227,13 @@ export function CommandPalette() {
     const searchData = async () => {
       setIsSearching(true);
       try {
-        const response = await fetch(
-          `/api/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`,
-        );
+        const response = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`);
         if (response.ok) {
           const data = await response.json();
           setSearchResults(data.results || []);
         }
       } catch (error) {
-        logger.error('Search error', error);
+        console.error('Search error:', error);
       } finally {
         setIsSearching(false);
       }
@@ -252,7 +249,7 @@ export function CommandPalette() {
     return navigationItems.filter(
       (item) =>
         item.title.toLowerCase().includes(query) ||
-        item.id.toLowerCase().includes(query),
+        item.id.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 
@@ -316,20 +313,17 @@ export function CommandPalette() {
           </div>
         )}
 
-        {!isSearching &&
-          searchQuery &&
-          searchResults.length === 0 &&
-          filteredNavItems.length === 0 && (
-            <CommandEmpty>
-              <div className="flex flex-col items-center gap-2 py-4">
-                <Search className="h-8 w-8 text-muted-foreground" />
-                <p>"{searchQuery}" için sonuç bulunamadı</p>
-                <p className="text-xs text-muted-foreground">
-                  Farklı bir arama terimi deneyin
-                </p>
-              </div>
-            </CommandEmpty>
-          )}
+        {!isSearching && searchQuery && searchResults.length === 0 && filteredNavItems.length === 0 && (
+          <CommandEmpty>
+            <div className="flex flex-col items-center gap-2 py-4">
+              <Search className="h-8 w-8 text-muted-foreground" />
+              <p>"{searchQuery}" için sonuç bulunamadı</p>
+              <p className="text-xs text-muted-foreground">
+                Farklı bir arama terimi deneyin
+              </p>
+            </div>
+          </CommandEmpty>
+        )}
 
         {/* Search Results */}
         {searchResults.length > 0 && (
@@ -347,9 +341,7 @@ export function CommandPalette() {
                     {result.type === 'user' && result.avatar ? (
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={result.avatar} />
-                        <AvatarFallback>
-                          {getInitials(result.title)}
-                        </AvatarFallback>
+                        <AvatarFallback>{getInitials(result.title)}</AvatarFallback>
                       </Avatar>
                     ) : (
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
@@ -359,19 +351,13 @@ export function CommandPalette() {
                     <div className="flex flex-col">
                       <span className="font-medium">{result.title}</span>
                       {result.subtitle && (
-                        <span className="text-xs text-muted-foreground">
-                          {result.subtitle}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{result.subtitle}</span>
                       )}
                     </div>
                     <span className="ml-auto text-xs text-muted-foreground capitalize">
-                      {result.type === 'user'
-                        ? 'Kullanıcı'
-                        : result.type === 'transaction'
-                          ? 'İşlem'
-                          : result.type === 'moment'
-                            ? 'Moment'
-                            : result.type}
+                      {result.type === 'user' ? 'Kullanıcı' :
+                       result.type === 'transaction' ? 'İşlem' :
+                       result.type === 'moment' ? 'Moment' : result.type}
                     </span>
                   </CommandItem>
                 );

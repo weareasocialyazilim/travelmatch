@@ -41,28 +41,17 @@ export const momentsService = {
     try {
       let query = supabase.from('moments').select(
         `
-        id,
-        user_id,
-        title,
-        description,
-        location,
-        status,
-        price,
-        currency,
-        category,
-        images,
-        tags,
-        created_at,
-        updated_at,
-        users:user_id (
-          id,
-          full_name,
-          avatar_url,
-          location,
-          kyc_status,
-          rating
-        )
-      `,
+          *,
+          users:user_id (
+            id,
+            full_name,
+            avatar_url,
+            location,
+            kyc_status,
+            rating,
+            created_at
+          )
+        `,
         { count: 'exact' },
       );
 
@@ -121,112 +110,6 @@ export const momentsService = {
       if (error) throw error;
       return okList<any>(data || [], count);
     } catch (error) {
-      const errorMessage = String(
-        (error as { message?: string }).message || '',
-      );
-      const errorCode = String((error as { code?: string }).code || '');
-      const isPermissionDenied =
-        errorCode === '42501' ||
-        errorMessage.toLowerCase().includes('permission denied');
-
-      if (isPermissionDenied) {
-        try {
-          let fallbackQuery = supabase.from('moments').select(
-            `
-            id,
-            user_id,
-            title,
-            description,
-            location,
-            status,
-            price,
-            currency,
-            category,
-            images,
-            tags,
-            created_at,
-            updated_at
-          `,
-            { count: 'exact' },
-          );
-
-          if (options?.category) {
-            fallbackQuery = fallbackQuery.eq('category', options.category);
-          }
-          if (options?.userId) {
-            fallbackQuery = fallbackQuery.eq('user_id', options.userId);
-          }
-          if (options?.status) {
-            fallbackQuery = fallbackQuery.eq('status', options.status);
-          }
-          if (options?.city) {
-            fallbackQuery = fallbackQuery.ilike(
-              'location',
-              `%${options.city}%`,
-            );
-          }
-          if (options?.country) {
-            fallbackQuery = fallbackQuery.ilike(
-              'location',
-              `%${options.country}%`,
-            );
-          }
-          if (options?.minPrice) {
-            fallbackQuery = fallbackQuery.gte('price', options.minPrice);
-          }
-          if (options?.maxPrice) {
-            fallbackQuery = fallbackQuery.lte('price', options.maxPrice);
-          }
-          if (options?.search) {
-            fallbackQuery = fallbackQuery.or(
-              `title.ilike.%${options.search}%,description.ilike.%${options.search}%`,
-            );
-          }
-
-          if (options?.sortBy) {
-            switch (options.sortBy) {
-              case 'price_low':
-                fallbackQuery = fallbackQuery.order('price', {
-                  ascending: true,
-                });
-                break;
-              case 'price_high':
-                fallbackQuery = fallbackQuery.order('price', {
-                  ascending: false,
-                });
-                break;
-              case 'newest':
-              default:
-                fallbackQuery = fallbackQuery.order('created_at', {
-                  ascending: false,
-                });
-                break;
-            }
-          } else {
-            fallbackQuery = fallbackQuery.order('created_at', {
-              ascending: false,
-            });
-          }
-
-          fallbackQuery = fallbackQuery.range(
-            options?.offset || 0,
-            (options?.offset || 0) + (options?.limit || 20) - 1,
-          );
-
-          const {
-            data: fallbackData,
-            count: fallbackCount,
-            error: fallbackError,
-          } = await fallbackQuery;
-
-          if (fallbackError) throw fallbackError;
-          return okList<any>(fallbackData || [], fallbackCount);
-        } catch (fallbackError) {
-          logger.error('[DB] List moments fallback error:', fallbackError);
-          return { data: [], count: 0, error: fallbackError as Error };
-        }
-      }
-
       logger.error('[DB] List moments error:', error);
       return { data: [], count: 0, error: error as Error };
     }
@@ -238,26 +121,16 @@ export const momentsService = {
         .from('moments')
         .select(
           `
-          id,
-          user_id,
-          title,
-          description,
-          location,
-          status,
-          price,
-          currency,
-          category,
-          images,
-          tags,
-          created_at,
-          updated_at,
+          *,
           users:user_id (
             id,
             full_name,
             avatar_url,
             location,
             kyc_status,
-            rating
+            rating,
+            review_count,
+            created_at
           ),
           moment_requests:requests!moment_id (
             id,
@@ -605,7 +478,16 @@ export const momentsService = {
       const limit = options?.limit || 20;
 
       let query = supabase.from('moments').select(`
-          *
+          *,
+          users:user_id (
+            id,
+            full_name,
+            avatar_url,
+            location,
+            kyc_status,
+            rating,
+            created_at
+          )
         `);
 
       if (options?.category) {

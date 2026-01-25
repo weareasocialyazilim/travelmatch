@@ -6,7 +6,7 @@
  *
  * Cerrahi Müdahale:
  * - Kategori Bazlı Kamera Modu (Yemek = AI Food Mode vb.)
- * - Kanıt onayı: doğrulama tamamlandığında süreç güncellenir
+ * - PayTR Trigger: Kanıt yüklenince escrowService'e Capture sinyali
  * - "Anı mühürlendi mi?" sorusu (eski: "Seyahat bitti mi?")
  *
  * @module screens/MomentProofCeremony
@@ -296,7 +296,7 @@ export const MomentProofCeremony: React.FC = () => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Submit proof and update verification flow
+  // Submit proof and trigger PayTR capture
   const handleSealMoment = async () => {
     if (!user?.id || photos.length === 0) {
       showToast('En az bir fotoğraf gerekli', 'error');
@@ -355,7 +355,7 @@ export const MomentProofCeremony: React.FC = () => {
         })
         .eq('id', escrowId);
 
-      // 4. Update verification status
+      // 4. CRITICAL: Trigger PayTR Capture signal
       // This releases the funds to the recipient's sub-merchant account
       try {
         const releaseResult = await escrowService.releaseEscrow(escrowId);
@@ -417,7 +417,7 @@ export const MomentProofCeremony: React.FC = () => {
     return (
       <LoadingState
         type="overlay"
-        message="Anı mühürleniyor... doğrulama işleniyor"
+        message="Anı mühürleniyor... PayTR'a sinyal gönderiliyor"
       />
     );
   }
@@ -597,8 +597,8 @@ export const MomentProofCeremony: React.FC = () => {
           >
             <Text style={styles.sealQuestion}>Anı mühürlendi mi?</Text>
             <Text style={styles.sealDescription}>
-              Bu düğmeye bastığınızda, hediye süreci doğrulama için işleme
-              alınır. onaylanacak ve hesabınıza aktarılacaktır.
+              Bu düğmeye bastığınızda, hediye tutarı PayTR tarafından
+              onaylanacak ve hesabınıza aktarılacaktır.
             </Text>
 
             <TouchableOpacity

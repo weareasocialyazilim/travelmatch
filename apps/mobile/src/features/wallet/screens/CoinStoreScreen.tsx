@@ -29,8 +29,6 @@ import { HapticManager } from '@/services/HapticManager';
 import { logger } from '@/utils/logger';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/hooks/useAuth';
-import { coinService } from '@/services/coinService';
-import { showLoginPrompt } from '@/stores/modalStore';
 
 // RevenueCat import
 import Purchases, {
@@ -53,7 +51,7 @@ const CoinStoreScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { user, isGuest } = useAuth();
+  const { user } = useAuth();
 
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,16 +59,9 @@ const CoinStoreScreen = () => {
   const [userCoins, setUserCoins] = useState(0);
 
   useEffect(() => {
-    if (isGuest) {
-      showLoginPrompt({ action: 'default' });
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
-      return;
-    }
     fetchPackages();
     fetchUserCoins();
-  }, [isGuest, navigation]);
+  }, []);
 
   const fetchUserCoins = async () => {
     if (!user) return;
@@ -78,11 +69,9 @@ const CoinStoreScreen = () => {
       .from('wallets')
       .select('coins_balance')
       .eq('user_id', user.id)
-      .eq('currency', 'LVND')
       .single();
-    const walletData = data as { coins_balance?: number | null } | null;
-    if (walletData) {
-      setUserCoins(walletData.coins_balance || 0);
+    if (data) {
+      setUserCoins(data.coins_balance || 0);
     }
   };
 
@@ -93,9 +82,12 @@ const CoinStoreScreen = () => {
       // Initialize RevenueCat (if not done globally)
       // await Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY });
 
-      const availablePackages = await coinService.getPackages();
-      if (availablePackages.length !== 0) {
-        setPackages(availablePackages);
+      const offerings = await Purchases.getOfferings();
+      if (
+        offerings.current !== null &&
+        offerings.current.availablePackages.length !== 0
+      ) {
+        setPackages(offerings.current.availablePackages);
       } else {
         // Fallback for Reviewer/Dev if no offerings found or unconnected
         // Default to Mock for uninterrupted Review Flow if RC fails
@@ -149,14 +141,19 @@ const CoinStoreScreen = () => {
 
     try {
       setPurchasing(true);
-      const result = await coinService.purchasePackage(pack);
+      const { customerInfo } = await Purchases.purchasePackage(pack);
 
-      if (result.success || __DEV__) {
+      // Check if purchase was successful (active entitlement)
+      // For testing without Real IAP, we might also allow if we are in DEV and simulation is active
+      const isPro =
+        typeof customerInfo.entitlements.active['pro'] !== 'undefined';
+
+      if (isPro || __DEV__) {
         // Verify via backend webhook (triggered by RC) -> Refresh Balance
         // Slight delay to allow webhook to process
         setTimeout(async () => {
           await fetchUserCoins();
-          Alert.alert('Success', 'LVND yüklendi!');
+          Alert.alert('Success', 'LVND Coin loaded!');
           HapticManager.success();
           setPurchasing(false);
         }, 2000);
@@ -184,6 +181,7 @@ const CoinStoreScreen = () => {
           onPress={() => handlePurchase(item)}
           disabled={purchasing}
           activeOpacity={0.8}
+          testID={`card-coin-package-${index}`}
         >
           <BlurView
             intensity={20}
@@ -220,7 +218,7 @@ const CoinStoreScreen = () => {
 
   return (
     <LiquidScreenWrapper variant="dark" safeAreaTop={false}>
-      <View style={styles.container}>
+      <View testID="screen-coin-store" style={styles.container}>
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity
@@ -253,7 +251,7 @@ const CoinStoreScreen = () => {
                 size={28}
                 color={DARK_THEME.accentGold}
               />
-              <Text style={styles.balanceText}>{userCoins}</Text>
+              <Text testID="text-balance" style={styles.balanceText}>{userCoins}</Text>
             </View>
             <Text style={styles.balanceSubtext}>
               {t(

@@ -1,4 +1,4 @@
-// KYC Document Type Selection Screen - Standard glass cards
+// KYC Document Type Selection Screen - Awwwards standard glass cards
 // Featuring silky glass effects and neon selection highlights
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
@@ -25,7 +25,6 @@ import { Button } from '@/components/ui/Button';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
-import { useKycAuthGuard } from './useKycAuthGuard';
 import type { DocumentType, VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -42,7 +41,7 @@ const DOCUMENT_OPTIONS = [
   {
     id: 'passport' as DocumentType,
     label: 'Pasaport',
-    description: 'Uluslararası kimlik belgesi',
+    description: 'Uluslararası seyahat belgesi',
     icon: 'passport' as const,
     accentColor: COLORS.primary,
   },
@@ -198,7 +197,6 @@ const KYCDocumentTypeScreen: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DocumentType | null>(
     data.documentType,
   );
-  useKycAuthGuard();
 
   const handleContinue = () => {
     if (!selectedType) return;

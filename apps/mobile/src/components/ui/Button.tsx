@@ -1,6 +1,6 @@
 // components/ui/Button.tsx
 // Lovendo Ultimate Design System 2026
-// Standardında Buton Sistemi
+// Awwwards standardında Buton Sistemi
 // Neon parlaması, haptik geri bildirim ve ipeksi geçişler içerir.
 //
 // CONSOLIDATED: Replaces Button.tsx, HapticButton.tsx, AnimatedButton.tsx

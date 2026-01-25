@@ -8,5 +8,7 @@ export { WalletConnectButton } from './WalletConnectButton';
 
 // Migrated from components/
 export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
+export { AddCardBottomSheet } from './AddCardBottomSheet';
+export { RemoveCardModal } from './RemoveCardModal';
 export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
 export { PendingTransactionsModal } from './PendingTransactionsModal';

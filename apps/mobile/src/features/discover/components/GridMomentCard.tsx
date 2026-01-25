@@ -3,17 +3,12 @@ import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { formatCurrency } from '@/utils/currencyFormatter';
-import type { CurrencyCode } from '@/constants/currencies';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { GridCardProps } from './types';
 
 export const GridMomentCard: React.FC<GridCardProps> = memo(
-  ({ item, index, onPress, priceDisplay, priceSecondary }) => {
+  ({ item, index, onPress }) => {
     const creatorName = item.user?.name?.split(' ')[0] || 'Anonim';
-    const currency = (item.currency || 'TRY') as CurrencyCode;
-    const fallbackPrice = formatCurrency(item.price || 0, currency);
-    const primaryPrice = priceDisplay || fallbackPrice;
 
     return (
       <View
@@ -24,7 +19,7 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
           onPress={() => onPress(item)}
           activeOpacity={0.95}
           accessibilityRole="button"
-          accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${primaryPrice}`}
+          accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${item.price} dolar`}
           accessibilityHint="Detayları görmek için dokunun"
         >
           {/* Image - Using OptimizedImage for better performance */}
@@ -87,14 +82,7 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
                   {item.distance || '?'} km
                 </Text>
               </View>
-              <View style={styles.gridPriceStack}>
-                <Text style={styles.gridPrice}>{primaryPrice}</Text>
-                {!!priceSecondary && (
-                  <Text style={styles.gridPriceSecondary}>
-                    {priceSecondary}
-                  </Text>
-                )}
-              </View>
+              <Text style={styles.gridPrice}>{item.price} LVND</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -182,17 +170,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: COLORS.text.secondary,
   },
-  gridPriceStack: {
-    alignItems: 'flex-end',
-  },
   gridPrice: {
     fontSize: 14,
     fontWeight: '700',
     color: COLORS.mint,
-  },
-  gridPriceSecondary: {
-    marginTop: 2,
-    fontSize: 10,
-    color: COLORS.text.secondary,
   },
 });

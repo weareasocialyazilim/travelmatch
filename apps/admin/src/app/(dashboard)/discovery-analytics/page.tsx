@@ -280,7 +280,7 @@ const topMoments = [
   },
   {
     id: 'MOM-005',
-    title: 'Private Yacht Experience',
+    title: 'Private Yacht Tour',
     host: 'Deniz K.',
     category: 'Luxury',
     discoveries: 654,

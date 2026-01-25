@@ -13,8 +13,8 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 
 const SCREENS = [
   { name: 'Onboarding', route: 'Onboarding' as const },
-  { name: 'Auth: Login', route: 'UnifiedAuth' as const },
-  { name: 'Auth: Register', route: 'UnifiedAuth' as const },
+  { name: 'Auth: Login', route: 'Login' as const },
+  { name: 'Auth: Register', route: 'Register' as const },
   { name: 'Main: Discover', route: 'Discover' as const },
   { name: 'Main: Inbox', route: 'Inbox' as const },
   { name: 'Main: Profile', route: 'Profile' as const },
@@ -45,16 +45,7 @@ export const DevMenuScreen = ({ navigation }: Props) => {
           <TouchableOpacity
             key={index}
             style={styles.item}
-            onPress={() => {
-              if (screen.route === 'UnifiedAuth') {
-                const initialMode = screen.name.includes('Register')
-                  ? 'register'
-                  : 'login';
-                (navigation as any).navigate(screen.route, { initialMode });
-                return;
-              }
-              (navigation as any).navigate(screen.route);
-            }}
+            onPress={() => (navigation as any).navigate(screen.route)}
           >
             <Text style={styles.itemText}>{screen.name}</Text>
             <Text style={styles.arrow}>→</Text>

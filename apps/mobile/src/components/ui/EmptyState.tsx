@@ -1,7 +1,7 @@
 // components/ui/EmptyState.tsx
 // Lovendo Ultimate Design System 2026
 // "Liquid Empty State System" - Zarif Boşluklar
-// Standard premium empty state with neon particles
+// Awwwards-standard premium empty state with neon particles
 
 import React, { useEffect, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
@@ -203,7 +203,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   subtitle,
   actionLabel,
   onAction,
-  actionSize = 'lg',
+  actionSize = 'md',
   secondaryActionLabel,
   onSecondaryAction,
   illustration,
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: SPACING.screenPadding,
+    paddingHorizontal: SPACING['2xl'],
     paddingVertical: SPACING['3xl'],
     flex: 1,
   },
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
-    maxWidth: SCREEN_WIDTH - SPACING.screenPadding * 2,
+    maxWidth: SCREEN_WIDTH * 0.8,
   },
   titlePremium: {
     fontSize: 28,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    maxWidth: SCREEN_WIDTH - SPACING.screenPadding * 2,
+    maxWidth: SCREEN_WIDTH * 0.75,
     marginBottom: SPACING.xl,
   },
   actionsContainer: {

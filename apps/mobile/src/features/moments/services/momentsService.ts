@@ -203,7 +203,12 @@ export const momentsApi = {
         images,
         tags,
         created_at,
-        updated_at
+        updated_at,
+        users:user_id (
+          id,
+          full_name,
+          avatar_url
+        )
       `,
       )
       .eq('status', 'active');
@@ -266,7 +271,13 @@ export const momentsApi = {
         images,
         tags,
         created_at,
-        updated_at
+        updated_at,
+        users:user_id (
+          id,
+          full_name,
+          avatar_url,
+          bio
+        )
       `,
       )
       .eq('id', id)
@@ -457,7 +468,12 @@ export const momentsApi = {
           price,
           currency,
           location,
-          category
+          category,
+          users:user_id (
+            id,
+            full_name,
+            avatar_url
+          )
         )
       `,
       )

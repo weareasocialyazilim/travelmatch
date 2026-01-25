@@ -40,7 +40,7 @@ const WalletCard: React.FC<WalletCardProps> = memo(
 
     const animatedProps = useAnimatedProps(() => {
       return {
-        text: `${Math.round(animatedBalance.value).toLocaleString('tr-TR')} LVND`,
+        text: `₺${animatedBalance.value.toFixed(2)}`,
       };
     });
 
@@ -48,7 +48,7 @@ const WalletCard: React.FC<WalletCardProps> = memo(
       <TouchableOpacity
         style={styles.walletCard}
         onPress={onPress}
-        accessibilityLabel={`Cüzdan bakiyesi ${Math.round(balance).toLocaleString('tr-TR')} LVND. Yönetmek için dokun`}
+        accessibilityLabel={`Cüzdan bakiyesi ₺${balance.toFixed(2)}. Yönetmek için dokun`}
         accessibilityRole="button"
       >
         <View style={styles.walletLeft}>

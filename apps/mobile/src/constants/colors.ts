@@ -1,5 +1,5 @@
 /**
- * Lovendo Mobile Constants - Edition Color Palette
+ * Lovendo Mobile Constants - Awwwards Edition Color Palette
  *
  * Felsefe: Twilight Zinc (Yumuşak Koyu) zemin üzerinde
  * GenZ enerjisini temsil eden yüksek kontrastlı Neon dokunuşlar.

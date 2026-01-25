@@ -2,22 +2,8 @@
 -- Created: 2026-01-24 13:00:00
 -- Purpose: Trigger Edge Function on file upload to storage.objects
 
--- Ensure pg_net extension is enabled for making HTTP requests (best effort)
-DO $$
-BEGIN
-  CREATE SCHEMA IF NOT EXISTS extensions;
-
-  BEGIN
-    CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
-  EXCEPTION
-    WHEN insufficient_privilege THEN
-      RAISE NOTICE 'pg_net extension creation skipped (insufficient privileges).';
-    WHEN feature_not_supported THEN
-      RAISE NOTICE 'pg_net extension creation skipped (not supported).';
-    WHEN undefined_object THEN
-      RAISE NOTICE 'pg_net extension creation skipped (extension not available).';
-  END;
-END $$;
+-- Ensure pg_net extension is enabled for making HTTP requests
+CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
 
 -- Function to trigger the Edge Function
 CREATE OR REPLACE FUNCTION public.trigger_handle_storage_upload()

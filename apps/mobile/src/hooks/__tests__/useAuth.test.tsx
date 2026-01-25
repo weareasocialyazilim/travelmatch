@@ -81,7 +81,6 @@ jest.mock('../../services/supabaseAuthService', () => ({
 
 // Import after mocks
 import { useAuth, AuthProvider } from '../../hooks/useAuth';
-import { ToastProvider } from '../../context/ToastContext';
 
 describe('useAuth', () => {
   beforeEach(() => {
@@ -118,9 +117,7 @@ describe('useAuth', () => {
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <ToastProvider>
-      <AuthProvider>{children}</AuthProvider>
-    </ToastProvider>
+    <AuthProvider>{children}</AuthProvider>
   );
 
   describe('Re-export', () => {

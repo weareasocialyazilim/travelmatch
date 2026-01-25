@@ -5,11 +5,21 @@
  * This is the recommended way to import payment services.
  *
  * Modular structure:
- * - PayTRProvider: REMOVED (Apple IAP compliance)
+ * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
  * - walletService: Balance queries, withdrawals
  * - escrowService: Titan Protocol escrow logic
  * - transactionService: Transaction history
  */
+
+// PayTR Provider
+export {
+  paytrProvider,
+  type PayTRPaymentResponse,
+  type CreatePaymentParams,
+  type SavedCard,
+  type CardTokenizeParams,
+  type CardTokenizeResult,
+} from './PayTRProvider';
 
 // Re-export from parent services
 export { walletService, type WalletBalance } from '../walletService';

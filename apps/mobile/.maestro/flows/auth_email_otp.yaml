@@ -1,0 +1,71 @@
+# Auth Email/OTP Flow - P0 Critical Path
+# Validates: Email input → OTP request → Verification
+# Risk covered: Auth bypass, login failure, OTP delivery issues
+
+appId: com.lovendo.app
+name: "P0: Auth Email OTP Flow"
+tags:
+  - smoke
+  - p0
+  - auth
+  - critical
+
+env:
+  TEST_EMAIL: "e2e-test@lovendo.xyz"
+
+---
+
+# Start fresh
+- clearState
+- launchApp:
+    clearState: true
+
+# Wait for Welcome screen
+- extendedWaitUntil:
+    visible:
+      id: "screen-welcome"
+    timeout: 15000
+
+# Tap Login button
+- tapOn:
+    id: "btn-login"
+
+# Wait for Unified Auth screen
+- extendedWaitUntil:
+    visible:
+      id: "screen-unified-auth"
+    timeout: 5000
+
+# Take screenshot before input
+- takeScreenshot: "auth_identifier_screen"
+
+# Enter email address
+- tapOn:
+    id: "input-identifier"
+
+- inputText: ${TEST_EMAIL}
+
+# Tap Continue button
+- tapOn:
+    id: "btn-continue"
+
+# Wait for password step (existing user) or OTP sent message
+# The app will either show password input or redirect to OTP verification
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          id: "input-password"
+      - visible:
+          id: "screen-verify-code"
+      - visible:
+          text: ".*kod.*"  # Turkish: "kod gönderildi"
+    timeout: 10000
+
+# Take screenshot of result
+- takeScreenshot: "auth_after_identifier"
+
+# SUCCESS: Auth flow progressed past identifier step
+# Note: Full OTP verification requires either:
+# 1. Test mode backend that accepts a fixed OTP (e.g., 123456)
+# 2. Real SMS/Email delivery with external service integration
+# For CI, we recommend configuring a test bypass in staging

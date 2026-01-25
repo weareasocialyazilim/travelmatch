@@ -4,7 +4,6 @@ import { ESCROW_THRESHOLDS } from '@/constants/values';
 import { logger } from '@/utils/logger';
 import { encryptionService } from '@/services/encryptionService';
 import { userService } from '@/services/userService';
-import { edgeFunctions } from '@/services/edgeFunctions';
 
 /**
  * Messages API Service
@@ -181,9 +180,6 @@ export const messagesApi = {
    * Alıcı (Host) bu fonksiyonu çağırarak göndericiye sohbet izni verir.
    * is_chat_approved_by_host flag'i true olur.
    *
-   * EK-P0-1: Now uses Edge Function instead of direct DB access
-   * This prevents privilege escalation and ensures server-side validation.
-   *
    * Notification: "Seni beğendi" → "[Kullanıcı] seninle bir sohbet başlattı!"
    */
   unlockConversation: async (giftId: string, senderId: string) => {
@@ -192,23 +188,63 @@ export const messagesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // EK-P0-1: Use Edge Function for secure gift approval
-    // Server-side validation of:
-    // - Gift ownership (receiver_id matches authenticated user)
-    // - $30 minimum amount
-    // - Notification creation
-    const { data, error } = await edgeFunctions.approveGiftChat(giftId, senderId);
+    // MASTER RULE: First check gift amount meets $30 minimum for chat unlock
+    const { data: gift, error: fetchError } = await supabase
+      .from('gifts')
+      .select('id, amount, currency, status')
+      .eq('id', giftId)
+      .eq('receiver_id', user.id)
+      .single();
 
-    if (error) {
-      logger.error('Failed to unlock conversation:', { error: error.message });
-      throw new Error(error.message || 'Failed to unlock conversation');
+    if (fetchError || !gift) {
+      throw new Error('Gift not found or you are not the recipient');
     }
 
-    if (!data?.success) {
-      throw new Error('Failed to unlock conversation');
+    // Cast to proper type after null check
+    const giftData = gift as {
+      id: string;
+      amount: number;
+      currency: string;
+      status: string;
+    };
+
+    // CRITICAL: Enforce $30 minimum for chat unlock (Tier 2+)
+    const chatEligibility = determineChatTier(giftData.amount || 0);
+    if (chatEligibility.tier === 'none') {
+      throw new Error(
+        `Chat cannot be unlocked for gifts under $30. ${chatEligibility.messageTR}`,
+      );
     }
 
-    return { success: true, alreadyApproved: data.already_approved };
+    // Update gift to mark chat as approved by host
+    const { error: giftError } = await supabase
+      .from('gifts')
+      .update({
+        host_approved: true,
+        // REFACTOR: is_liked → is_chat_approved_by_host (in database migration)
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', giftId)
+      .eq('receiver_id', user.id); // Security: Only receiver can approve
+
+    if (giftError) throw giftError;
+
+    // Create notification for sender
+    // "[Kullanıcı] seninle bir sohbet başlattı!"
+    const { error: notifError } = await supabase.from('notifications').insert({
+      user_id: senderId,
+      type: 'chat_unlocked',
+      title: 'Sohbet Başladı! 💬',
+      body: 'Hediyeni kabul etti ve seninle sohbet başlattı!',
+      data: { gift_id: giftId, host_id: user.id },
+    });
+
+    if (notifError) {
+      // Log but don't throw - notification failure shouldn't block unlock
+      logger.error('Failed to create notification:', { error: notifError });
+    }
+
+    return { success: true };
   },
 
   /**
@@ -217,8 +253,6 @@ export const messagesApi = {
    * Host bireysel teşekkür mesajı gönderir.
    * Bu, toplu teşekkürden farklı olarak kişiye özeldir.
    * ANCAK sohbet başlatmaz - sadece bir kerelik mesajdır.
-   *
-   * EK-P0-1: Notification now sent via Edge Function
    */
   sendGratitudeNote: async (
     giftId: string,
@@ -230,8 +264,7 @@ export const messagesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // Create gratitude note record (this table can stay client-writable
-    // as it doesn't affect permissions or financial state)
+    // Create gratitude note record
     const { error } = await supabase.from('gratitude_notes').insert({
       gift_id: giftId,
       sender_id: senderId, // The gift giver
@@ -242,12 +275,8 @@ export const messagesApi = {
 
     if (error) throw error;
 
-    // EK-P0-1: Create notification via Edge Function
-    // This ensures:
-    // - Validated gift relationship (host can only thank their gift givers)
-    // - Rate limiting
-    // - Audit trail
-    const { error: notifError } = await edgeFunctions.sendNotification({
+    // Create notification for gift sender
+    const { error: notifError } = await supabase.from('notifications').insert({
       user_id: senderId,
       type: 'gratitude_received',
       title: 'Teşekkür Notu Aldın! 🙏',

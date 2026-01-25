@@ -66,7 +66,9 @@ export {
   getEscrowExplanation,
 } from './escrowService';
 export type {
+  PaymentCard,
   BankAccount,
+  PaymentIntent,
   PaymentStatus,
   PaymentMethod,
   TransactionType,

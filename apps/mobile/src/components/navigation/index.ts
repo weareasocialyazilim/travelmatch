@@ -1,5 +1,5 @@
 /**
- * Navigation Components - Edition
+ * Navigation Components - Awwwards Edition
  *
  * Premium navigation components with Liquid Glass aesthetics.
  */

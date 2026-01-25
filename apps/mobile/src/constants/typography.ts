@@ -1,5 +1,5 @@
 /**
- * Lovendo Design System - Typography V2
+ * Lovendo Awwwards Design System 2026 - Typography V2
  * "Sophisticated Typography" - Awwwards projelerinin %70'i tipografidir
  *
  * Premium Typography System featuring:

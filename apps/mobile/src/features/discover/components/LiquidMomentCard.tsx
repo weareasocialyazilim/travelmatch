@@ -25,12 +25,20 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { formatCurrency } from '@/utils/currencyFormatter';
-import type { CurrencyCode } from '@/constants/currencies';
 import type { SubscriptionTier } from '@/features/moments/services/momentsService';
 
 const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
+
+// Currency symbols for display
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  EUR: '€',
+  TRY: '₺',
+  GBP: '£',
+  JPY: '¥',
+  CAD: 'C$',
+};
 
 // Subscription tier styling configuration
 const TIER_CONFIG: Record<
@@ -80,7 +88,7 @@ export interface LiquidMomentCardProps {
 }
 
 /**
- * Standardında Liquid Moment Card.
+ * Awwwards standardında Liquid Moment Card.
  * Görsel derinlik ve ipeksi glass paneller içerir.
  * Creator-set price ile "🎁 X ile Destekle" butonu gösterir.
  * Subscription tier badge ile premium host gösterimi.
@@ -100,8 +108,8 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
   }) => {
     // Format price with currency symbol
     const formattedPrice = useMemo(() => {
-      const currencyCode = (currency || 'TRY') as CurrencyCode;
-      return formatCurrency(price, currencyCode);
+      const symbol = CURRENCY_SYMBOLS[currency] || currency;
+      return `${symbol}${price.toLocaleString()}`;
     }, [price, currency]);
 
     // Get tier styling

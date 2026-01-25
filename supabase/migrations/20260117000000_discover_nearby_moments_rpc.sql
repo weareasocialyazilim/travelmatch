@@ -83,9 +83,8 @@ BEGIN
 END;
 $$;
 
--- Grant execute permission to authenticated and anonymous users (for guest browse)
+-- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text) TO anon;
 
--- Add helpful comment (with full signature to avoid ambiguity)
-COMMENT ON FUNCTION discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text) IS 'Discovers nearby moments using PostGIS geography for accurate distance calculations. Returns moments within specified radius ordered by distance.';
+-- Add helpful comment
+COMMENT ON FUNCTION discover_nearby_moments IS 'Discovers nearby moments using PostGIS geography for accurate distance calculations. Returns moments within specified radius ordered by distance.';

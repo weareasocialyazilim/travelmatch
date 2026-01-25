@@ -1,5 +1,5 @@
 /**
- * ProfileScreen - Edition
+ * ProfileScreen - Awwwards Edition
  *
  * Premium profile experience with Twilight Zinc dark theme.
  * Features:
@@ -17,7 +17,6 @@ import {
   RefreshControl,
   Share,
 } from 'react-native';
-import { SPACING } from '@/constants/spacing';
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -31,7 +30,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useParallaxHeader } from '@/hooks/useParallaxHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { SkeletonList } from '@/components/ui';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import {
@@ -62,7 +61,6 @@ import {
 } from '../constants/theme';
 import { TrustGardenView } from '@/components/TrustGardenView';
 import { trustScoreService, type UserTier } from '@/services/TrustScoreService';
-import { showLoginPrompt } from '@/stores/modalStore';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -89,7 +87,7 @@ const ProfileScreen: React.FC = () => {
   });
 
   // Get user from auth context
-  const { user: authUser, isLoading: _authLoading, isGuest } = useAuth();
+  const { user: authUser, isLoading: _authLoading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
@@ -155,21 +153,13 @@ const ProfileScreen: React.FC = () => {
     if (authUser) {
       // Use auth user data with fallbacks from profile
       const authUserAny = authUser as unknown as Record<string, unknown>;
-      const fallbackAvatarName = (
-        authUser.name ||
-        userProfile?.name ||
-        ''
-      ).trim();
-      const fallbackAvatar = fallbackAvatarName
-        ? `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackAvatarName)}`
-        : '';
       return {
-        name: authUser.name || userProfile?.name || '',
+        name: authUser.name || userProfile?.name || 'User',
         avatarUrl:
           (authUserAny.profilePhoto as string) ||
           (authUserAny.avatarUrl as string) ||
           userProfile?.avatar ||
-          fallbackAvatar,
+          'https://ui-avatars.com/api/?name=User',
         isVerified:
           authUser.kyc === 'Verified' || userProfile?.isVerified || false,
         location:
@@ -177,7 +167,7 @@ const ProfileScreen: React.FC = () => {
             ? authUser.location
             : (authUser.location as { city?: string })?.city ||
               userProfile?.location?.city ||
-              '',
+              'Unknown Location',
         trustScore: authUser.trustScore || userProfile?.rating || 0,
         momentsCount:
           myMoments.length ||
@@ -195,8 +185,8 @@ const ProfileScreen: React.FC = () => {
 
     // Fallback for guest/loading
     return {
-      name: '',
-      avatarUrl: '',
+      name: 'Guest',
+      avatarUrl: 'https://ui-avatars.com/api/?name=User',
       isVerified: false,
       location: '',
       trustScore: 0,
@@ -207,12 +197,6 @@ const ProfileScreen: React.FC = () => {
       savedCount: 0,
     };
   }, [authUser, myMoments, userProfile]);
-
-  useEffect(() => {
-    if (isGuest || !authUser) {
-      showLoginPrompt({ action: 'default' });
-    }
-  }, [isGuest, authUser]);
 
   // Navigation handlers with haptic feedback
   const handleEditProfile = useCallback(() => {
@@ -369,25 +353,6 @@ const ProfileScreen: React.FC = () => {
     handleShare();
   };
 
-  if (isGuest || !authUser) {
-    return (
-      <LiquidScreenWrapper variant="twilight" safeAreaTop>
-        <View style={styles.container}>
-          <EmptyState
-            title={t('profile.loginRequiredTitle', 'Giriş gerekli')}
-            description={t(
-              'profile.loginRequiredMessage',
-              'Profilinizi görüntülemek için giriş yapmanız gerekir.',
-            )}
-            actionLabel={t('profile.loginNow', 'Giriş Yap')}
-            onAction={() => showLoginPrompt({ action: 'default' })}
-            style={styles.loginRequiredEmptyState}
-          />
-        </View>
-      </LiquidScreenWrapper>
-    );
-  }
-
   return (
     <LiquidScreenWrapper variant="twilight" safeAreaTop>
       <View style={styles.container}>
@@ -478,12 +443,10 @@ const ProfileScreen: React.FC = () => {
               />
 
               {/* Creator Dashboard (Visible if user has earnings or is verified) */}
-              {(balances.coins > 0 ||
-                balances.pending > 0 ||
-                userData.isVerified) && (
+              {(balances.coins > 0 || balances.pending > 0 || userData.isVerified) && (
                 <>
                   <View style={styles.dashboardDivider} />
-                  <CreatorDashboard
+                  <CreatorDashboard 
                     balance={balances.coins}
                     pendingBalance={balances.pending}
                     onWithdraw={handleWallet}
@@ -495,10 +458,10 @@ const ProfileScreen: React.FC = () => {
               <View style={styles.dashboardDivider} />
 
               {/* Trust Garden */}
-              <TrustGardenView
-                score={realTrustScore}
-                isVerified={userData.isVerified}
-                tier={userTier}
+              <TrustGardenView 
+                score={realTrustScore} 
+                isVerified={userData.isVerified} 
+                tier={userTier} 
               />
 
               {/* Divider */}
@@ -522,7 +485,7 @@ const ProfileScreen: React.FC = () => {
                     {t('wallet.title')}
                   </Text>
                   <Text style={styles.dashboardItemSubtitle}>
-                    {balances.coins.toLocaleString('tr-TR')} LVND
+                    {userData.walletBalance.toLocaleString('tr-TR')} TL
                   </Text>
                 </View>
                 <Ionicons
@@ -555,7 +518,7 @@ const ProfileScreen: React.FC = () => {
           {/* Moments Grid */}
           <View style={styles.momentsGrid}>
             {myMomentsLoading && myMoments.length === 0 ? (
-              <Skeleton type="list" listType="moment" count={4} />
+              <SkeletonList type="moment" count={4} />
             ) : displayedMoments.length > 0 ? (
               <FlashList
                 data={displayedMoments}
@@ -607,7 +570,6 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: PROFILE_COLORS.background.primary,
   },
   header: {
     flexDirection: 'row',
@@ -698,9 +660,6 @@ const styles = StyleSheet.create({
   emptyCard: {
     paddingVertical: 32,
     borderColor: PROFILE_COLORS.glass.border,
-  },
-  loginRequiredEmptyState: {
-    paddingBottom: SPACING.bottomNavHeight,
   },
 
   bottomSpacer: {

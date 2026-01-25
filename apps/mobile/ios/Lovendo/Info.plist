@@ -30,7 +30,10 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>lovendo</string>
+<<<<<<< Updated upstream
+=======
           <string>com.lovendo.app</string>
+>>>>>>> Stashed changes
         </array>
       </dict>
     </array>

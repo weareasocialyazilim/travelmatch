@@ -50,8 +50,7 @@ export const passwordValidation = z
   .min(8, 'forms.validation.password.min')
   .regex(/[A-Z]/, 'forms.validation.password.uppercase')
   .regex(/[a-z]/, 'forms.validation.password.lowercase')
-  .regex(/[0-9]/, 'forms.validation.password.number')
-  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'forms.validation.password.special');
+  .regex(/[0-9]/, 'forms.validation.password.number');
 
 export const optionalPasswordValidation = z
   .string()
@@ -59,7 +58,6 @@ export const optionalPasswordValidation = z
   .regex(/[A-Z]/, 'forms.validation.password.uppercase')
   .regex(/[a-z]/, 'forms.validation.password.lowercase')
   .regex(/[0-9]/, 'forms.validation.password.number')
-  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'forms.validation.password.special')
   .optional()
   .or(z.literal(''));
 
@@ -169,7 +167,8 @@ export const requiredPhoneValidation = z
   .regex(/^\+?[1-9]\d{9,14}$/, 'forms.validation.phone.invalid');
 
 export const completeProfileSchema = z.object({
-  fullName: nameValidation.optional(),
+  fullName: nameValidation,
+  username: usernameValidation,
   bio: bioValidation,
   avatar: z.string().optional().or(z.literal('')),
   interests: z
@@ -178,8 +177,6 @@ export const completeProfileSchema = z.object({
     .max(5, 'forms.validation.interests.max'),
   // Phone number for SMS verification (REQUIRED)
   phone: requiredPhoneValidation,
-  gender: genderValidation,
-  dateOfBirth: dateOfBirthValidation,
 });
 
 // ============================================================================

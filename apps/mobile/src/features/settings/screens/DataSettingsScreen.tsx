@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,23 +11,11 @@ import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { useAuth } from '@/context/AuthContext';
-import { showLoginPrompt } from '@/stores/modalStore';
-import { EmptyState } from '@/components';
-import { useTranslation } from '@/hooks/useTranslation';
 
 export const DataSettingsScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
-  const { user, isGuest } = useAuth();
   const [dataSaver, setDataSaver] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
-
-  useEffect(() => {
-    if (isGuest || !user) {
-      showLoginPrompt({ action: 'default' });
-    }
-  }, [isGuest, user]);
 
   const handleClearCache = () => {
     showAlert({
@@ -42,22 +30,6 @@ export const DataSettingsScreen = ({ navigation }: any) => {
       ],
     });
   };
-
-  if (isGuest || !user) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <EmptyState
-          title={t('settings.loginRequiredTitle', 'Giriş gerekli')}
-          description={t(
-            'settings.loginRequiredMessage',
-            'Ayarları görmek için giriş yapmanız gerekir.',
-          )}
-          actionLabel={t('settings.loginNow', 'Giriş Yap')}
-          onAction={() => showLoginPrompt({ action: 'default' })}
-        />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

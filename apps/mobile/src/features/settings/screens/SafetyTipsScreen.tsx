@@ -24,17 +24,17 @@ const TIPS: SafetyTip[] = [
   {
     icon: 'gift-outline',
     title: 'Safe Gifting',
-    desc: 'Gifts use in-app LVND coins only. No direct money transfers between users.',
+    desc: 'All gift transactions are secured through our escrow system. Funds are only released after proof of experience is verified.',
   },
   {
     icon: 'cash-lock',
     title: 'Keep Payments In-App',
-    desc: 'Never send money outside the app. Coin purchases are protected by Apple/Google In‑App Purchase.',
+    desc: 'Never send money outside the app. Your payments are protected by PayTR escrow only when made through Moment.',
   },
   {
     icon: 'camera-enhance',
     title: 'Share Your Moments',
-    desc: 'Document your experiences with photos to build trust and accountability.',
+    desc: 'Document your experiences with photos. This protects both gifters and receivers in the escrow process.',
   },
   {
     icon: 'shield-check',
@@ -61,7 +61,7 @@ export const SafetyTipsScreen: React.FC<SafetyTipsScreenProps> = ({
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.hero}>Your gifts are protected in‑app.</Text>
+        <Text style={styles.hero}>Your gift is protected with escrow.</Text>
 
         {TIPS.map((tip, index) => (
           <View key={index} style={styles.card}>

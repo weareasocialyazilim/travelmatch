@@ -58,26 +58,26 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
     const steps: TimelineStep[] = [
       {
         id: '1',
-        title: 'Jest Alındı',
+        title: 'Gesture Received',
         subtitle: isAnonymous
-          ? `Anonim bir destekçi sana $${amount} gönderdi`
-          : `${senderName ?? 'Biri'} sana $${amount} gönderdi`,
+          ? `Anonymous supporter sent you $${amount}`
+          : `${senderName ?? 'Someone'} sent you $${amount}`,
         icon: 'gift-outline',
         status: 'completed',
-        time: '3 gün önce',
+        time: '3 days ago',
       },
       {
         id: '2',
-        title: 'Kanıt Yüklendi',
-        subtitle: `"${momentTitle}" için kanıtını yükledin`,
+        title: 'Proof Uploaded',
+        subtitle: `You uploaded proof for "${momentTitle}"`,
         icon: 'camera-outline',
         status: status === 'pending_proof' ? 'current' : 'completed',
-        time: status === 'pending_proof' ? undefined : '2 gün önce',
+        time: status === 'pending_proof' ? undefined : '2 days ago',
       },
       {
         id: '3',
-        title: 'Doğrulama',
-        subtitle: 'Sistem kanıtını doğruladı',
+        title: 'Verification',
+        subtitle: 'System verified your proof',
         icon: 'check-decagram',
         status:
           status === 'pending_verification'
@@ -85,15 +85,15 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             : status === 'verified'
               ? 'completed'
               : 'pending',
-        time: status === 'verified' ? '1 gün önce' : undefined,
+        time: status === 'verified' ? '1 day ago' : undefined,
       },
       {
         id: '4',
-        title: 'Ödeme Hesaba Geçti',
-        subtitle: `$${amount} bakiyene eklendi`,
+        title: 'Funds Added',
+        subtitle: `$${amount} added to your balance`,
         icon: 'wallet-plus-outline',
         status: status === 'verified' ? 'completed' : 'pending',
-        time: status === 'verified' ? 'Az önce' : undefined,
+        time: status === 'verified' ? 'Just now' : undefined,
       },
     ];
 
@@ -208,7 +208,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Jest Detayları</Text>
+        <Text style={styles.headerTitle}>Gesture Details</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -223,12 +223,12 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             <MaterialCommunityIcons name="gift" size={40} color={COLORS.mint} />
           </View>
 
-          <Text style={styles.giftTitle}>Bir jest aldın!</Text>
+          <Text style={styles.giftTitle}>You received a gesture!</Text>
 
           <View style={styles.amountContainer}>
             <Text style={styles.amountValue}>${amount}</Text>
             <Text style={styles.amountLabel}>
-              &quot;{momentTitle}&quot; için
+              for &quot;{momentTitle}&quot;
             </Text>
           </View>
 
@@ -243,7 +243,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                     color={COLORS.text.secondary}
                   />
                 </View>
-                <Text style={styles.senderName}>Anonim Destekçi</Text>
+                <Text style={styles.senderName}>Anonymous Supporter</Text>
               </View>
             ) : (
               <View style={styles.senderInfo}>
@@ -254,7 +254,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                   style={styles.senderAvatar}
                 />
                 <View>
-                  <Text style={styles.senderLabel}>Gönderen</Text>
+                  <Text style={styles.senderLabel}>From</Text>
                   <Text style={styles.senderName}>{senderName}</Text>
                 </View>
               </View>
@@ -288,15 +288,15 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
               ]}
             >
               {status === 'verified'
-                ? 'Onaylandı ve bakiyeye eklendi'
-                : 'Doğrulama bekliyor'}
+                ? 'Verified & Added to Balance'
+                : 'Pending Verification'}
             </Text>
           </View>
         </View>
 
         {/* Timeline */}
         <View style={styles.timelineContainer}>
-          <Text style={styles.sectionTitle}>Süreç</Text>
+          <Text style={styles.sectionTitle}>Progress</Text>
 
           {steps.map((step, index) => (
             <View key={step.id} style={styles.timelineItem}>
@@ -377,7 +377,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                 size={20}
                 color={COLORS.utility.white}
               />
-              <Text style={styles.primaryButtonText}>Kanıt Yükle</Text>
+              <Text style={styles.primaryButtonText}>Upload Proof</Text>
             </TouchableOpacity>
           )}
 
@@ -394,7 +394,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                     color={COLORS.utility.white}
                   />
                   <Text style={styles.primaryButtonText}>
-                    {senderName ? `${senderName}’e Teşekkür Et` : 'Teşekkür Et'}
+                    Say Thanks to {senderName}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -419,7 +419,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                     isAnonymous && styles.primaryButtonText,
                   ]}
                 >
-                  Bakiyeyi Gör
+                  View Balance
                 </Text>
               </TouchableOpacity>
             </>
@@ -435,8 +435,8 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           />
           <Text style={styles.infoText}>
             {status === 'verified'
-              ? 'Ödeme bakiyene eklendi. İstersen çekebilir ya da yeni bir an için kullanabilirsin.'
-              : 'Kanıtını yükleyince ödeme serbest kalır. Sistemimiz otomatik doğrular.'}
+              ? 'The funds have been added to your balance. You can withdraw or use them for your next experience.'
+              : 'Upload proof of your experience to unlock the funds. Our system will verify automatically.'}
           </Text>
         </View>
       </ScrollView>

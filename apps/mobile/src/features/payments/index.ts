@@ -2,7 +2,7 @@
  * Payments Feature - Barrel Exports
  *
  * Bu feature şunları içerir:
- * - Payment methods removed (Apple IAP compliance)
+ * - Payment methods (PaymentMethodsScreen)
  * - Transactions (TransactionDetailScreen, TransactionHistoryScreen)
  * - KYC verification (PaymentsKYCScreen, kyc/ folder)
  * - Subscriptions (SubscriptionScreen)
@@ -13,6 +13,8 @@
  */
 
 // Screens - with default exports
+export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
+export { default as AddCardScreen } from './screens/AddCardScreen';
 export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
 export { RefundRequestScreen } from './screens/RefundRequestScreen';
 export { default as SuccessScreen } from './screens/SuccessScreen';
@@ -25,8 +27,7 @@ export { TransactionHistoryScreen } from './screens/TransactionHistoryScreen';
 export { SubscriptionScreen } from './screens/SubscriptionScreen';
 export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
-// PayTRWebViewScreen REMOVED - Apple IAP Compliance
-// All purchases must use RevenueCat/IAP. PayTR only for withdrawals.
+export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
 // REMOVED: BulkThankYouScreen - orphan screen, never registered in navigation
 export { default as UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
@@ -35,7 +36,14 @@ export { default as SubscriberOfferModal } from './screens/SubscriberOfferModal'
 // KYC Screens - MOVED TO features/verifications/kyc
 // Import from '@/features/verifications/kyc' for new code
 // Re-export for backward compatibility (deprecated)
-export { KYCIntroScreen, KYCPendingScreen } from '../verifications/kyc';
+export {
+  KYCIntroScreen,
+  KYCDocumentTypeScreen,
+  KYCDocumentCaptureScreen,
+  KYCSelfieScreen,
+  KYCReviewScreen,
+  KYCPendingScreen,
+} from '../verifications/kyc';
 
 // Components
 export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
@@ -43,6 +51,8 @@ export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
 // Hooks
 export {
   useWalletBalance,
+  useSavedCards,
+  useCreatePaymentIntent,
   useWithdraw,
   useKYCStatus,
   useSubmitKYC,
@@ -53,6 +63,7 @@ export {
 
 // Alias exports for backward compatibility
 export { useWalletBalance as useWallet } from './hooks/usePayments';
+export { useSavedCards as usePaymentMethods } from './hooks/usePayments';
 
 // Placeholder hooks for future implementation
 export const useTransactions = () => ({

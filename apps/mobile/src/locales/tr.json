@@ -66,7 +66,7 @@
     "settings": "Ayarlar",
     "notifications": "Bildirimler",
     "favorites": "Favoriler",
-    "myRequests": "Taleplerim",
+    "bookings": "Taleplerim",
     "wallet": "Cüzdan",
     "createMoment": "Yeni an oluştur",
     "discoverTab": "Anlar sekmesi",
@@ -112,22 +112,22 @@
       "premium": "Premium"
     }
   },
-  "request": {
-    "joinNow": "Hemen Katıl",
-    "experienceRequest": "Deneyim Talebi",
-    "requestConfirmed": "Talep Onaylandı",
-    "requestCancelled": "Talep İptal Edildi",
-    "requestPending": "Talep Beklemede",
+  "booking": {
+    "bookNow": "Hemen Katıl",
+    "bookingRequest": "Deneyim Talebi",
+    "bookingConfirmed": "Talep Onaylandı",
+    "bookingCancelled": "Talep İptal Edildi",
+    "bookingPending": "Talep Beklemede",
     "guests": "Misafirler",
     "totalPrice": "Toplam Fiyat",
-    "requestDate": "Talep Tarihi",
-    "confirmRequest": "Talebi Onayla",
-    "cancelRequest": "Talebi İptal Et",
-    "requestSuccess": "Talep gönderildi!",
-    "requestError": "Talep başarısız. Lütfen tekrar deneyin.",
-    "noRequestsFound": "Talep bulunamadı",
-    "upcomingExperiences": "Yaklaşan Deneyimler",
-    "pastExperiences": "Geçmiş Deneyimler"
+    "bookingDate": "Talep Tarihi",
+    "confirmBooking": "Talebi Onayla",
+    "cancelBooking": "Talebi İptal Et",
+    "bookingSuccess": "Talep gönderildi!",
+    "bookingError": "Talep başarısız. Lütfen tekrar deneyin.",
+    "noBookingsFound": "Talep bulunamadı",
+    "upcomingBookings": "Yaklaşan Deneyimler",
+    "pastBookings": "Geçmiş Deneyimler"
   },
   "chat": {
     "messages": "Mesajlar",
@@ -180,56 +180,6 @@
     "savedMoments": "Kaydedilen Anlar",
     "offlineTitle": "İnternet bağlantısı yok",
     "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli."
-  },
-
-  "trust": {
-    "factors": {
-      "identity": "Kimlik",
-      "social": "Sosyal",
-      "experience": "Deneyim",
-      "response": "Yanıt",
-      "score": "Puan"
-    },
-    "garden": {
-      "title": "Güven Bahçesi",
-      "factorsTitle": "Güven Faktörleri",
-      "howToImprove": "Nasıl geliştirilir:",
-      "levelsTitle": "Güven Seviyeleri",
-      "points": "puan",
-      "levels": {
-        "sprout": "Fidan",
-        "developing": "Gelişen",
-        "growing": "Büyüyen",
-        "blooming": "Çiçeklenen"
-      },
-      "identityVerification": "Kimlik Doğrulama",
-      "identityDesc": "KYC doğrulama durumu",
-      "socialConnections": "Sosyal Bağlantılar",
-      "socialDesc": "Bağlı hesaplar",
-      "completedExperiences": "Tamamlanan Deneyimler",
-      "experienceDesc": "Tamamlanan moment sayısı",
-      "responseRate": "Yanıt Oranı",
-      "responseDesc": "İsteklere hızlı yanıt",
-      "receivedRatings": "Alınan Puanlar",
-      "ratingsDesc": "Ortalama değerlendirme",
-      "tips": {
-        "verifyId": "Kimliğini doğrula",
-        "addAddress": "Adresini ekle",
-        "completeKyc": "KYC sürecini tamamla",
-        "connectInstagram": "Instagram hesabını bağla",
-        "connectTwitter": "X (Twitter) hesabını bağla",
-        "addWebsite": "Web siteni ekle",
-        "completeMoments": "Daha fazla moment tamamla",
-        "getHighRatings": "Yüksek değerlendirmeler al",
-        "respondQuickly": "Mesajlara hızlı dön",
-        "respondIn2h": "İlk 2 saatte yanıt ver",
-        "acceptQuickly": "İstekleri hızlı onayla",
-        "keepCalendarUpdated": "Takvimi güncel tut",
-        "offerUnique": "Özgün deneyimler sun",
-        "clearCommunication": "Net iletişim kur",
-        "exceedExpectations": "Beklentilerin ötesine geç"
-      }
-    }
   },
 
   "payment": {
@@ -361,11 +311,11 @@
   "onboarding": {
     "page1": {
       "title": "Lovendo'ya Hoş Geldiniz",
-      "description": "Doğrulanmış, içten hediyelerle insanlara benzersiz anlarında bağlantı kurun ve destek olun."
+      "description": "Doğrulanmış, içten hediyelerle gezginlere benzersiz yolculuklarında bağlantı kurun ve destek olun."
     },
     "page2": {
-      "title": "Deneyimlerinizi Paylaşın",
-      "description": "Anlarınızı oluşturun ve dünyanın dört bir yanındaki destekçilerden hediyeler alın."
+      "title": "Yolculuğunuzu Paylaşın",
+      "description": "Seyahatlerinizden anlar oluşturun ve dünyanın dört bir yanındaki destekçilerden hediyeler alın."
     },
     "page3": {
       "title": "Birlikte Güven Oluşturun",
@@ -373,7 +323,7 @@
     },
     "page4": {
       "title": "Maceranıza Başlayın",
-      "description": "Anlamlı hediyeler ve özgün deneyimlerle bağlantı kuran binlerce insana katılın."
+      "description": "Anlamlı hediyeler ve özgün deneyimlerle bağlantı kuran binlerce gezgine katılın."
     },
     "slides": {
       "1": {
@@ -527,7 +477,7 @@
       "coffee": "Kahve",
       "food": "Yemek",
       "culture": "Kültür",
-      "tours": "Keşif",
+      "tours": "Turlar",
       "nightlife": "Gece Hayatı",
       "shopping": "Alışveriş",
       "music": "Müzik",
@@ -574,8 +524,8 @@
     "notifications": "Bildirimler",
     "markAllAsRead": "Tümünü Okundu İşaretle",
     "noNotifications": "Bildirim yok",
-    "newRequest": "Yeni eşleşme talebi",
-    "requestConfirmed": "Talep onaylandı",
+    "newBooking": "Yeni eşleşme talebi",
+    "bookingConfirmed": "Talep onaylandı",
     "newMessage": "{{name}} adlı kişiden yeni mesaj",
     "momentLiked": "{{name}} anınızı beğendi",
     "newReview": "{{name}} adlı kişiden yeni yorum"
@@ -839,9 +789,9 @@
     "failed": "{{count}} kez başarısız oldu"
   },
   "emptyState": {
-    "noMomentsNearby": "Burada henüz bir moment yok.",
-    "tryIncreasingDistance": "Bugün ne yaşamak istiyorsun? İlk moment’i sen başlat.",
-    "createMoment": "İlk moment’ini oluştur",
+    "noMomentsNearby": "Bu civarda henüz an yok 🗺️",
+    "tryIncreasingDistance": "Mesafe filtreni artırmayı dene veya\nyeni bir an başlatan ilk sen ol!",
+    "createMoment": "An Oluştur",
     "discoveringMoments": "Anlar keşfediliyor...",
     "tapToRetry": "Yeniden denemek için dokun"
   },

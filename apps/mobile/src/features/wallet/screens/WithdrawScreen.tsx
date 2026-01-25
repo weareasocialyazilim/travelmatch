@@ -45,7 +45,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showAlert } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
-import { showLoginPrompt } from '@/stores/modalStore';
 
 // Withdrawal Rate: 1 Coin = 1.00 TRY (As per Financial Constitution)
 const COIN_TO_TRY_RATE = 1.0;
@@ -418,7 +417,7 @@ const AmountInput: React.FC<{
 
 const WithdrawScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { user, isGuest } = useAuth();
+  const { user } = useAuth();
 
   // Security: Prevent screenshots during withdrawal
   useScreenSecurity();
@@ -440,15 +439,6 @@ const WithdrawScreen: React.FC = () => {
   // ─────────────────────────────────────────────────────────────────
   // Data Fetching - MOVED BEFORE EARLY RETURN (Rules of Hooks)
   // ─────────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (isGuest) {
-      showLoginPrompt({ action: 'default' });
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
-    }
-  }, [isGuest, navigation]);
 
   const fetchData = useCallback(async () => {
     if (!user?.id || !canWithdraw) return;

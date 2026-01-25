@@ -27,7 +27,7 @@ import {
 } from '@/services/notificationService';
 
 /**
- * Standardında Bildirim Merkezi.
+ * Awwwards standardında Bildirim Merkezi.
  * Gerçek backend verilerini kullanan liste yapısı.
  * Her bildirim bir "aktivite kartı" olarak tasarlandı.
  */

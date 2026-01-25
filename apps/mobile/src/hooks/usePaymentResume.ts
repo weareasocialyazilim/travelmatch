@@ -16,7 +16,7 @@
  * function PaymentFlow() {
  *   const { savePendingPayment, clearPendingPayment } = usePaymentResume();
  *
- *   // Before navigating to purchase flow
+ *   // Before navigating to PayTR WebView
  *   await savePendingPayment({
  *     merchantOid: 'order_123',
  *     amount: 99.99,
@@ -243,9 +243,8 @@ export function usePaymentResume(options?: {
 
         navigation.navigate('Success', {
           type: 'gift_sent',
-          title: 'Hediye Gönderildi',
-          subtitle:
-            'Ödeme emanet hesabında. Kanıt onaylanınca alıcıya aktarılır.',
+          title: 'Ödeme Başarılı!',
+          subtitle: 'Hediyeniz başarıyla gönderildi.',
           details: {
             amount: pendingPayment.amount,
             referenceId: pendingPayment.merchantOid,

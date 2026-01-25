@@ -9,7 +9,6 @@ import {
   type Database,
 } from '../../config/supabase';
 import { logger } from '../../utils/logger';
-import { SUBSCRIPTION_PLANS } from '../../features/payments/constants/plans';
 import type {
   Tables,
   DbResult,
@@ -467,31 +466,7 @@ export const subscriptionsService = {
 
       if (error) throw error;
       return okList<any>(data || [], data?.length);
-    } catch (error: any) {
-      const errorMessage = String(error?.message || '');
-      const errorCode = String(error?.code || '');
-      const isPermissionDenied =
-        errorCode === '42501' ||
-        errorMessage.toLowerCase().includes('permission denied');
-
-      if (isPermissionDenied) {
-        const fallbackPlans = SUBSCRIPTION_PLANS.map((plan) => ({
-          id: plan.id,
-          name: plan.name,
-          price: plan.price,
-          interval: plan.interval,
-          features: plan.features?.map((feature) => feature.text) || [],
-          is_popular: !!plan.popular,
-          color: plan.color,
-          icon: plan.icon,
-          is_active: true,
-          created_at: null,
-        }));
-
-        logger.warn('[DB] Get plans permission denied, using fallback.');
-        return okList<any>(fallbackPlans, fallbackPlans.length);
-      }
-
+    } catch (error) {
       logger.error('[DB] Get plans error:', error);
       return { data: [], count: 0, error: error as Error };
     }

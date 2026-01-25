@@ -156,7 +156,7 @@ export const STORE_METADATA = {
         type: 'Payment Info',
         purpose: 'Purchases',
         shared: true,
-        processor: 'Apple/Google IAP',
+        processor: 'PayTR',
       },
       { type: 'Messages', purpose: 'App Functionality', shared: false },
     ],
@@ -167,7 +167,7 @@ export const STORE_METADATA = {
       'Independent security review',
     ],
     thirdPartyServices: [
-      { name: 'PayTR', purpose: 'Withdrawal processing' },
+      { name: 'PayTR', purpose: 'Payment processing' },
       { name: 'Supabase', purpose: 'Database and authentication' },
       { name: 'Mapbox', purpose: 'Maps and location' },
       { name: 'Sentry', purpose: 'Error tracking' },
@@ -187,7 +187,7 @@ ${changes.map((change) => `• ${change}`).join('\n')}
     version: '1.0.0',
     changes: [
       'Initial release',
-      'Discover and share moments',
+      'Discover and share travel moments',
       'Secure gift system with escrow protection',
       'Real-time encrypted messaging',
       'KYC verification for trusted hosts',
@@ -200,7 +200,7 @@ ${changes.map((change) => `• ${change}`).join('\n')}
 export const generateFullDescription = (): string => {
   const { features } = STORE_METADATA;
 
-  return `${STORE_METADATA.appName} connects travelers through unique experiences. Share your moments, discover local guides, and create unforgettable memories.
+  return `${STORE_METADATA.appName} connects travelers through unique experiences. Share your travel moments, discover local guides, and create unforgettable memories.
 
 KEY FEATURES:
 
@@ -212,7 +212,7 @@ ${f.description}`,
   .join('\n\n')}
 
 WHY LOVENDO?
-We believe the best experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, Lovendo brings people together.
+We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, Lovendo brings people together.
 
 Download now and start your journey!`;
 };

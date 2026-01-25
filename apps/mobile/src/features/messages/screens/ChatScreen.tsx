@@ -17,8 +17,6 @@ import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { NetworkGuard } from '../../../components/NetworkGuard';
-import { useAuth } from '@/hooks/useAuth';
-import { showLoginPrompt } from '@/stores/modalStore';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'Chat'>;
 type ChatScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Chat'>;
@@ -27,7 +25,6 @@ const ChatScreen: React.FC = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation<ChatScreenNavigationProp>();
   const { otherUser, conversationId } = route.params;
-  const { isGuest } = useAuth();
 
   // Escrow logic: System automatically verifies proof
   const isSender = true; // In real app: check if currentUserId === chat.senderId
@@ -60,15 +57,6 @@ const ChatScreen: React.FC = () => {
     isSender,
     proofStatus,
   });
-
-  const requireLogin = useCallback(
-    (action: 'chat' | 'chat_unlock' | 'default' = 'chat') => {
-      if (!isGuest) return true;
-      showLoginPrompt({ action });
-      return false;
-    },
-    [isGuest],
-  );
 
   const renderMessage = useCallback(
     ({ item }: { item: Message }) => (
@@ -183,18 +171,10 @@ const ChatScreen: React.FC = () => {
             currentUserId={otherUser.id}
             messageText={messageText}
             onTextChange={setMessageText}
-            onSend={() => {
-              if (!requireLogin('chat')) return;
-              handleSend();
-            }}
-            onAttachPress={() => {
-              if (!requireLogin('chat')) return;
-              setShowAttachmentSheet(true);
-            }}
+            onSend={handleSend}
+            onAttachPress={() => setShowAttachmentSheet(true)}
             isTyping={isAnyoneTyping}
             isSending={isSending}
-            isDisabled={isGuest}
-            onDisabledPress={() => requireLogin('chat')}
           />
         </KeyboardAvoidingView>
 
@@ -202,19 +182,15 @@ const ChatScreen: React.FC = () => {
           visible={showAttachmentSheet}
           onClose={() => setShowAttachmentSheet(false)}
           onPhotoVideo={handlePhotoVideo}
-          onGift={() => {
-            if (!requireLogin('chat')) return;
-            handleGift(navigation);
-          }}
+          onGift={() => handleGift(navigation)}
         />
 
         <ReportBlockBottomSheet
           visible={showChatOptions}
           onClose={() => setShowChatOptions(false)}
-          onSubmit={(action, reason, details) => {
-            if (!requireLogin('chat')) return;
-            handleChatAction(action, reason ?? '', details ?? '', navigation);
-          }}
+          onSubmit={(action, reason, details) =>
+            handleChatAction(action, reason ?? '', details ?? '', navigation)
+          }
           targetType="user"
         />
       </SafeAreaView>

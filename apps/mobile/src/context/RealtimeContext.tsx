@@ -151,6 +151,13 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const typingDebounceRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
+  // Exponential backoff state for reconnection
+  const reconnectAttemptRef = useRef<number>(0);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const MAX_RECONNECT_ATTEMPTS = 10;
+  const BASE_DELAY_MS = 1000;
+  const MAX_DELAY_MS = 30000;
+
   // Derived state
   const isConnected = connectionState === 'connected';
 
@@ -362,6 +369,8 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       subscribeToUserStatus();
 
       setConnectionState('connected');
+      // Reset reconnect counter on successful connection
+      reconnectAttemptRef.current = 0;
       logger.info('RealtimeContext', 'Connected to Supabase Realtime');
     } catch (error) {
       logger.error('RealtimeContext', 'Failed to connect:', error);
@@ -389,14 +398,72 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   /**
-   * Force reconnect
+   * Calculate delay with exponential backoff and jitter
+   * Prevents reconnect storm when multiple clients reconnect simultaneously
+   */
+  const calculateReconnectDelay = useCallback((attempt: number): number => {
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
+    const exponentialDelay = Math.min(
+      BASE_DELAY_MS * Math.pow(2, attempt),
+      MAX_DELAY_MS
+    );
+    // Add jitter: +/- 25% randomization to prevent thundering herd
+    const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1);
+    return Math.round(exponentialDelay + jitter);
+  }, []);
+
+  /**
+   * Force reconnect with exponential backoff and jitter
+   * Prevents reconnect storm when network issues occur
    */
   const reconnect = useCallback(() => {
+    // Clear any pending reconnect
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    // Check if we've exceeded max attempts
+    if (reconnectAttemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
+      logger.error(
+        'RealtimeContext',
+        `Max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) exceeded`
+      );
+      setConnectionState('disconnected');
+      return;
+    }
+
     disconnect();
-    setTimeout(() => {
-      void connect();
-    }, 1000);
-  }, [disconnect, connect]);
+    setConnectionState('reconnecting');
+
+    const delay = calculateReconnectDelay(reconnectAttemptRef.current);
+    reconnectAttemptRef.current += 1;
+
+    logger.info(
+      'RealtimeContext',
+      `Reconnecting in ${delay}ms (attempt ${reconnectAttemptRef.current}/${MAX_RECONNECT_ATTEMPTS})`
+    );
+
+    reconnectTimeoutRef.current = setTimeout(() => {
+      void connect().then(() => {
+        // Reset attempt counter on successful connection
+        if (connectionState === 'connected') {
+          reconnectAttemptRef.current = 0;
+        }
+      });
+    }, delay);
+  }, [disconnect, connect, connectionState, calculateReconnectDelay]);
+
+  /**
+   * Reset reconnect state (call after successful connection)
+   */
+  const resetReconnectState = useCallback(() => {
+    reconnectAttemptRef.current = 0;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+  }, []);
 
   /**
    * Subscribe to an event

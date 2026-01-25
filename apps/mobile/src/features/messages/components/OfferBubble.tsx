@@ -1,14 +1,14 @@
 /**
- * OfferBubble - Gift Offer Card (LVND Coin Transfer)
+ * OfferBubble - Gift Offer Card with PayTR Integration
  *
- * APPLE IAP COMPLIANT: All purchases via RevenueCat/IAP
- * Offers are now LVND coin transfers, not direct payments.
+ * ELEVATED: Accept button triggers PayTR Pre-authorization WebView
+ * Legal: Turkey regulations require escrow before funds release
  *
  * Features:
  * - Liquid Platinum styling for high-value offers
- * - Direct LVND coin transfer on acceptance
+ * - PayTR WebView flow on acceptance
  * - Haptic feedback on interactions
- * - Confetti animation on successful transfer
+ * - Confetti animation on successful payment
  */
 
 import React, { useState } from 'react';
@@ -17,11 +17,13 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { WebView } from 'react-native-webview';
 import { COLORS } from '@/constants/colors';
 import { HapticManager } from '@/services/HapticManager';
 import type { OfferStatus } from '@/types/message.types';
@@ -36,11 +38,13 @@ interface OfferBubbleProps {
   momentTitle?: string;
   momentId?: string;
   giftOfferId?: string;
+  /** PayTR iframe token for pre-authorization */
+  paytrToken?: string;
   onAccept?: () => void;
   onDecline?: () => void;
-  /** Called when coin transfer completes successfully */
+  /** Called when PayTR WebView completes successfully */
   onPaymentSuccess?: () => void;
-  /** Called when coin transfer fails */
+  /** Called when PayTR WebView fails or is cancelled */
   onPaymentFailure?: (error?: string) => void;
   isOwn?: boolean;
   /** Is user a high-value subscriber (Platinum styling) */
@@ -54,13 +58,15 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
   momentTitle,
   momentId: _momentId,
   giftOfferId: _giftOfferId,
+  paytrToken,
   onAccept,
   onDecline,
-  onPaymentSuccess: _onPaymentSuccess,
-  onPaymentFailure: _onPaymentFailure,
+  onPaymentSuccess,
+  onPaymentFailure,
   isOwn = false,
   isPlatinumUser = false,
 }) => {
+  const [showPayTRWebView, setShowPayTRWebView] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const currencySymbol =
@@ -68,20 +74,50 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
   const isPlatinumOffer = amount >= PLATINUM_THRESHOLD || isPlatinumUser;
 
   /**
-   * Handle Accept - Direct LVND coin transfer
-   * APPLE IAP COMPLIANT: Uses pre-purchased LVND coins
+   * Handle Accept - Trigger PayTR Pre-authorization
+   * Legal requirement: Funds held in escrow until moment completion
    */
   const handleAccept = async () => {
     HapticManager.paymentInitiated();
-    setIsProcessing(true);
-    // Direct accept - LVND coin transfer handled by backend
-    onAccept?.();
-    setIsProcessing(false);
+
+    if (paytrToken) {
+      // Open PayTR WebView for pre-authorization
+      setShowPayTRWebView(true);
+    } else {
+      // Legacy flow - direct accept
+      onAccept?.();
+    }
   };
 
   const handleDecline = () => {
     HapticManager.buttonPress();
     onDecline?.();
+  };
+
+  /**
+   * Handle PayTR WebView navigation
+   * Success: https://www.paytr.com/odeme/basarili
+   * Failure: https://www.paytr.com/odeme/hata
+   */
+  const handlePayTRNavigation = (navState: { url: string }) => {
+    if (
+      navState.url.includes('/odeme/basarili') ||
+      navState.url.includes('success')
+    ) {
+      setShowPayTRWebView(false);
+      setIsProcessing(false);
+      // Trigger success celebration
+      HapticManager.paymentComplete();
+      onPaymentSuccess?.();
+    } else if (
+      navState.url.includes('/odeme/hata') ||
+      navState.url.includes('error')
+    ) {
+      setShowPayTRWebView(false);
+      setIsProcessing(false);
+      HapticManager.paymentFailed();
+      onPaymentFailure?.('Ödeme işlemi başarısız');
+    }
   };
 
   const getStatusConfig = () => {
@@ -150,7 +186,7 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
     );
   }
 
-  // Received offer - with actions and LVND coin transfer
+  // Received offer - with actions and PayTR integration
   return (
     <Animated.View entering={FadeInUp} style={styles.offerContainer}>
       <LinearGradient
@@ -249,6 +285,61 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
           </View>
         )}
       </LinearGradient>
+
+      {/* PayTR Pre-authorization WebView Modal */}
+      <Modal
+        visible={showPayTRWebView}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => {
+          setShowPayTRWebView(false);
+          onPaymentFailure?.('Ödeme iptal edildi');
+        }}
+      >
+        <View style={styles.webViewContainer}>
+          <View style={styles.webViewHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                setShowPayTRWebView(false);
+                onPaymentFailure?.('Ödeme iptal edildi');
+              }}
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.primary}
+              />
+            </TouchableOpacity>
+            <Text style={styles.webViewTitle}>Güvenli Ödeme</Text>
+            <MaterialCommunityIcons
+              name="lock"
+              size={20}
+              color={COLORS.feedback.success}
+            />
+          </View>
+          {paytrToken && (
+            <WebView
+              source={{
+                uri: `https://www.paytr.com/odeme/guvenli/${paytrToken}`,
+              }}
+              onNavigationStateChange={handlePayTRNavigation}
+              style={styles.webView}
+              startInLoadingState
+              renderLoading={() => (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator
+                    size="large"
+                    color={COLORS.brand.primary}
+                  />
+                  <Text style={styles.loadingText}>
+                    PayTR'a bağlanılıyor...
+                  </Text>
+                </View>
+              )}
+            />
+          )}
+        </View>
+      </Modal>
     </Animated.View>
   );
 };
@@ -435,6 +526,45 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+
+  // PayTR WebView styles
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background.primary,
+  },
+  webViewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
+    backgroundColor: COLORS.background.secondary,
+  },
+  webViewTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  webView: {
+    flex: 1,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.primary,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: COLORS.text.secondary,
   },
 });
 

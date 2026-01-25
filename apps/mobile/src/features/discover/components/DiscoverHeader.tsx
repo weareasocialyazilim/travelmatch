@@ -1,7 +1,7 @@
 /**
  * DiscoverHeader Component
  *
- * Standardında Discover Header.
+ * Awwwards standardında Discover Header.
  * Minimalist hiyerarşi ve premium boşluk kullanımı.
  *
  * 40+ yaş: Yüksek okunabilirlik, net hiyerarşi
@@ -28,6 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
+import { useSmartMicrocopy } from '@/hooks/useSmartMicrocopy';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -162,6 +163,90 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// AWWWARDS STYLE HEADER - Premium Discover Experience
+// ═══════════════════════════════════════════════════════════════════
+
+interface AwwwardsDiscoverHeaderProps {
+  /** User's name for greeting */
+  userName?: string;
+  /** User's avatar URL */
+  userAvatar?: string;
+  /** Greeting text (auto-detected by time if not provided) */
+  greeting?: string;
+  /** Notification count (shows dot if > 0) */
+  notificationCount?: number;
+  /** Active filters count (shows badge if > 0) */
+  activeFiltersCount?: number;
+  /** Callback when notifications are pressed */
+  onNotificationsPress?: () => void;
+  /** Callback when filter is pressed */
+  onFilterPress?: () => void;
+  /** Callback when avatar is pressed */
+  onAvatarPress?: () => void;
+}
+
+// Time-based greeting is handled by useSmartMicrocopy hook
+
+/**
+ * AwwwardsDiscoverHeader - Awwwards standardında premium header
+ *
+ * Minimalist hiyerarşi ve premium boşluk kullanımı.
+ * 40+ yaş için okunabilirlik, GenZ için estetik derinlik.
+ */
+export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
+  userName,
+  userAvatar: _userAvatar,
+  greeting: _customGreeting,
+  notificationCount: _notificationCount = 0,
+  activeFiltersCount: _activeFiltersCount = 0,
+  onNotificationsPress: _onNotificationsPress,
+  onFilterPress: _onFilterPress,
+  onAvatarPress: _onAvatarPress,
+}) => {
+  const insets = useSafeAreaInsets();
+
+  // Smart micro-copy based on context
+  const { greeting, subtext } = useSmartMicrocopy({
+    userName: userName || 'Explorer',
+    city: 'şehir', // Location feature planned for v1.1
+  });
+
+  return (
+    <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
+      {/* Smart greeting */}
+      <Text style={awwwardsStyles.greeting}>{greeting}</Text>
+      {subtext && <Text style={awwwardsStyles.subtext}>{subtext}</Text>}
+    </View>
+  );
+};
+
+const awwwardsStyles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    backgroundColor: COLORS.bg.primary,
+  },
+  greeting: {
+    fontSize: 18,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    letterSpacing: -0.3,
+    textAlign: 'center',
+  },
+  subtext: {
+    fontSize: 14,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    fontWeight: '400',
+    color: COLORS.text.secondary,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // LEGACY HEADERS - Backward Compatibility
 // ═══════════════════════════════════════════════════════════════════
 
@@ -170,111 +255,66 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
  */
 export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   location,
-  locationDisabled = false,
-  locationDisabledMessage = 'Konum değiştirme Premium üyelikte aktif.',
   activeFiltersCount,
   onLocationPress,
   onFilterPress,
-  viewMode,
-  onToggleView,
-}) => {
-  const insets = useSafeAreaInsets();
+}) => (
+  <View style={styles.header}>
+    {/* Location Selector */}
+    <TouchableOpacity
+      style={styles.locationSelector}
+      onPress={onLocationPress}
+      activeOpacity={0.7}
+    >
+      <MaterialCommunityIcons
+        name="map-marker"
+        size={18}
+        color={COLORS.brand.primary}
+      />
+      <Text style={styles.locationText} numberOfLines={1}>
+        {location}
+      </Text>
+      <MaterialCommunityIcons
+        name="chevron-down"
+        size={18}
+        color={COLORS.text.secondary}
+      />
+    </TouchableOpacity>
 
-  return (
-    <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-      {/* Location Selector */}
+    {/* Right Controls */}
+    <View style={styles.headerControls}>
+      {/* Filter Button */}
       <TouchableOpacity
-        style={[
-          styles.locationSelector,
-          locationDisabled && styles.locationSelectorDisabled,
-        ]}
-        onPress={onLocationPress}
-        activeOpacity={locationDisabled ? 1 : 0.7}
-        disabled={locationDisabled}
+        style={styles.controlButton}
+        onPress={onFilterPress}
+        activeOpacity={0.7}
       >
         <MaterialCommunityIcons
-          name="map-marker"
-          size={18}
-          color={locationDisabled ? COLORS.text.muted : COLORS.brand.primary}
+          name="filter-variant"
+          size={22}
+          color={COLORS.text.primary}
         />
-        <Text style={styles.locationText} numberOfLines={1}>
-          {location}
-        </Text>
-        <MaterialCommunityIcons
-          name={locationDisabled ? 'lock' : 'chevron-down'}
-          size={18}
-          color={locationDisabled ? COLORS.text.muted : COLORS.utility.white}
-        />
-      </TouchableOpacity>
-      {locationDisabled ? (
-        <Text style={styles.locationDisabledText} numberOfLines={1}>
-          {locationDisabledMessage}
-        </Text>
-      ) : null}
-
-      {/* Right Controls */}
-      <View style={styles.headerControls}>
-        {/* Filter Button */}
-        <TouchableOpacity
-          style={styles.controlButton}
-          onPress={onFilterPress}
-          activeOpacity={0.7}
-        >
-          <MaterialCommunityIcons
-            name="filter-variant"
-            size={22}
-            color={COLORS.utility.white}
-          />
-          {(activeFiltersCount ?? 0) > 0 && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {onToggleView && (
-          <TouchableOpacity
-            style={styles.controlButton}
-            onPress={onToggleView}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel={
-              viewMode === 'grid'
-                ? 'Liste görünümüne geç'
-                : 'Grid görünümüne geç'
-            }
-          >
-            <MaterialCommunityIcons
-              name={
-                viewMode === 'grid'
-                  ? 'view-agenda-outline'
-                  : 'view-grid-outline'
-              }
-              size={20}
-              color={COLORS.utility.white}
-            />
-          </TouchableOpacity>
+        {(activeFiltersCount ?? 0) > 0 && (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
+          </View>
         )}
-      </View>
+      </TouchableOpacity>
     </View>
-  );
-};
+  </View>
+);
 
 const styles = StyleSheet.create({
   // Legacy header styles
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(8, 8, 10, 0.35)',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    paddingTop: 48,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: COLORS.utility.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.default,
   },
   locationSelector: {
     flexDirection: 'row',
@@ -282,23 +322,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 16,
   },
-  locationSelectorDisabled: {
-    opacity: 0.5,
-  },
   locationText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: COLORS.utility.white,
+    color: COLORS.text.primary,
     marginLeft: 6,
     marginRight: 2,
     flexShrink: 1,
-  },
-  locationDisabledText: {
-    position: 'absolute',
-    left: 16,
-    top: 58,
-    fontSize: 12,
-    color: COLORS.text.muted,
   },
   headerControls: {
     flexDirection: 'row',
@@ -309,11 +339,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   filterBadge: {
     position: 'absolute',

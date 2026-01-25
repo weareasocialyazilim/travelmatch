@@ -1,5 +1,5 @@
 /**
- * Lovendo Edition - Requests Screen
+ * Lovendo Awwwards Edition - Requests Screen
  * Gelen teklifleri ve giden istekleri ipeksi bir hiyerarşiyle listeler.
  */
 import React, { useCallback } from 'react';

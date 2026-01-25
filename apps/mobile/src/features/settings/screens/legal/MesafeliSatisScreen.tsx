@@ -73,7 +73,7 @@ Ad Soyad, adres ve iletişim bilgileri sipariş sırasında alınmaktadır.`,
 
 HİZMET TANIMI: Anı Paylaşımı ve Dijital Hediye Aracılığı
 
-Platform, kullanıcıların birbirlerine anı bazlı hediyeler göndermesini sağlayan bir dijital aracı hizmet sunmaktadır. Hediye tutarı LVND coin üzerinden yürütülür; kullanıcılar arası doğrudan para transferi yapılmaz.`,
+Platform, kullanıcıların birbirlerine anı bazlı hediyeler göndermesini sağlayan bir dijital aracı hizmet sunmaktadır. Hediye tutarı, PayTR ödeme altyapısı üzerinden alıcının deneyimi gerçekleştirip kanıt yüklemesine kadar güvenli şekilde (escrow) tutulmaktadır.`,
   },
   {
     id: 'hizmet_bilgileri',
@@ -81,10 +81,10 @@ Platform, kullanıcıların birbirlerine anı bazlı hediyeler göndermesini sa�
     content: `3.1. Hizmet Tanımı: Anı Paylaşımı ve Dijital Hediye Aracılığı Hizmeti
 
 3.2. Hizmet Özellikleri:
-- Hediye tutarı LVND coin ile gerçekleşir
+- Hediye tutarı PayTR escrow sisteminde güvenle tutulur
 - Alıcı deneyimi gerçekleştirip fotoğraflı kanıt yükler
-- Kanıt, topluluk güveni ve hizmet kalitesi için kullanılır
-- Kullanıcılar arası nakit transfer yapılmaz
+- Kanıt onaylandıktan sonra tutar PayTR üzerinden alıcıya aktarılır
+- 7 gün içinde kanıt yüklenmezse tutar iade edilir
 
 3.3. Fiyat Bilgisi:
 - Hediye tutarı: Sipariş anında belirlenir
@@ -92,19 +92,20 @@ Platform, kullanıcıların birbirlerine anı bazlı hediyeler göndermesini sa�
 - KDV: Komisyona dahildir
 - Toplam ödeme: Sipariş özetinde gösterilir
 
-3.4. Ödeme Şekli: Apple App Store / Google Play In‑App Purchase
+3.4. Ödeme Şekli: PayTR altyapısı ile Kredi kartı / Banka kartı (3D Secure)
 
-3.5. Ödeme Hizmet Sağlayıcısı: Apple / Google`,
+3.5. Ödeme Hizmet Sağlayıcısı: PayTR Ödeme ve Elektronik Para Kuruluşu A.Ş.`,
   },
   {
     id: 'teslimat',
     title: 'MADDE 4 – TESLİMAT',
     content: `4.1. Dijital Hizmet Teslimatı:
-Hediye bildirimi, coin işlemi tamamlandıktan hemen sonra alıcıya iletilir.
+Hediye bildirimi, PayTR üzerinden ödeme onaylandıktan hemen sonra alıcıya iletilir.
 
-4.2. İşlem Süreci:
+4.2. Para Transferi Süreci:
+- Escrow süresi: 7 gün (kullanıcı güven puanına göre değişebilir)
 - Kanıt onay süresi: 24-72 saat
-- Kullanıcılar arası nakit transfer yapılmaz
+- PayTR banka transferi: 1-2 iş günü
 
 4.3. Teslimat Adresi:
 Dijital hizmet olduğundan fiziksel teslimat adresi gerekmemektedir.`,
@@ -117,7 +118,7 @@ Dijital hizmet olduğundan fiziksel teslimat adresi gerekmemektedir.`,
 5.2. Cayma Hakkının Kullanılamayacağı Durumlar:
 - Hediye alıcısı deneyimi gerçekleştirmeye başlamışsa
 - Kanıt yüklenmiş ve onaylanmışsa
-- Kanıt yüklenmiş ve onaylanmışsa
+- Escrow süresi dolmuş ve PayTR transferi gerçekleşmişse
 
 5.3. Cayma Hakkı Kullanımı:
 Cayma hakkını kullanmak için:
@@ -127,7 +128,7 @@ c) KEP: ${COMPANY_INFO.kep}
 yollarından biriyle bildirimde bulunabilirsiniz.
 
 5.4. İade Süreci:
-Cayma hakkı kullanıldığında, iade süreçleri Apple/Google mağaza politikalarına göre yürütülür.`,
+Cayma hakkı kullanıldığında, PayTR üzerinden aynı ödeme yöntemiyle 14 gün içinde iade edilir.`,
   },
   {
     id: 'garanti',
@@ -135,7 +136,8 @@ Cayma hakkı kullanıldığında, iade süreçleri Apple/Google mağaza politika
     content: `6.1. Dijital hizmetlerde yasal garanti süresi yoktur.
 
 6.2. Platform Güvenceleri:
-- IAP üzerinden güvenli satın alma
+- PayTR escrow sistemi ile ödeme güvenliği
+- 7 gün içinde kanıt yüklenmezse tam iade
 - İtiraz ve şikayet mekanizması
 - Müşteri destek hizmeti
 

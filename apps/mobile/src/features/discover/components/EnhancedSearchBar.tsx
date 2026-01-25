@@ -4,7 +4,7 @@
  * Modern Discovery search bar with Liquid Glass effect.
  * Features integrated filter button and smooth transitions.
  *
- * Part of the Standard Discovery experience.
+ * Part of the Awwwards-standard Discovery experience.
  */
 import React, { useState, useCallback } from 'react';
 import {

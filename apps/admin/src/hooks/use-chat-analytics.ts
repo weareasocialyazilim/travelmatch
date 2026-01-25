@@ -163,7 +163,7 @@ const mockActiveConversations: ActiveConversation[] = [
   {
     id: 'CONV-001',
     participants: ['Ahmet K.', 'Ayse M.'],
-    moment: 'Kapadokya Balloon Experience',
+    moment: 'Kapadokya Balloon Tour',
     giftAmount: 2450,
     messages: 24,
     lastActivity: '2 dk once',
@@ -183,7 +183,7 @@ const mockActiveConversations: ActiveConversation[] = [
   {
     id: 'CONV-003',
     participants: ['Can B.', 'Deniz K.'],
-    moment: 'Istanbul Food Experience',
+    moment: 'Istanbul Food Tour',
     giftAmount: 950,
     messages: 12,
     lastActivity: '12 dk once',

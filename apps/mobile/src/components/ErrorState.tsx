@@ -42,7 +42,7 @@ interface ErrorStateProps {
 }
 
 /**
- * Standardında Hata Durum Ekranı - "Premium Error State"
+ * Awwwards standardında Hata Durum Ekranı - "Premium Error State"
  * Dating & Gifting Platform Master 2026 Edition
  *
  * Kriz Yönetimi: Hata anlarını bir hayal kırıklığı olmaktan çıkarıp,

@@ -69,13 +69,9 @@ export interface DiscoverHeaderProps {
   userName?: string;
   userAvatar?: string;
   location?: string;
-  locationDisabled?: boolean;
-  locationDisabledMessage?: string;
   activeFiltersCount?: number;
   onLocationPress?: () => void;
   onFilterPress?: () => void;
-  viewMode?: 'immersive' | 'grid';
-  onToggleView?: () => void;
 }
 
 // =============================================================================
@@ -122,10 +118,6 @@ export interface GridCardProps {
   index: number;
   /** Press handler for the card */
   onPress: (item: MomentCardProps) => void;
-  /** Optional formatted price for display */
-  priceDisplay?: string;
-  /** Optional secondary price (e.g., original currency) */
-  priceSecondary?: string;
 }
 
 // =============================================================================

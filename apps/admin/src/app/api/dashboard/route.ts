@@ -92,11 +92,15 @@ export async function GET(request: NextRequest) {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending'),
 
-      // Revenue calculation from payments
+      // Revenue calculation from payments (last 6 months only for performance)
       supabase
         .from('payments')
         .select('amount, status, created_at')
-        .eq('status', 'completed'),
+        .eq('status', 'completed')
+        .gte(
+          'created_at',
+          new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+        ),
 
       // Recent users for activity chart (last 30 days)
       supabase
@@ -118,8 +122,14 @@ export async function GET(request: NextRequest) {
         )
         .order('created_at', { ascending: true }),
 
-      // System health check - count active sessions
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      // Active users in last 24h (from activity_logs)
+      supabase
+        .from('activity_logs')
+        .select('user_id', { count: 'exact', head: false })
+        .gte(
+          'created_at',
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        ),
     ]);
 
     // Calculate revenue
@@ -155,8 +165,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(20);
 
-    // System health metrics
-    const activeUsers24h = systemHealthResult.count || 0;
+    // System health metrics - count distinct active users from activity_logs
+    const activeUserIds = new Set(
+      (systemHealthResult.data || []).map((r: { user_id: string }) => r.user_id)
+    );
+    const activeUsers24h = activeUserIds.size;
     const totalUsers = usersResult.count || 0;
     const engagementRate =
       totalUsers > 0 ? Math.round((activeUsers24h / totalUsers) * 100) : 0;

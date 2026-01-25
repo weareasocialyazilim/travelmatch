@@ -1,7 +1,7 @@
 /**
  * DiscoverScreen - Lovendo: The Rebirth
  *
- * Standardında keşfet ekranı.
+ * Awwwards standardında keşfet ekranı.
  * "Soft Minimalist & Premium" tasarım diliyle güncellendi.
  *
  * Features:
@@ -33,7 +33,6 @@ import {
 import { logger } from '@/utils/logger';
 import { FlashList } from '@shopify/flash-list';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -41,14 +40,12 @@ import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monit
 import { ReportBlockBottomSheet } from '@/features/moderation/components/ReportBlockBottomSheet';
 import {
   ImmersiveMomentCard,
-  GridMomentCard,
-  DiscoverHeader,
+  AwwwardsDiscoverHeader,
   StoriesRow,
   StoryViewer,
   type UserStory,
   type Story,
 } from '../components';
-import type { MomentCardProps } from '../components/types';
 // Note: FloatingDock is now rendered by MainTabNavigator
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
@@ -66,32 +63,22 @@ import {
   ContentReactiveGlow,
   LocationPermissionPrompt,
 } from '@/components/ui';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { LocationModal } from '../components/LocationModal';
 import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
 import { useSearchStore } from '@/stores/searchStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { useContentReactiveGlow } from '@/hooks/useContentReactiveGlow';
-import { supabase } from '@/services/supabase';
-import { DEFAULT_CURRENCY } from '@/constants/currencies';
-import type { CurrencyCode } from '@/constants/currencies';
-import { formatPriceDisplay } from '@/utils/currencyFormatter';
-import type { DiscoveryMoment } from '@/services/discoveryService';
-import type { Moment as DomainMoment } from '@/types';
 
 const { height } = Dimensions.get('window');
 
 const DiscoverScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const insets = useSafeAreaInsets();
   const flashListRef = useRef<FlashList<Moment>>(null);
-  const { user, isGuest } = useAuth();
 
   // Search store for filters - connects to useDiscoverMoments
-  const { setFilters, filters: searchFilters } = useSearchStore();
+  const { setFilters } = useSearchStore();
 
   // Content-reactive glow system
   const { glowColors, glowOpacity, updateGlowFromImage } =
@@ -100,13 +87,6 @@ const DiscoverScreen = () => {
   // Filter modal state
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterValues | null>(null);
-  const [viewMode, setViewMode] = useState<'immersive' | 'grid'>('immersive');
-  const [userCurrency, setUserCurrency] =
-    useState<CurrencyCode>(DEFAULT_CURRENCY);
-  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({
-    TRY: 1,
-  });
-  const [selectedCity, setSelectedCity] = useState('');
 
   // StoryViewer state
   const [storyViewerVisible, setStoryViewerVisible] = useState(false);
@@ -116,53 +96,6 @@ const DiscoverScreen = () => {
     const endMeasurement = measureScreenLoad('DiscoverScreen');
     return endMeasurement;
   }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadCurrencyPreferences = async () => {
-      try {
-        if (user?.id) {
-          const { data: preference, error: preferenceError } = await supabase
-            .from('user_currency_preferences')
-            .select('preferred_currency')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          const preferredCurrency = (
-            preference as { preferred_currency?: string | null } | null
-          )?.preferred_currency;
-
-          if (!preferenceError && preferredCurrency && isMounted) {
-            setUserCurrency(preferredCurrency as CurrencyCode);
-          }
-        }
-
-        const { data: rates, error: ratesError } = await supabase
-          .from('exchange_rates')
-          .select('from_currency, to_currency, rate')
-          .eq('from_currency', 'TRY');
-
-        if (!ratesError && isMounted) {
-          const nextRates: Record<string, number> = { TRY: 1 };
-          (
-            (rates as Array<{ to_currency: string; rate: number }> | null) || []
-          ).forEach((rate) => {
-            nextRates[rate.to_currency] = rate.rate;
-          });
-          setExchangeRates(nextRates);
-        }
-      } catch (error) {
-        logger.error('Currency preference load failed', error);
-      }
-    };
-
-    loadCurrencyPreferences();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.id]);
   const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
     null,
   );
@@ -177,54 +110,20 @@ const DiscoverScreen = () => {
     refresh,
     loadMore,
     hasMore,
-    userLocation,
+    userLocation: _userLocation,
     locationPermission,
   } = useDiscoverMoments();
 
-  const normalizeDiscoveryMoment = useCallback(
-    (moment: DiscoveryMoment): Moment => ({
-      id: moment.id,
-      title: moment.title || '',
-      description: moment.description || '',
-      category: 'other',
-      location: moment.location?.name || 'Unknown Location',
-      images: moment.imageUrl ? [moment.imageUrl] : [],
-      image: moment.imageUrl || undefined,
-      pricePerGuest: moment.requestedAmount || 0,
-      price: moment.requestedAmount || 0,
-      currency: moment.currency || DEFAULT_CURRENCY,
-      maxGuests: 1,
-      duration: '1h',
-      availability: [],
-      distance:
-        typeof moment.distance === 'number'
-          ? `${moment.distance.toFixed(1)} km`
-          : undefined,
-      hostId: moment.userId,
-      hostName: moment.userName || 'Host',
-      hostAvatar: moment.userAvatar || '',
-      hostRating: 0,
-      hostReviewCount: 0,
-      saves: 0,
-      isSaved: false,
-      status: (moment.status as Moment['status']) || 'active',
-      createdAt: moment.createdAt || new Date().toISOString(),
-      updatedAt: moment.createdAt || new Date().toISOString(),
-    }),
-    [],
-  );
+  // Cast discovery moments to Moment type for compatibility
+  const moments = discoveryMoments as unknown as Moment[];
 
-  const moments = useMemo(
-    () => discoveryMoments.map(normalizeDiscoveryMoment),
-    [discoveryMoments, normalizeDiscoveryMoment],
-  );
+  const { user, isGuest } = useAuth();
 
   // Subscription state for upgrade CTA
   const { subscription } = useSubscription();
   const currentTier =
     (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
   const isPremium = currentTier !== 'free';
-  const canChangeLocation = !isGuest && currentTier !== 'free';
 
   // Pending moment for post-login action
   const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);
@@ -282,8 +181,6 @@ const DiscoverScreen = () => {
     }));
   }, [userStories]);
 
-  const [showLocationModal, setShowLocationModal] = useState(false);
-
   // Header actions
   const handleNotificationsPress = useCallback(() => {
     HapticManager.buttonPress();
@@ -293,27 +190,6 @@ const DiscoverScreen = () => {
   const handleFilterPress = useCallback(() => {
     HapticManager.filterApplied();
     setShowFilterModal(true);
-  }, []);
-
-  const handleLocationPress = useCallback(() => {
-    HapticManager.buttonPress();
-
-    if (isGuest || !user) {
-      showLoginPrompt({ action: 'default' });
-      return;
-    }
-
-    if (!canChangeLocation) {
-      navigation.navigate('Subscription');
-      return;
-    }
-
-    setShowLocationModal(true);
-  }, [isGuest, user, canChangeLocation, navigation]);
-
-  const handleToggleView = useCallback(() => {
-    HapticManager.selectionChange();
-    setViewMode((prev) => (prev === 'grid' ? 'immersive' : 'grid'));
   }, []);
 
   const handleFilterApply = useCallback(
@@ -367,13 +243,10 @@ const DiscoverScreen = () => {
   }, [refresh]);
 
   const handleCitySelect = useCallback(
-    (coords: { latitude: number; longitude: number; name?: string }) => {
+    (coords: { latitude: number; longitude: number }) => {
       // Manually set location and refresh
       // Note: This would require extending useDiscoverMoments to accept manual coords
       logger.info('City selected:', coords);
-      if (coords.name) {
-        setSelectedCity(coords.name);
-      }
       // For now, just refresh with the hook's logic
       refresh();
     },
@@ -562,65 +435,6 @@ const DiscoverScreen = () => {
     [navigation],
   );
 
-  const toDomainMoment = useCallback(
-    (moment: Moment): DomainMoment => ({
-      id: moment.id,
-      user: {
-        id: moment.hostId,
-        name: moment.hostName || 'Host',
-        avatar: moment.hostAvatar,
-        isVerified: false,
-        type: 'local',
-      },
-      title: moment.title || '',
-      story: moment.description || '',
-      imageUrl: moment.images?.[0] || moment.image || '',
-      image: moment.image,
-      images: moment.images,
-      price: moment.price || moment.pricePerGuest || 0,
-      currency: moment.currency,
-      pricePerGuest: moment.pricePerGuest,
-      location:
-        typeof moment.location === 'string'
-          ? { city: moment.location, country: '' }
-          : {
-              city: moment.location?.city || 'Unknown',
-              country: moment.location?.country || '',
-              coordinates: moment.location?.coordinates
-                ? {
-                    lat: moment.location.coordinates.lat,
-                    lng: moment.location.coordinates.lng,
-                  }
-                : undefined,
-            },
-      availability: Array.isArray(moment.availability)
-        ? moment.availability.join(', ')
-        : moment.availability,
-      distance: moment.distance,
-      status: moment.status,
-      description: moment.description,
-      category:
-        typeof moment.category === 'string'
-          ? { id: moment.category, label: moment.category, emoji: '✨' }
-          : moment.category,
-      date: moment.date,
-      completedDate: moment.completedDate,
-      rating: moment.rating,
-      requestCount: moment.requestCount,
-    }),
-    [],
-  );
-
-  const handleOpenMoment = useCallback(
-    (moment: Moment) => {
-      navigation.navigate('MomentDetail', {
-        moment: toDomainMoment(moment),
-        isOwner: false,
-      });
-    },
-    [navigation, toDomainMoment],
-  );
-
   // Handle Share Press
   const handleSharePress = useCallback(async (moment: Moment) => {
     HapticManager.buttonPress();
@@ -670,67 +484,9 @@ const DiscoverScreen = () => {
     [updateGlowFromImage],
   );
 
-  const convertAmount = useCallback(
-    (amount: number, from: CurrencyCode, to: CurrencyCode) => {
-      if (from === to) return amount;
-
-      const rateFrom = from === 'TRY' ? 1 : exchangeRates[from];
-      const rateTo = to === 'TRY' ? 1 : exchangeRates[to];
-
-      if (!rateFrom || !rateTo) return undefined;
-
-      const amountInTry = from === 'TRY' ? amount : amount / rateFrom;
-      return to === 'TRY' ? amountInTry : amountInTry * rateTo;
-    },
-    [exchangeRates],
-  );
-
-  const getPriceDisplay = useCallback(
-    (moment: Moment) => {
-      const amount = moment.price || moment.pricePerGuest || 0;
-      const currency = (moment.currency || DEFAULT_CURRENCY) as CurrencyCode;
-      const converted = convertAmount(amount, currency, userCurrency);
-      return formatPriceDisplay(amount, currency, userCurrency, converted);
-    },
-    [convertAmount, userCurrency],
-  );
-
   // Render each moment card
   const renderItem = useCallback(
     ({ item, index }: { item: Moment; index: number }) => {
-      const priceDisplay = getPriceDisplay(item);
-
-      if (viewMode === 'grid') {
-        const gridItem: MomentCardProps = {
-          id: item.id,
-          imageUrl:
-            item.images?.[0] || item.image || 'https://via.placeholder.com/400',
-          title: item.title,
-          price: item.price || item.pricePerGuest || 0,
-          currency: item.currency || DEFAULT_CURRENCY,
-          location:
-            typeof item.location === 'string'
-              ? item.location
-              : item.location?.city || 'Unknown Location',
-          distance: item.distance || '?',
-          user: {
-            id: item.hostId,
-            name: item.hostName || 'Host',
-            avatar: item.hostAvatar,
-          },
-        };
-
-        return (
-          <GridMomentCard
-            item={gridItem}
-            index={index}
-            onPress={(_pressedItem) => handleOpenMoment(item)}
-            priceDisplay={priceDisplay.primary}
-            priceSecondary={priceDisplay.secondary}
-          />
-        );
-      }
-
       // Show inline subscription card every 5 moments
       const shouldShowSubscription = (index + 1) % 5 === 0 && !isPremium;
 
@@ -743,8 +499,6 @@ const DiscoverScreen = () => {
             onUserPress={() => handleUserPress(item)}
             onSharePress={() => handleSharePress(item)}
             onReportPress={() => handleReportPress(item)}
-            priceDisplay={priceDisplay.primary}
-            priceSecondary={priceDisplay.secondary}
           />
           {shouldShowSubscription && (
             <View style={styles.inlineSubscription}>
@@ -759,16 +513,13 @@ const DiscoverScreen = () => {
       );
     },
     [
-      getPriceDisplay,
       handleGiftPress,
       handleCounterOffer,
-      handleOpenMoment,
       handleUserPress,
       handleSharePress,
       handleReportPress,
       isPremium,
       navigation,
-      viewMode,
     ],
   );
 
@@ -801,11 +552,9 @@ const DiscoverScreen = () => {
   );
 
   // Render header component for FlatList - MOVED BEFORE EARLY RETURNS (Rules of Hooks)
-  const headerSpacing = useMemo(() => insets.top + 68, [insets.top]);
-
   const renderHeader = useCallback(
     () => (
-      <View style={[styles.headerSection, { paddingTop: headerSpacing }]}>
+      <View style={styles.headerSection}>
         {/* Stories Section */}
         <StoriesRow
           stories={stories}
@@ -827,7 +576,6 @@ const DiscoverScreen = () => {
       handleCreateStoryPress,
       currentTier,
       handleSubscriptionUpgrade,
-      headerSpacing,
     ],
   );
 
@@ -838,8 +586,6 @@ const DiscoverScreen = () => {
         <LocationPermissionPrompt
           onCitySelect={handleCitySelect}
           onRequestPermission={handleRequestLocationPermission}
-          disableCitySelection={!canChangeLocation}
-          disabledMessage="Premium ile şehir seçimi açılır"
         />
       </LiquidScreenWrapper>
     );
@@ -877,14 +623,14 @@ const DiscoverScreen = () => {
   if (!loading && activeMoments.length === 0) {
     return (
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
-        <View style={styles.emptyContainer}>
+        <View testID="empty-moments" style={styles.emptyContainer}>
           <Ionicons
             name="compass-outline"
             size={64}
             color={COLORS.text.muted}
             style={styles.emptyIcon}
           />
-          <Text style={styles.emptyTitle}>
+          <Text testID="text-empty-title" style={styles.emptyTitle}>
             {t('emptyState.noMomentsNearby')}
           </Text>
           <Text style={styles.emptySubtitle}>
@@ -893,6 +639,7 @@ const DiscoverScreen = () => {
           <TouchableOpacity
             style={styles.emptyCTAButton}
             onPress={() => navigation.navigate('CreateMoment')}
+            testID="btn-create-moment-empty"
           >
             <LinearGradient
               colors={[COLORS.primary, '#22C55E']}
@@ -915,30 +662,20 @@ const DiscoverScreen = () => {
       {/* Content-reactive ambient glow */}
       <ContentReactiveGlow colors={glowColors} opacity={glowOpacity} />
 
-      {/* Location & Filter Header */}
-      <DiscoverHeader
-        location={
-          selectedCity ||
-          (locationPermission === 'granted' ? 'Yakınımda' : 'Konum Seç')
-        }
-        locationDisabled={!canChangeLocation}
-        locationDisabledMessage={
-          isGuest
-            ? 'Konum değiştirmek için giriş yapmalısın.'
-            : 'Konum değiştirme Premium üyelikte aktif.'
-        }
+      {/* Awwwards-style Header */}
+      <AwwwardsDiscoverHeader
+        userName={user?.name || 'Explorer'}
+        notificationCount={3}
         activeFiltersCount={
           activeFilters ? Object.keys(activeFilters).length : 0
         }
-        onLocationPress={handleLocationPress}
+        onNotificationsPress={handleNotificationsPress}
         onFilterPress={handleFilterPress}
-        viewMode={viewMode}
-        onToggleView={handleToggleView}
+        onAvatarPress={handleAvatarPress}
       />
 
       {/* Immersive Vertical Feed with Stories Header - FlashList for 30-40% better perf */}
       <FlashList
-        key={viewMode}
         ref={flashListRef}
         data={activeMoments}
         renderItem={renderItem}
@@ -949,8 +686,7 @@ const DiscoverScreen = () => {
         refreshing={loading}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
-        estimatedItemSize={viewMode === 'grid' ? 260 : height}
-        numColumns={viewMode === 'grid' ? 2 : 1}
+        estimatedItemSize={height}
         contentContainerStyle={styles.feedContent}
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemsChanged}
@@ -975,28 +711,6 @@ const DiscoverScreen = () => {
           (activeFilters?.ageRange as [number, number]) || [18, 99]
         }
         initialGender={(activeFilters?.gender as string) || 'all'}
-      />
-
-      {/* Location Modal */}
-      <LocationModal
-        visible={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        selectedLocation={selectedCity}
-        recentLocations={['İstanbul', 'Ankara', 'İzmir', 'Antalya', 'Bursa']}
-        popularCities={[
-          { id: '1', name: 'İstanbul', country: 'Türkiye', emoji: '🇹🇷' },
-          { id: '2', name: 'Ankara', country: 'Türkiye', emoji: '🇹🇷' },
-          { id: '3', name: 'İzmir', country: 'Türkiye', emoji: '🇹🇷' },
-          { id: '4', name: 'Antalya', country: 'Türkiye', emoji: '🇹🇷' },
-          { id: '5', name: 'Bursa', country: 'Türkiye', emoji: '🇹🇷' },
-        ]}
-        currentLocationName={selectedCity || 'Konum tespit ediliyor...'}
-        onLocationSelect={(location) => {
-          setSelectedCity(location);
-          setFilters({ ...searchFilters, location });
-          handleCitySelect({ latitude: 0, longitude: 0, name: location });
-          setShowLocationModal(false);
-        }}
       />
 
       {/* Instagram-style Story Viewer Modal */}
@@ -1032,12 +746,11 @@ const DiscoverScreen = () => {
 const styles = StyleSheet.create({
   // Header Section with Stories
   headerSection: {
-    marginVertical: 8,
+    marginVertical: 12,
   },
 
   // Feed Content - Premium spacing
   feedContent: {
-    paddingTop: 8,
     paddingBottom: 100, // Space for FloatingDock
   },
 

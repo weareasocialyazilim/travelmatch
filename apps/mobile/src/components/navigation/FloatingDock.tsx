@@ -53,7 +53,7 @@ const getPendingNotificationCount = (): number => {
 /**
  * FloatingDock - Liquid Glass Navigation Bar
  *
- * High-quality floating navigation dock with:
+ * Awwwards-quality floating navigation dock with:
  * - Glassmorphism blur effect
  * - Neon glow on active state
  * - Silky smooth spring animations
@@ -378,16 +378,17 @@ const styles = StyleSheet.create({
   glowLayer: {
     position: 'absolute',
     top: 20, // Offset for center button
-    width: width - DOCK_HORIZONTAL_PADDING * 2,
+    left: DOCK_HORIZONTAL_PADDING,
+    right: DOCK_HORIZONTAL_PADDING,
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
     backgroundColor: 'transparent',
-    opacity: 0,
-    alignSelf: 'center',
     ...Platform.select({
       ios: {
-        shadowOpacity: 0,
-        shadowRadius: 0,
+        shadowColor: COLORS.brand.primary,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.15,
+        shadowRadius: 15,
       },
       android: {
         elevation: 0,
@@ -395,15 +396,12 @@ const styles = StyleSheet.create({
     }),
   },
   blurContainer: {
-    width: width - DOCK_HORIZONTAL_PADDING * 2,
+    width: '100%',
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(8, 8, 10, 0.92)',
+    overflow: 'visible',
+    backgroundColor: '#000000', // Pure black for depth perception
     marginTop: 20, // Space for center button to overflow
-    alignSelf: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   container: {
     flex: 1,
@@ -503,15 +501,15 @@ const styles = StyleSheet.create({
   centerButtonWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
+    marginTop: -32,
     zIndex: 10,
     width: 64,
   },
   centerButtonGlow: {
     position: 'absolute',
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: COLORS.brand.primary,
     ...Platform.select({
       ios: {

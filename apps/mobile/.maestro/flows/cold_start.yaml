@@ -1,0 +1,51 @@
+# Cold Start Flow - P0 Smoke Test
+# Validates: App launches without crash, Auth screen visible
+# Risk covered: App initialization failure, crash on startup
+
+appId: com.lovendo.app
+name: "P0: Cold Start"
+tags:
+  - smoke
+  - p0
+  - cold_start
+
+---
+
+# Clear app state for fresh launch
+- clearState
+
+# Launch the app
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Wait for app to initialize (splash screen)
+- assertVisible:
+    text: ".*"
+    timeout: 15000
+
+# App should eventually show Welcome screen or Auth
+# This validates the entire boot sequence
+- extendedWaitUntil:
+    visible:
+      id: "screen-welcome"
+    timeout: 20000
+
+# Verify Welcome screen elements are present
+- assertVisible:
+    id: "btn-create-account"
+    timeout: 5000
+
+- assertVisible:
+    id: "btn-login"
+    timeout: 3000
+
+# Verify Apple Sign In button (if enabled)
+- assertVisible:
+    id: "btn-apple-signin"
+    optional: true
+
+# Take screenshot for visual verification
+- takeScreenshot: "cold_start_welcome"
+
+# SUCCESS: App launched and auth screen is visible

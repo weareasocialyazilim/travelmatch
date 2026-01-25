@@ -23,15 +23,21 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('user_id');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
-    const cursor = searchParams.get('cursor');
 
     const supabase = createServiceClient();
 
     let query = supabase
-      .from('view_admin_escrow_transactions')
-      .select('*')
+      .from('escrow_transactions')
+      .select(
+        `
+        *,
+        sender:users!escrow_transactions_sender_id_fkey(id, display_name, avatar_url, email),
+        recipient:users!escrow_transactions_recipient_id_fkey(id, display_name, avatar_url, email),
+        moment:moments(id, title, price)
+      `,
+        { count: 'exact' },
+      )
       .order('created_at', { ascending: false })
-      .order('id', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (status) {
@@ -42,37 +48,7 @@ export async function GET(request: NextRequest) {
       query = query.or(`sender_id.eq.${userId},recipient_id.eq.${userId}`);
     }
 
-    if (cursor) {
-      const [cursorDate, cursorId] = cursor.split('|');
-      if (cursorDate && cursorId) {
-        query = query.or(
-          `created_at.lt.${cursorDate},and(created_at.eq.${cursorDate},id.lt.${cursorId})`,
-        );
-      } else if (cursorDate) {
-        query = query.lt('created_at', cursorDate);
-      }
-    }
-
-    const { data: escrowTransactions, error } = await query;
-
-    let countQuery = supabase
-      .from('escrow_transactions')
-      .select('id', { count: 'exact', head: true });
-
-    if (status) {
-      countQuery = countQuery.eq(
-        'status',
-        status as EscrowTransactionRow['status'],
-      );
-    }
-
-    if (userId) {
-      countQuery = countQuery.or(
-        `sender_id.eq.${userId},recipient_id.eq.${userId}`,
-      );
-    }
-
-    const { count } = await countQuery;
+    const { data: escrowTransactions, count, error } = await query;
 
     if (error) {
       logger.error('Escrow query error:', error);
@@ -101,20 +77,12 @@ export async function GET(request: NextRequest) {
           .reduce((sum, e) => sum + (e.amount || 0), 0) || 0,
     };
 
-    const nextCursor =
-      escrowTransactions && escrowTransactions.length === limit
-        ? `${escrowTransactions[escrowTransactions.length - 1].created_at}|${
-            escrowTransactions[escrowTransactions.length - 1].id
-          }`
-        : null;
-
     return NextResponse.json({
       escrowTransactions,
       summary,
       total: count || 0,
       limit,
       offset,
-      nextCursor,
     });
   } catch (error) {
     logger.error('Escrow GET error:', error);

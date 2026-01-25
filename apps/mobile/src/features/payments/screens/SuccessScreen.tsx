@@ -15,119 +15,23 @@ import Animated, {
   withDelay,
 } from 'react-native-reanimated';
 import type { RootStackParamList } from '@/navigation/routeParams';
-import type { SuccessType } from '../types/success.types';
 
-type SuccessConfig = {
-  title: string;
-  subtitle: string;
-  buttonText: string;
-  nextScreen?: keyof RootStackParamList | 'BACK';
-};
-
-const DEFAULT_SUCCESS: SuccessConfig = {
-  title: 'Tamamlandı!',
-  subtitle: 'İşlemin başarıyla tamamlandı.',
-  buttonText: 'Devam Et',
-  nextScreen: 'Discover',
-};
-
-const SUCCESS_CONFIG: Record<SuccessType, SuccessConfig> = {
-  card_added: {
-    title: 'Kart Eklendi',
-    subtitle: 'Ödeme yöntemini dilediğin zaman kullanabilirsin.',
-    buttonText: 'Tamam',
-    nextScreen: 'BACK',
-  },
-  card_removed: {
-    title: 'Kart Kaldırıldı',
-    subtitle: 'Ödeme yöntemin listenden kaldırıldı.',
-    buttonText: 'Tamam',
-    nextScreen: 'BACK',
-  },
-  cache_cleared: {
-    title: 'Temizlendi',
-    subtitle: 'Veriler güncellendi.',
-    buttonText: 'Tamam',
-    nextScreen: 'BACK',
-  },
-  gift_sent: {
-    title: 'Hediye Gönderildi',
-    subtitle: 'Ödeme emanet hesabında. Kanıt onaylanınca alıcıya aktarılır.',
-    buttonText: 'Keşfet',
-    nextScreen: 'Discover',
-  },
-  withdraw: {
-    title: 'Çekim Alındı',
-    subtitle: 'Talebin işleme alındı. Onaylanınca hesabına geçer.',
-    buttonText: 'Cüzdana Dön',
-    nextScreen: 'Wallet',
-  },
-  withdrawal: {
-    title: 'Çekim Başarılı',
-    subtitle: 'Ödeme hesabına aktarıldı.',
-    buttonText: 'Cüzdana Dön',
-    nextScreen: 'Wallet',
-  },
-  payment: {
-    title: 'LVND Yüklendi',
-    subtitle:
-      'Bakiyen anında güncellendi. Dilediğin anda jest gönderebilirsin.',
-    buttonText: 'Keşfet',
-    nextScreen: 'Discover',
-  },
-  review: {
-    title: 'Teşekkürler',
-    subtitle: 'Geri bildirimin bize ulaştı.',
-    buttonText: 'Devam Et',
-    nextScreen: 'Discover',
-  },
-  dispute: {
-    title: 'Talebin Alındı',
-    subtitle: 'İnceleme tamamlanınca bilgilendirileceksin.',
-    buttonText: 'Tamam',
-    nextScreen: 'Discover',
-  },
-  proof_uploaded: {
-    title: 'Kanıtın Gönderildi',
-    subtitle: 'Onaylandığında ödeme hesabına geçer.',
-    buttonText: 'Tamam',
-    nextScreen: 'Discover',
-  },
-  proof_approved: {
-    title: 'Kanıt Onaylandı',
-    subtitle: 'Ödeme hesabına geçti.',
-    buttonText: 'Cüzdana Git',
-    nextScreen: 'Wallet',
-  },
-  profile_complete: {
-    title: 'Profil Tamamlandı',
-    subtitle: 'Artık anlarını paylaşmaya hazırsın.',
-    buttonText: 'Keşfet',
-    nextScreen: 'Discover',
-  },
-  offer: {
-    title: 'Teklif Gönderildi',
-    subtitle: 'Yanıt geldiğinde bildirim alacaksın.',
-    buttonText: 'Keşfet',
-    nextScreen: 'Discover',
-  },
-  generic: DEFAULT_SUCCESS,
+type SuccessParams = {
+  title?: string;
+  message?: string;
+  buttonText?: string;
+  nextScreen?: string;
 };
 
 export const SuccessScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'Success'>>();
-  const params = route.params ?? { type: 'generic' };
-  const type = (params.type ?? 'generic') as SuccessType;
-  const config = SUCCESS_CONFIG[type] ?? DEFAULT_SUCCESS;
-  const title = params.title ?? config.title;
-  const subtitle = params.subtitle ?? config.subtitle;
-  const buttonText =
-    (params as { buttonText?: string }).buttonText ?? config.buttonText;
-  const nextScreen =
-    (params as { nextScreen?: string }).nextScreen ??
-    config.nextScreen ??
-    'Discover';
+  const route = useRoute<RouteProp<{ Success: SuccessParams }, 'Success'>>();
+  const {
+    title = 'Success!',
+    message = 'Operation completed successfully.',
+    buttonText = 'Continue',
+    nextScreen = 'Discover',
+  } = route.params || {};
 
   const scale = useSharedValue(0);
 
@@ -155,7 +59,7 @@ export const SuccessScreen = () => {
       </Animated.View>
 
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.message}>{subtitle}</Text>
+      <Text style={styles.message}>{message}</Text>
 
       <TouchableOpacity style={styles.btn} onPress={handlePress}>
         <Text style={styles.btnText}>{buttonText}</Text>

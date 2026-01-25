@@ -3,8 +3,8 @@
  *
  * Bu ekran kullanıcıların:
  * - Bir moment'a katılmak için host'a ödeme yapmasını sağlar
- * - IAP coin satın alma akışı ile çalışır
- * - Kullanıcılar arası direkt ödeme yoktur
+ * - PayTR güvenli ödeme entegrasyonu ile çalışır
+ * - Escrow sistemi ile güvenli transfer yapar
  *
  * NOT: Bu "arkadaşa hediye" değil, moment'a katılım ödemesidir.
  */
@@ -37,11 +37,6 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { PaymentSecurityBadge } from '../components/PaymentSecurityBadge';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
-import { useAuth } from '@/hooks/useAuth';
-import { showLoginPrompt } from '@/stores/modalStore';
-import { useFeatureFlag } from '@/utils/featureFlags';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { ANALYTICS_EVENTS } from '@lovendo/shared';
 
 type UnifiedGiftFlowRouteProp = RouteProp<
   RootStackParamList,
@@ -52,9 +47,6 @@ const UnifiedGiftFlowScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<UnifiedGiftFlowRouteProp>();
   const insets = useSafeAreaInsets();
-  const { isGuest } = useAuth();
-  const analytics = useAnalytics();
-  const paymentsEnabled = useFeatureFlag('paymentsEnabled');
 
   const {
     recipientId: _hostId,
@@ -86,56 +78,28 @@ const UnifiedGiftFlowScreen: React.FC = () => {
   }, [navigation]);
 
   const handleProceedToPayment = useCallback(async () => {
-    if (isGuest) {
-      showLoginPrompt({ action: 'default' });
-      return;
-    }
-
-    if (!paymentsEnabled) {
-      HapticManager.error();
-      return;
-    }
-
     HapticManager.buttonPress();
     setIsProcessing(true);
 
     try {
-      analytics.trackEvent(ANALYTICS_EVENTS.PAYMENT_INIT, {
-        momentId: momentId || null,
+      // Navigate to PayTR WebView for secure payment
+      navigation.navigate('PayTRWebView', {
+        iframeToken: `moment_${momentId}_${Date.now()}`,
+        merchantOid: `moment_payment_${momentId}`,
         amount: requestedAmount || 0,
-        currency: requestedCurrency || 'TRY',
-        source: 'unified_gift_flow',
+        currency: (requestedCurrency as 'TRY' | 'EUR' | 'USD') || 'TRY',
+        giftId: momentId,
       });
-      // APPLE IAP COMPLIANT: Redirect to Coin Store for LVND purchase
-      // Moments are paid with pre-purchased LVND coins, not direct credit card
-      navigation.navigate('CoinStore');
-      // After user has coins, they can return and complete the moment join
     } catch (error) {
-      logger.error('UnifiedGiftFlow', 'Navigation failed', { error });
+      logger.error('UnifiedGiftFlow', 'Payment navigation failed', { error });
       HapticManager.error();
       navigation.navigate('PaymentFailed', {
-        error: 'İşlem başlatılamadı. Lütfen tekrar deneyin.',
+        error: 'Ödeme işlemi başlatılamadı. Lütfen tekrar deneyin.',
       });
     } finally {
       setIsProcessing(false);
     }
-  }, [
-    analytics,
-    isGuest,
-    momentId,
-    navigation,
-    paymentsEnabled,
-    requestedAmount,
-    requestedCurrency,
-  ]);
-
-  React.useEffect(() => {
-    if (!isGuest) return;
-    showLoginPrompt({ action: 'default' });
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
-  }, [isGuest, navigation]);
+  }, [momentId, requestedAmount, requestedCurrency, navigation]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -234,9 +198,8 @@ const UnifiedGiftFlowScreen: React.FC = () => {
               color={COLORS.trust.primary}
             />
             <Text style={styles.infoText}>
-              {paymentsEnabled
-                ? 'Paran şu an kimseye gitmiyor. Deneyim gerçekleşene kadar güvenle tutulur. Onaylandığında aktarılır.'
-                : 'Ödemeler geçici olarak kapalı. Sistem tekrar açıldığında devam edebilirsin.'}
+              Ödemeniz escrow hesabında güvende tutulur. Moment tamamlandıktan
+              sonra host'a aktarılır. Sorun yaşarsanız iade talep edebilirsiniz.
             </Text>
           </View>
         </ScrollView>
@@ -244,12 +207,9 @@ const UnifiedGiftFlowScreen: React.FC = () => {
         {/* Bottom CTA */}
         <View style={[styles.bottomCta, { paddingBottom: insets.bottom + 16 }]}>
           <TouchableOpacity
-            style={[
-              styles.payButton,
-              (isProcessing || !paymentsEnabled) && styles.payButtonDisabled,
-            ]}
+            style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
             onPress={handleProceedToPayment}
-            disabled={isProcessing || !paymentsEnabled}
+            disabled={isProcessing}
           >
             <LinearGradient
               colors={GRADIENTS.gift as readonly [string, string, ...string[]]}

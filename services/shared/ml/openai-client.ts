@@ -5,8 +5,33 @@
 
 import OpenAI from 'openai';
 
+// Environment compatibility: Support both Deno and Node.js
+const getEnvVar = (key: string): string => {
+  // Try Deno first
+  if (
+    typeof (
+      globalThis as unknown as {
+        Deno?: { env: { get: (k: string) => string | undefined } };
+      }
+    ).Deno !== 'undefined'
+  ) {
+    return (
+      (
+        globalThis as unknown as {
+          Deno: { env: { get: (k: string) => string | undefined } };
+        }
+      ).Deno.env.get(key) ?? ''
+    );
+  }
+  // Fallback to Node.js
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] ?? '';
+  }
+  return '';
+};
+
 const openai = new OpenAI({
-  apiKey: Deno.env.get('OPENAI_API_KEY') ?? '',
+  apiKey: getEnvVar('OPENAI_API_KEY'),
 });
 
 /**
@@ -14,8 +39,9 @@ const openai = new OpenAI({
  */
 export async function analyzeImage(
   imageUrl: string,
-  prompt: string
+  prompt: string,
 ): Promise<any> {
+  // eslint-disable-line @typescript-eslint/no-explicit-any
   const response = await openai.chat.completions.create({
     model: 'gpt-4-vision-preview',
     messages: [
@@ -38,9 +64,9 @@ export async function analyzeImage(
  */
 export async function generateText(
   prompt: string,
-  systemPrompt?: string
+  systemPrompt?: string,
 ): Promise<string> {
-  const messages: any[] = [];
+  const messages: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   if (systemPrompt) {
     messages.push({ role: 'system', content: systemPrompt });
@@ -60,9 +86,7 @@ export async function generateText(
 /**
  * Check content moderation
  */
-export async function moderateContent(
-  content: string
-): Promise<{
+export async function moderateContent(content: string): Promise<{
   flagged: boolean;
   categories: Record<string, boolean>;
 }> {
@@ -81,9 +105,7 @@ export async function moderateContent(
 /**
  * Generate embeddings for semantic search
  */
-export async function generateEmbedding(
-  text: string
-): Promise<number[]> {
+export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await openai.embeddings.create({
     model: 'text-embedding-ada-002',
     input: text,
@@ -96,7 +118,7 @@ export async function generateEmbedding(
  * Batch generate embeddings
  */
 export async function batchGenerateEmbeddings(
-  texts: string[]
+  texts: string[],
 ): Promise<number[][]> {
   const response = await openai.embeddings.create({
     model: 'text-embedding-ada-002',

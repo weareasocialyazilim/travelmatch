@@ -34,7 +34,12 @@ export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 // Moved from features/payments - KYC is core to Trust Garden
 // ===================================
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
+export { default as KYCDocumentTypeScreen } from './kyc/KYCDocumentTypeScreen';
+export { default as KYCDocumentCaptureScreen } from './kyc/KYCDocumentCaptureScreen';
+export { default as KYCSelfieScreen } from './kyc/KYCSelfieScreen';
+export { default as KYCReviewScreen } from './kyc/KYCReviewScreen';
 export { default as KYCPendingScreen } from './kyc/KYCPendingScreen';
+export * from './kyc/types';
 
 // Types
 // export type { AuthenticationResult } from './components/MomentAuthenticator';

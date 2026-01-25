@@ -5,10 +5,10 @@ const logger = new Logger();
 
 /**
  * Verify Proof Edge Function
- *
+ * 
  * AI-powered proof verification using Claude 3.5 Sonnet
  * Analyzes video frames to verify travel claims
- *
+ * 
  * Cost: ~$0.003/proof (3x cheaper than GPT-4 Vision)
  */
 
@@ -16,10 +16,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.20.1';
 import { getCorsHeaders } from '../_shared/security-middleware.ts';
-import {
-  createUpstashRateLimiter,
-  RateLimitConfig,
-} from '../_shared/upstashRateLimit.ts';
+import { createUpstashRateLimiter, RateLimitConfig } from '../_shared/upstashRateLimit.ts';
 
 // Rate limit config: 10 requests per hour per user
 const RATE_LIMIT_CONFIG: RateLimitConfig = {
@@ -52,22 +49,15 @@ interface VerificationResult {
 /**
  * Calculate distance between two coordinates in kilometers (Haversine formula)
  */
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   return R * c;
 }
 
@@ -78,7 +68,7 @@ function calculateDistance(
 async function verifyExifLocation(
   exifLocation: { latitude: number; longitude: number } | undefined,
   claimedLocation: string,
-  supabase: ReturnType<typeof createClient>,
+  supabase: ReturnType<typeof createClient>
 ): Promise<{ match: boolean; distance?: number; reason?: string }> {
   if (!exifLocation || !exifLocation.latitude || !exifLocation.longitude) {
     return { match: false, reason: 'No EXIF location data provided' };
@@ -87,21 +77,16 @@ async function verifyExifLocation(
   // Get moment's location coordinates
   // For now, we'll use a simple geocoding approach
   // In production, you'd want to store lat/lng with moments
-
+  
   // Check if the exif coordinates are within Turkey's general bounds
   // (This is a simplified check - enhance with proper geocoding)
-  const inTurkey =
-    exifLocation.latitude >= 35.8 &&
-    exifLocation.latitude <= 42.5 &&
-    exifLocation.longitude >= 26.0 &&
-    exifLocation.longitude <= 45.0;
+  const inTurkey = 
+    exifLocation.latitude >= 35.8 && exifLocation.latitude <= 42.5 &&
+    exifLocation.longitude >= 26.0 && exifLocation.longitude <= 45.0;
 
   // For now, accept if EXIF data exists and is in valid range
   // Full implementation would geocode claimedLocation and compare
-  if (
-    inTurkey ||
-    (exifLocation.latitude !== 0 && exifLocation.longitude !== 0)
-  ) {
+  if (inTurkey || (exifLocation.latitude !== 0 && exifLocation.longitude !== 0)) {
     return { match: true, reason: 'Valid EXIF location data detected' };
   }
 
@@ -112,23 +97,20 @@ async function verifyExifLocation(
  * Extract frames from video URL
  * Returns base64 encoded frames at specified timestamps
  */
-async function extractFrames(
-  videoUrl: string,
-  timestamps: number[],
-): Promise<string[]> {
+async function extractFrames(videoUrl: string, timestamps: number[]): Promise<string[]> {
   // For now, we'll use the video thumbnail/first frame
   // In production, you'd use ffmpeg or a video processing service
-
+  
   // Fetch video and get first frame
   const response = await fetch(videoUrl);
   if (!response.ok) {
     throw new Error(`Failed to fetch video: ${response.status}`);
   }
-
+  
   // For MVP: Use video URL directly or thumbnail
   // Claude can analyze video frames when provided as images
   // This is a simplified version - enhance with ffmpeg for production
-
+  
   return [videoUrl]; // Claude will analyze the video content
 }
 
@@ -139,18 +121,18 @@ async function analyzeWithClaude(
   anthropic: Anthropic,
   frames: string[],
   claimedLocation: string,
-  claimedDate: string,
+  claimedDate: string
 ): Promise<VerificationResult> {
+  
   const message = await anthropic.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `You are a travel proof verification AI for Lovendo platform.
+    messages: [{
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: `You are a travel proof verification AI for Lovendo platform.
 
 Analyze this travel proof and verify the claim.
 
@@ -181,17 +163,16 @@ Respond ONLY with valid JSON (no markdown):
 Verification thresholds:
 - confidence >= 0.8: verified
 - confidence 0.5-0.8: needs_review
-- confidence < 0.5: rejected`,
-          },
-          {
-            type: 'text',
-            text: `Video/Image URL for analysis: ${frames[0]}
+- confidence < 0.5: rejected`
+        },
+        {
+          type: 'text',
+          text: `Video/Image URL for analysis: ${frames[0]}
 
-Note: If you cannot directly access the URL, base your analysis on the metadata and context provided. For real verification, the mobile app would extract actual frames.`,
-          },
-        ],
-      },
-    ],
+Note: If you cannot directly access the URL, base your analysis on the metadata and context provided. For real verification, the mobile app would extract actual frames.`
+        }
+      ]
+    }]
   });
 
   // Parse Claude's response
@@ -232,7 +213,7 @@ Note: If you cannot directly access the URL, base your analysis on the metadata 
 
   return {
     ...analysis,
-    status,
+    status
   };
 }
 
@@ -251,10 +232,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -266,52 +244,43 @@ serve(async (req) => {
     // Verify user and get user ID for rate limiting
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const token = authHeader.replace('Bearer ', '');
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token);
-
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid authorization token' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Apply rate limiting (10 requests per hour per user)
     const rateLimiter = createUpstashRateLimiter(RATE_LIMIT_CONFIG);
     const rateLimitResult = await rateLimiter.limit(`verify-proof:${user.id}`);
-
+    
     if (!rateLimitResult.success) {
       return new Response(
-        JSON.stringify({
-          error: 'Rate limit exceeded',
+        JSON.stringify({ 
+          error: 'Rate limit exceeded', 
           message: 'Maximum 10 verification requests per hour',
-          retryAfter: rateLimitResult.reset,
+          retryAfter: rateLimitResult.reset
         }),
-        {
-          status: 429,
-          headers: {
-            ...corsHeaders,
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
             'Content-Type': 'application/json',
             'X-RateLimit-Limit': String(rateLimitResult.limit),
             'X-RateLimit-Remaining': String(rateLimitResult.remaining),
-            'X-RateLimit-Reset': String(rateLimitResult.reset),
-          },
-        },
+            'X-RateLimit-Reset': String(rateLimitResult.reset)
+          } 
+        }
       );
     }
 
     if (!anthropicApiKey) {
       return new Response(
         JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -319,32 +288,18 @@ serve(async (req) => {
 
     // Parse request body
     const body: VerifyProofRequest = await req.json();
-    const {
-      videoUrl,
-      claimedLocation,
-      claimedDate,
-      momentId,
-      userId,
-      exifLocation,
-    } = body;
+    const { videoUrl, claimedLocation, claimedDate, momentId, userId, exifLocation } = body;
 
     if (!videoUrl || !claimedLocation || !momentId || !userId) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // MASTER TOUCH: Verify EXIF location matches claimed location
-    const exifVerification = await verifyExifLocation(
-      exifLocation,
-      claimedLocation,
-      supabase,
-    );
-
+    const exifVerification = await verifyExifLocation(exifLocation, claimedLocation, supabase);
+    
     // If EXIF location doesn't match and we have EXIF data, add to red flags
     let exifRedFlags: string[] = [];
     if (exifLocation && !exifVerification.match) {
@@ -359,12 +314,12 @@ serve(async (req) => {
       anthropic,
       frames,
       claimedLocation,
-      claimedDate || new Date().toISOString(),
+      claimedDate || new Date().toISOString()
     );
 
     // Combine red flags
     const allRedFlags = [...result.redFlags, ...exifRedFlags];
-
+    
     // Adjust confidence based on EXIF verification
     let adjustedConfidence = result.confidence;
     if (exifLocation) {
@@ -414,7 +369,7 @@ serve(async (req) => {
         exif_latitude: exifLocation?.latitude,
         exif_longitude: exifLocation?.longitude,
         ai_model: 'claude-3-5-sonnet-20241022',
-        created_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
       });
 
     if (insertError) {
@@ -426,15 +381,12 @@ serve(async (req) => {
     if (finalResult.status === 'verified') {
       await supabase
         .from('moments')
-        .update({
-          proof_verified: true,
-          proof_verified_at: new Date().toISOString(),
-        })
+        .update({ proof_verified: true, proof_verified_at: new Date().toISOString() })
         .eq('id', momentId)
         .eq('user_id', userId);
 
-      // NOTE: Payment transfers are disabled (IAP-only). Escrow release is not triggered here.
-      // Find pending escrow for this moment for logging/visibility only.
+      // MASTER LOGIC: Trigger PayTR escrow release when proof is verified
+      // Find pending escrow for this moment and trigger release
       const { data: pendingEscrow } = await supabase
         .from('escrow_transactions')
         .select('id, amount, recipient_id')
@@ -443,33 +395,52 @@ serve(async (req) => {
         .single();
 
       if (pendingEscrow) {
-        logger.info(
-          `[verify-proof] Escrow ${pendingEscrow.id} remains pending (transfers disabled).`,
-        );
+        logger.info(`[verify-proof] Triggering PayTR escrow release for escrow ${pendingEscrow.id}`);
+        
+        // Call paytr-transfer edge function to release funds
+        try {
+          const paytrResponse = await fetch(`${supabaseUrl}/functions/v1/paytr-transfer`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`, // Service key for internal call
+            },
+            body: JSON.stringify({
+              escrowId: pendingEscrow.id,
+              momentId: momentId,
+              action: 'release',
+              reason: 'proof_verified',
+            }),
+          });
+
+          if (!paytrResponse.ok) {
+            logger.error('PayTR transfer failed:', await paytrResponse.text());
+            // Don't fail the verification - escrow release can be retried
+          } else {
+            logger.info(`[verify-proof] PayTR escrow released successfully for moment ${momentId}`);
+          }
+        } catch (paytrError) {
+          logger.error('PayTR transfer error:', paytrError);
+          // Log but don't fail - verification succeeded, payment can be retried
+        }
       }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        verification: finalResult,
+        verification: finalResult
       }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     logger.error('Verification failed:', error);
     return new Response(
       JSON.stringify({
         error: 'Verification failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error'
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

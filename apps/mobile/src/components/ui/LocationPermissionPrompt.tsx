@@ -36,24 +36,13 @@ const CITIES = [
 ];
 
 interface LocationPermissionPromptProps {
-  onCitySelect: (coords: {
-    latitude: number;
-    longitude: number;
-    name?: string;
-  }) => void;
+  onCitySelect: (coords: { latitude: number; longitude: number }) => void;
   onRequestPermission: () => void;
-  disableCitySelection?: boolean;
-  disabledMessage?: string;
 }
 
 export const LocationPermissionPrompt: React.FC<
   LocationPermissionPromptProps
-> = ({
-  onCitySelect,
-  onRequestPermission,
-  disableCitySelection = false,
-  disabledMessage = 'Şehir seçimi Premium üyelikte aktif.',
-}) => {
+> = ({ onCitySelect, onRequestPermission }) => {
   const [showCityPicker, setShowCityPicker] = useState(false);
 
   const handleCitySelect = (city: (typeof CITIES)[0]) => {
@@ -61,7 +50,6 @@ export const LocationPermissionPrompt: React.FC<
     onCitySelect({
       latitude: city.coords.lat,
       longitude: city.coords.lng,
-      name: city.name,
     });
     setShowCityPicker(false);
   };
@@ -112,13 +100,8 @@ export const LocationPermissionPrompt: React.FC<
 
       <TouchableOpacity
         style={styles.secondaryButton}
-        onPress={() => {
-          if (!disableCitySelection) {
-            setShowCityPicker(true);
-          }
-        }}
+        onPress={() => setShowCityPicker(true)}
         activeOpacity={0.8}
-        disabled={disableCitySelection}
       >
         <Text style={styles.secondaryButtonText}>Şehir Seç</Text>
         <Ionicons
@@ -127,9 +110,6 @@ export const LocationPermissionPrompt: React.FC<
           color={COLORS.text.secondary}
         />
       </TouchableOpacity>
-      {disableCitySelection ? (
-        <Text style={styles.disabledHint}>{disabledMessage}</Text>
-      ) : null}
 
       <TouchableOpacity
         style={styles.tertiaryButton}
@@ -207,12 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  disabledHint: {
-    marginTop: 8,
-    color: COLORS.text.muted,
-    fontSize: 13,
-    textAlign: 'center',
   },
   title: {
     fontSize: 24,

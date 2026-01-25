@@ -7,6 +7,10 @@ import {
   generateMerchantOid,
 } from '../_shared/paytr.ts';
 
+// Exchange Rate: 1 Coin = X TRY
+// In a real app, this should be fetched from DB or config
+const COIN_TO_TRY_RATE = 0.50; 
+
 const WithdrawalSchema = z.object({
   amount: z.number().min(50, "En az 50 Coin çekebilirsiniz"), // Minimum 50 Coins
   bankAccountId: z.string().uuid(),
@@ -23,39 +27,11 @@ const handler = createGuard(
     const { amount: coinAmount, bankAccountId } = body;
     const userId = user!.id;
 
-    // 1. Exchange Rate (Financial Constitution 2026: 1 LVND = 1 TRY)
-    // Fetch live rate from database for validation
-    const { data: dbRate, error: rateError } = await supabaseAdmin.rpc('get_live_exchange_rate', {
-      p_from_currency: 'LVND',
-      p_to_currency: 'TRY'
-    });
-
-    // Use hardcoded rate as fallback (system guarantee)
+    // 1. Exchange Rate (1:1 per Financial Constitution 2026)
     const COIN_TO_TRY_RATE = 1.0;
-
-    // Validate database rate if available
-    if (dbRate && dbRate.length > 0) {
-      const dbRateValue = parseFloat(dbRate[0].rate);
-      const rateDifference = Math.abs(dbRateValue - COIN_TO_TRY_RATE);
-
-      // Log warning if rates differ by more than 0.01%
-      if (rateDifference > 0.0001) {
-        logger.warn(`Rate mismatch detected! DB: ${dbRateValue}, System: ${COIN_TO_TRY_RATE}`);
-        // In production, this could trigger an alert
-      }
-
-      // Use database rate if it exists and is reasonable
-      if (dbRateValue > 0.5 && dbRateValue < 2.0) {
-        // Rate is within acceptable bounds (0.5-2.0 TRY per LVND)
-        logger.info(`Using DB rate: ${dbRateValue} (age: ${dbRate[0].is_stale ? 'stale' : 'fresh'})`);
-      }
-    } else if (rateError) {
-      logger.warn(`Failed to fetch DB rate: ${rateError.message}. Using system default.`);
-    }
-
     const fiatAmountGross = coinAmount * COIN_TO_TRY_RATE;
 
-    // 2. Determine Commission based on Subscription Tier (Server-Side Validation)
+    // 2. Determine Commission based on Subscription Tier
     const { data: userSub } = await supabaseAdmin
       .from('user_subscriptions')
       .select('plan_id')
@@ -64,27 +40,9 @@ const handler = createGuard(
       .maybeSingle();
 
     const planId = userSub?.plan_id || 'basic';
-
-    // Fetch commission rate from database (source of truth)
-    const { data: planData } = await supabaseAdmin
-      .from('subscription_plans')
-      .select('limits')
-      .eq('id', planId)
-      .single();
-
-    // Extract commission rate from limits field
-    let commissionRate = 0.15; // Default fallback
-    if (planData?.limits && typeof planData.limits === 'object') {
-      const limits = planData.limits as any;
-      if (limits.withdrawalCommission !== undefined) {
-        commissionRate = limits.withdrawalCommission;
-        logger.info(`Using DB commission rate for ${planId}: ${commissionRate * 100}%`);
-      } else {
-        logger.warn(`No withdrawalCommission in limits for ${planId}, using default 15%`);
-      }
-    } else {
-      logger.warn(`No limits found for plan ${planId}, using default commission 15%`);
-    }
+    let commissionRate = 0.15; // Free: 15%
+    if (planId === 'premium') commissionRate = 0.10; // Pro: 10%
+    if (planId === 'platinum') commissionRate = 0.05; // Elite: 5%
 
     const commissionAmount = fiatAmountGross * commissionRate;
     const fiatAmountNet = fiatAmountGross - commissionAmount;
@@ -116,20 +74,13 @@ const handler = createGuard(
       throw new Error('Banka hesabı bulunamadı');
     }
 
-    // 5. Determine if manual approval is required (dynamic threshold from DB)
-    const { data: approvalThreshold } = await supabaseAdmin.rpc('get_withdrawal_approval_threshold');
-    const APPROVAL_THRESHOLD = approvalThreshold || 1000; // Fallback to 1000 if DB fetch fails
-
-    logger.info(`Withdrawal approval threshold: ${APPROVAL_THRESHOLD} LVND (Amount: ${coinAmount})`);
-
+    // 5. Determine if manual approval is required (> 1000 units)
+    const APPROVAL_THRESHOLD = 1000;
     const requiresManualApproval = coinAmount > APPROVAL_THRESHOLD;
     const initialStatus = requiresManualApproval ? 'pending_approval' : 'pending_processing';
 
-    // 6. Generate Settlement ID (used as idempotency key)
-    const settlementId = generateMerchantOid('WTH');
-
-    // 7. Burn Coins (Atomic Transaction with Idempotency)
-    const { data: coinTxResult, error: coinIdxError } = await supabaseAdmin.rpc('handle_coin_transaction', {
+    // 6. Burn Coins (Atomic Transaction)
+    const { error: coinIdxError } = await supabaseAdmin.rpc('handle_coin_transaction', {
         p_user_id: userId,
         p_amount: -coinAmount,
         p_type: 'withdrawal_burn',
@@ -141,47 +92,23 @@ const handler = createGuard(
             rate: COIN_TO_TRY_RATE,
             tier: planId,
             bank_account: bankAccountId,
-            requires_approval: requiresManualApproval,
-            settlement_id: settlementId
-        },
-        p_idempotency_key: settlementId  // Prevents duplicate burns
+            requires_approval: requiresManualApproval
+        }
     });
 
     if (coinIdxError) {
         throw new Error('Coin düşümü başarısız: ' + coinIdxError.message);
     }
 
-    // Check if this was a duplicate request
-    const isDuplicate = coinTxResult?.message?.includes('idempotent');
-    if (isDuplicate) {
-        // Return existing withdrawal request
-        const { data: existingRequest } = await supabaseAdmin
-            .from('withdrawal_requests')
-            .select('*')
-            .eq('paytr_settlement_id', settlementId)
-            .single();
-
-        if (existingRequest) {
-            return {
-                success: true,
-                settlementId: settlementId,
-                coins_deducted: coinAmount,
-                fiat_amount: fiatAmountNet,
-                commission: commissionAmount,
-                requires_approval: requiresManualApproval,
-                status: existingRequest.status,
-                duplicate_request: true
-            };
-        }
-    }
-
-    // 8. Log Withdrawal Request
+    const mockSettlementId = generateMerchantOid('WTH');
+    
+    // 7. Log Withdrawal Request
     await supabaseAdmin.from('withdrawal_requests').insert({
         user_id: userId,
         amount: fiatAmountNet,
         currency: 'TRY',
         bank_account_id: bankAccountId,
-        paytr_settlement_id: settlementId,
+        paytr_settlement_id: mockSettlementId,
         status: initialStatus,
         withdrawal_approval_status: requiresManualApproval ? 'pending_approval' : 'approved',
         metadata: {
@@ -194,7 +121,7 @@ const handler = createGuard(
 
     return {
         success: true,
-        settlementId: settlementId,
+        settlementId: mockSettlementId,
         coins_deducted: coinAmount,
         fiat_amount: fiatAmountNet,
         commission: commissionAmount,

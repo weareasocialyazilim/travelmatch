@@ -156,7 +156,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
           'You can choose to protect your gift. If protected, money is held until proof is uploaded.\n\n' +
           '🔒 $100+: Escrow Protected\n' +
           'Money is held in escrow. The creator must upload proof to receive funds.\n\n' +
-          'This ensures authentic experiences and protects your gifts.',
+          'This ensures authentic travel experiences and protects your gifts.',
         buttons: [{ text: 'Got it', style: 'default' }],
       });
     };

@@ -58,26 +58,15 @@ interface SendGridEvent {
  * Verify SendGrid webhook signature
  * SendGrid uses ECDSA signature verification
  */
-/**
- * EK-P0-4: SECURITY - Fail closed pattern
- * If verification key is not configured, reject ALL requests
- * Never allow unauthenticated webhook processing
- */
 async function verifySignature(
   payload: string,
   signature: string,
   timestamp: string
-): Promise<{ valid: boolean; error?: string }> {
-  // CRITICAL: Fail closed if no verification key
+): Promise<boolean> {
+  // FAIL-CLOSED: If no verification key configured, reject all requests
   if (!SENDGRID_WEBHOOK_VERIFICATION_KEY) {
-    logger.error('[SendGrid Webhook] CRITICAL: No verification key configured - rejecting request');
-    return { valid: false, error: 'Service misconfigured' };
-  }
-
-  // Signature and timestamp are required
-  if (!signature || !timestamp) {
-    logger.warn('[SendGrid Webhook] Missing signature or timestamp header');
-    return { valid: false, error: 'Missing authentication headers' };
+    logger.error('[SendGrid Webhook] SENDGRID_WEBHOOK_VERIFICATION_KEY not configured - rejecting request');
+    return false;
   }
 
   try {
@@ -104,10 +93,11 @@ async function verifySignature(
       data
     );
 
-    return { valid: isValid, error: isValid ? undefined : 'Invalid signature' };
+    return isValid;
   } catch (error) {
     logger.error('[SendGrid Webhook] Signature verification error:', error);
-    return { valid: false, error: 'Signature verification failed' };
+    // FAIL-CLOSED: Reject on any verification error
+    return false;
   }
 }
 
@@ -232,13 +222,12 @@ serve(async (req) => {
     const signature = req.headers.get('X-Twilio-Email-Event-Webhook-Signature') || '';
     const timestamp = req.headers.get('X-Twilio-Email-Event-Webhook-Timestamp') || '';
 
-    // Verify signature - fail closed pattern
-    const verification = await verifySignature(rawBody, signature, timestamp);
-    if (!verification.valid) {
-      logger.warn('[SendGrid Webhook] Verification failed:', verification.error);
-      const statusCode = verification.error === 'Service misconfigured' ? 500 : 401;
-      return new Response(JSON.stringify({ error: verification.error }), {
-        status: statusCode,
+    // Verify signature
+    const isValid = await verifySignature(rawBody, signature, timestamp);
+    if (!isValid) {
+      logger.warn('[SendGrid Webhook] Invalid signature');
+      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+        status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
