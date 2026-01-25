@@ -351,7 +351,7 @@ export default function TriagePage() {
         );
       default:
         return (
-          <CanvaBadge variant="secondary" size="sm">
+          <CanvaBadge variant="default" size="sm">
             Dusuk
           </CanvaBadge>
         );
@@ -386,7 +386,7 @@ export default function TriagePage() {
         );
       default:
         return (
-          <CanvaBadge variant="secondary" size="sm">
+          <CanvaBadge variant="default" size="sm">
             Kapatildi
           </CanvaBadge>
         );
@@ -433,7 +433,7 @@ export default function TriagePage() {
             </CanvaBadge>
           )}
           {!TRIAGE_ACTIONS_ENABLED && (
-            <CanvaBadge variant="secondary" size="sm">
+            <CanvaBadge variant="default" size="sm">
               <Lock className="h-3 w-3 mr-1" />
               Aksiyonlar Kapali
             </CanvaBadge>
@@ -590,7 +590,7 @@ export default function TriagePage() {
                       <p className="text-sm font-medium text-foreground truncate">
                         {item.title}
                       </p>
-                      <CanvaBadge variant="secondary" size="sm">
+                      <CanvaBadge variant="default" size="sm">
                         {getItemTypeLabel(item.itemType)}
                       </CanvaBadge>
                     </div>

@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/types/database';

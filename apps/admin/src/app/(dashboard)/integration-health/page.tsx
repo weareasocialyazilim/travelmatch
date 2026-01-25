@@ -188,7 +188,7 @@ export default function IntegrationHealthPage() {
         );
       default:
         return (
-          <CanvaBadge variant="secondary" size="sm">
+          <CanvaBadge variant="default" size="sm">
             Bilinmiyor
           </CanvaBadge>
         );

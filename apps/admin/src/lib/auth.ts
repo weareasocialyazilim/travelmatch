@@ -1,5 +1,7 @@
+import 'server-only';
+
 import { cookies } from 'next/headers';
-import { createServiceClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import crypto from 'crypto';
 import { logger } from './logger';
 import type { Database } from '@/types/database';

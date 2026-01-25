@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';

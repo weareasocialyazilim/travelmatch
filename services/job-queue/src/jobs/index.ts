@@ -31,7 +31,7 @@ export const KycJobSchema = z.object({
   documentNumber: z.string().min(5),
   frontImageUrl: z.string().url(),
   backImageUrl: z.string().url().optional(),
-  provider: z.enum(['onfido', 'idenfy']).default('idenfy'),
+  provider: z.literal('idenfy').default('idenfy'),
   metadata: z
     .record(z.string(), z.unknown())
     .optional()
@@ -48,7 +48,7 @@ export const KycJobResultSchema = z.object({
   success: z.boolean(),
   status: z.enum(['verified', 'rejected', 'needs_review']),
   provider: z.string(),
-  providerId: z.string().optional(), // ID from provider (Onfido, idenfy)
+  providerId: z.string().optional(), // ID from idenfy provider
   confidence: z.number().min(0).max(1).optional(), // 0-1 confidence score
   rejectionReasons: z.array(z.string()).optional(),
   completedAt: z.string().datetime(),

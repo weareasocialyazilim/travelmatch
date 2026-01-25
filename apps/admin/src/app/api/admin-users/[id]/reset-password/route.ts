@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
@@ -19,7 +19,7 @@ async function hashPassword(password: string): Promise<string> {
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -36,12 +36,12 @@ export async function POST(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { new_password, send_email = true } = body;
 
     // Hedef admini kontrol et
-    const supabase = getClient();
+    const supabase = createServiceClient();
     const { data: targetAdmin, error: fetchError } = await supabase
       .from('admin_users')
       .select('id, email, name')

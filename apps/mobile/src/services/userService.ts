@@ -318,6 +318,8 @@ export const userService = {
       pendingBalance: 0,
       giftsSent: 0,
       giftsReceived: 0,
+      coinsBalance: 0,
+      pendingBalance: 0,
       createdAt: '',
       lastActiveAt: '',
     };
@@ -378,6 +380,8 @@ export const userService = {
       pendingBalance: 0,
       giftsSent: 0,
       giftsReceived: 0,
+      coinsBalance: 0,
+      pendingBalance: 0,
       createdAt: '',
       lastActiveAt: '',
     };
@@ -736,6 +740,8 @@ export const userService = {
         pendingBalance: 0,
         giftsSent: 0,
         giftsReceived: 0,
+        coinsBalance: 0,
+        pendingBalance: 0,
         createdAt: u.created_at || '',
         lastActiveAt: u.last_seen_at || u.updated_at || '',
       };
@@ -784,6 +790,8 @@ export const userService = {
         pendingBalance: 0,
         giftsSent: 0,
         giftsReceived: 0,
+        coinsBalance: 0,
+        pendingBalance: 0,
         createdAt: u.created_at || '',
         lastActiveAt: u.last_seen_at || u.updated_at || '',
       };

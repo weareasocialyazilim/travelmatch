@@ -608,7 +608,7 @@ const KYCSelfieScreen: React.FC = () => {
 };
 
 // Animated scanning dot
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const ScanningDot: React.FC<{ index: number }> = ({ index }) => {
   const opacity = useSharedValue(0.3);
 

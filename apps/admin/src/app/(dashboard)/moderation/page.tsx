@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
@@ -177,12 +178,9 @@ export default function ModerationPage() {
 
   useEffect(() => {
     loadData();
-<<<<<<< Updated upstream
+    // loadData is stable - it only depends on state setters which never change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-=======
   }, [activeTab, dateRange]);
->>>>>>> Stashed changes
 
   async function loadData() {
     setLoading(true);

@@ -359,7 +359,7 @@ export default function IntegrationsMonitorPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="neutral">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -379,8 +379,8 @@ export default function IntegrationsMonitorPage() {
 
   // Calculate overall stats
   const allServices = Object.values(integrations).flatMap(
-    (cat) => cat.services,
-  );
+    (cat) => cat.services as any[],
+  ) as any[];
   const healthyCount = allServices.filter((s) => s.status === 'healthy').length;
   const degradedCount = allServices.filter(
     (s) => s.status === 'degraded',
@@ -409,7 +409,7 @@ export default function IntegrationsMonitorPage() {
           </span>
           <CanvaButton
             variant="secondary"
-            size="small"
+            size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -458,27 +458,21 @@ export default function IntegrationsMonitorPage() {
         <CanvaStatCard
           title="Saglikli"
           value={`${healthyCount}/${allServices.length}`}
-          variant="success"
         />
 
         <CanvaStatCard
           title="Yavaslamis"
           value={degradedCount.toString()}
-          variant="warning"
         />
 
         <CanvaStatCard
           title="Ort. Uptime"
           value={`%${avgUptime.toFixed(2)}`}
-          variant={
-            avgUptime >= 99.9 ? 'success' : avgUptime >= 99 ? 'info' : 'warning'
-          }
         />
 
         <CanvaStatCard
           title="Bugun Hata"
           value={totalErrors.toString()}
-          variant={totalErrors > 10 ? 'error' : 'success'}
         />
       </div>
 
@@ -634,8 +628,8 @@ export default function IntegrationsMonitorPage() {
                       <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                         <span>Son kontrol: {service.lastCheck}</span>
                         <CanvaButton
-                          variant="tertiary"
-                          size="small"
+                          variant="ghost"
+                          size="sm"
                           className="h-6 px-2"
                         >
                           <ExternalLink className="h-3 w-3" />

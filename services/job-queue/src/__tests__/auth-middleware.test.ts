@@ -3,7 +3,7 @@
  * Tests for service-to-service and admin authentication
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+/// <reference types="jest" />
 import { Response } from 'express';
 import crypto from 'crypto';
 
@@ -32,18 +32,18 @@ const createMockRequest = (headers: Record<string, string> = {}) => ({
 
 const createMockResponse = () => {
   const res = {
-    status: vi.fn().mockReturnThis(),
-    json: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
   } as unknown;
   return res as Response;
 };
 
-const createMockNext = () => vi.fn();
+const createMockNext = () => jest.fn();
 
 describe('Service Authentication Middleware', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
     process.env = { ...process.env, ...mockEnv };
   });
 
@@ -209,7 +209,7 @@ describe('Service Authentication Middleware', () => {
       const validCreds = Buffer.from(
         `${mockEnv.BULL_BOARD_ADMIN_USER}:${mockEnv.BULL_BOARD_ADMIN_PASSWORD}`,
       ).toString('base64');
-      const _req = createMockRequest({ authorization: `Basic ${validCreds}` });
+      const req = createMockRequest({ authorization: `Basic ${validCreds}` });
       const _res = createMockResponse();
       const next = createMockNext();
 
