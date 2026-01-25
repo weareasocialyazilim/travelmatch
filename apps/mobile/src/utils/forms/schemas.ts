@@ -236,28 +236,6 @@ export const refundRequestSchema = z.object({
 // ============================================================================
 // TRIP SCHEMAS
 // ============================================================================
-
-export const createTripSchema = z
-  .object({
-    destination: z.string().min(1, 'forms.validation.destination.required'),
-    startDate: z.date(),
-    endDate: z.date(),
-    budget: amountValidation.optional(),
-    description: messageValidation.optional(),
-    companions: z.number().min(1).max(10).optional(),
-  })
-  .refine((data) => data.endDate > data.startDate, {
-    message: 'forms.validation.endDate.afterStart',
-    path: ['endDate'],
-  });
-
-export const tripRequestSchema = z.object({
-  tripId: z.string().uuid('forms.validation.tripId.invalid'),
-  message: messageValidation,
-  budget: amountValidation.optional(),
-});
-
-// ============================================================================
 // MOMENT SCHEMAS
 // ============================================================================
 
@@ -417,7 +395,7 @@ export const trustNoteSchema = z.object({
     .min(10, 'forms.validation.trustNote.min')
     .max(500, 'forms.validation.trustNote.max'),
   rating: z.number().min(1).max(5),
-  category: z.enum(['meet', 'trip', 'help', 'other']).optional(),
+  category: z.enum(['meet', 'experience', 'help', 'other']).optional(),
 });
 
 export const proofUploadSchema = z.object({
@@ -426,7 +404,7 @@ export const proofUploadSchema = z.object({
     .min(1, 'forms.validation.title.required')
     .max(100, 'forms.validation.title.max'),
   description: messageValidation.optional(),
-  category: z.enum(['travel', 'education', 'work', 'skill', 'other']),
+  category: z.enum(['experience', 'education', 'work', 'skill', 'other']),
 });
 
 // ============================================================================
@@ -445,8 +423,6 @@ export type WithdrawInput = z.infer<typeof withdrawSchema>;
 export type AddPaymentMethodInput = z.infer<typeof addPaymentMethodSchema>;
 export type SendGiftInput = z.infer<typeof sendGiftSchema>;
 export type RefundRequestInput = z.infer<typeof refundRequestSchema>;
-export type CreateTripInput = z.infer<typeof createTripSchema>;
-export type TripRequestInput = z.infer<typeof tripRequestSchema>;
 export type CreateMomentInput = z.infer<typeof createMomentSchema>;
 export type EditMomentInput = z.infer<typeof editMomentSchema>;
 export type ReportInput = z.infer<typeof reportSchema>;
