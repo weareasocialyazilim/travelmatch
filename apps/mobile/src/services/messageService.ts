@@ -578,12 +578,13 @@ class MessageService {
     conversationId: string,
     callback: (message: Message) => void,
   ) {
-    return messagesService.subscribeToConversation(
+    const channel = messagesService.subscribeToConversation(
       conversationId,
       (rawMessage: MessageRow) => {
         callback(transformMessage(rawMessage));
       },
     );
+    return channel.unsubscribe;
   }
 }
 
