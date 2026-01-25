@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import OfflineBanner from '../OfflineBanner';
 
 const meta: Meta<typeof OfflineBanner> = {
@@ -71,9 +71,9 @@ const AlwaysVisibleOfflineBanner = (props: any) => {
             }}
           />
         </View>
-        <View style={{ color: '#fff', fontSize: 14, fontWeight: '500' }}>
+        <Text style={{ color: '#fff', fontSize: 14, fontWeight: '500' }}>
           {props.message || "You're offline"}
-        </View>
+        </Text>
       </View>
       {props.showRetry !== false && (
         <View
@@ -84,9 +84,9 @@ const AlwaysVisibleOfflineBanner = (props: any) => {
             borderRadius: 6,
           }}
         >
-          <View style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>
+          <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>
             Retry
-          </View>
+          </Text>
         </View>
       )}
     </View>

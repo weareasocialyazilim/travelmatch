@@ -435,11 +435,7 @@ describe('Button Component - Enhanced Tests', () => {
 
     it('should render with haptic disabled', () => {
       const { getByText } = render(
-        <Button
-          title="No Haptic"
-          onPress={jest.fn() as jest.Mock}
-          haptic={false}
-        />,
+        <Button title="No Haptic" onPress={jest.fn() as jest.Mock} />,
       );
       expect(getByText('No Haptic')).toBeTruthy();
     });

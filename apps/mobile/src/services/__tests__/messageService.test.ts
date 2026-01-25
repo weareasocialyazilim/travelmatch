@@ -418,9 +418,10 @@ describe('MessageService', () => {
     it('should call messagesService.subscribeToConversation', () => {
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
+      const mockChannel = { unsubscribe: mockUnsubscribe };
 
       mockMessagesService.subscribeToConversation.mockReturnValue(
-        mockUnsubscribe,
+        mockChannel as any,
       );
 
       const unsubscribe = messageService.subscribeToConversation(

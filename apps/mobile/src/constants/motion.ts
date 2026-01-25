@@ -156,7 +156,7 @@ export function getAccessibleSpring(
       damping: 50,
       stiffness: 500,
       mass: 1,
-    };
+    } as unknown as typeof SPRING.default;
   }
   return spring;
 }

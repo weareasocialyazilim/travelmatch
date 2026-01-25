@@ -66,9 +66,9 @@ const CoinStoreScreen = () => {
   const fetchUserCoins = async () => {
     if (!user) return;
     const { data } = await supabase
-      .from('wallets')
+      .from('users')
       .select('coins_balance')
-      .eq('user_id', user.id)
+      .eq('id', user.id)
       .single();
     if (data) {
       setUserCoins(data.coins_balance || 0);
@@ -251,7 +251,9 @@ const CoinStoreScreen = () => {
                 size={28}
                 color={DARK_THEME.accentGold}
               />
-              <Text testID="text-balance" style={styles.balanceText}>{userCoins}</Text>
+              <Text testID="text-balance" style={styles.balanceText}>
+                {userCoins}
+              </Text>
             </View>
             <Text style={styles.balanceSubtext}>
               {t(

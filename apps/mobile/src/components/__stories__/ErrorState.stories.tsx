@@ -31,7 +31,7 @@ export const NetworkError: Story = {
   args: {
     message:
       'Unable to connect. Please check your internet connection and try again.',
-    icon: 'wifi-off',
+    icon: 'wifi-off' as any,
     onRetry: () => console.log('Retry pressed'),
     retryText: 'Retry Connection',
   },
@@ -40,7 +40,7 @@ export const NetworkError: Story = {
 export const NotFoundError: Story = {
   args: {
     message: "The page you're looking for doesn't exist.",
-    icon: 'map-marker-question-outline',
+    icon: 'map-marker-question-outline' as any,
     onRetry: undefined,
   },
 };
@@ -48,7 +48,7 @@ export const NotFoundError: Story = {
 export const AuthenticationError: Story = {
   args: {
     message: 'Your session has expired. Please log in again to continue.',
-    icon: 'lock-alert-outline',
+    icon: 'lock-alert-outline' as any,
     onRetry: () => console.log('Re-authenticate'),
     retryText: 'Log In',
   },
@@ -57,7 +57,7 @@ export const AuthenticationError: Story = {
 export const ServerError: Story = {
   args: {
     message: "Our servers are experiencing issues. We're working on it!",
-    icon: 'server-network-off',
+    icon: 'server-network-off' as any,
     onRetry: () => console.log('Retry pressed'),
     retryText: 'Try Again',
   },
@@ -66,7 +66,7 @@ export const ServerError: Story = {
 export const PermissionDenied: Story = {
   args: {
     message: "You don't have permission to view this content.",
-    icon: 'shield-lock-outline',
+    icon: 'shield-lock-outline' as any,
     onRetry: undefined,
   },
 };
@@ -74,7 +74,7 @@ export const PermissionDenied: Story = {
 export const DataLoadError: Story = {
   args: {
     message: 'Failed to load data. Please try again.',
-    icon: 'database-alert-outline',
+    icon: 'database-alert-outline' as any,
     onRetry: () => console.log('Retry pressed'),
   },
 };
@@ -82,7 +82,7 @@ export const DataLoadError: Story = {
 export const CustomIcon: Story = {
   args: {
     message: 'No results found. Try adjusting your filters.',
-    icon: 'magnify',
+    icon: 'magnify' as any,
     onRetry: () => console.log('Clear filters'),
     retryText: 'Clear Filters',
   },
@@ -91,7 +91,7 @@ export const CustomIcon: Story = {
 export const WithoutRetryButton: Story = {
   args: {
     message: 'This feature is currently unavailable.',
-    icon: 'alert-octagon-outline',
+    icon: 'alert-octagon-outline' as any,
     onRetry: undefined,
   },
 };

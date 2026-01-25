@@ -567,7 +567,7 @@ describe('AnimatedComponents', () => {
 
   describe('useShakeAnimation', () => {
     const TestComponent = () => {
-      const { shake, shakeValue } = useShakeAnimation();
+      const { shake } = useShakeAnimation();
 
       return (
         <View>

@@ -79,8 +79,8 @@ describe('SessionManager', () => {
     avatar: 'https://example.com/avatar.jpg',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    role: 'user',
-    kyc: 'pending',
+    role: 'user' as any,
+    kyc: 'pending' as any,
     location: { lat: 0, lng: 0 },
   } as User;
 

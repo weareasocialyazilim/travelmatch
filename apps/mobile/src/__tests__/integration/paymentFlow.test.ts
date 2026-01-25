@@ -142,6 +142,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T10:00:00Z',
         metadata: { momentId: 'moment-456' },
         moment_id: 'moment-456',
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -268,6 +269,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T11:00:00Z',
         metadata: {},
         moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -323,13 +325,11 @@ describe('Payment Flow Integration', () => {
       // Mock successful fetch for withdrawal
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            settlementId: 'txn-withdraw-789',
-            fiat_amount: 200,
-            status: 'success',
-          }),
+        json: jest.fn().mockResolvedValue({
+          settlementId: 'txn-withdraw-789',
+          fiat_amount: 200,
+          status: 'success',
+        }),
       });
 
       const initialBalance = 500;
@@ -380,6 +380,7 @@ describe('Payment Flow Integration', () => {
         created_at: '2024-01-15T12:00:00Z',
         metadata: {},
         moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -478,6 +479,7 @@ describe('Payment Flow Integration', () => {
             created_at: '2024-01-15T13:00:00Z',
             metadata: {},
             moment_id: null,
+            escrow_status: null,
           },
           error: null,
         });
@@ -519,6 +521,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-15T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         {
           id: 'txn-2',
@@ -531,6 +534,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-14T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         {
           id: 'txn-3',
@@ -543,6 +547,7 @@ describe('Payment Flow Integration', () => {
           created_at: '2024-01-13T10:00:00Z',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
       ];
 
@@ -626,13 +631,11 @@ describe('Payment Flow Integration', () => {
       // Mock successful fetch for withdrawal
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            settlementId: 'sett-multi',
-            fiat_amount: 50,
-            status: 'success',
-          }),
+        json: jest.fn().mockResolvedValue({
+          settlementId: 'sett-multi',
+          fiat_amount: 50,
+          status: 'success',
+        }),
       });
 
       let currentBalance = 1000;
@@ -681,6 +684,7 @@ describe('Payment Flow Integration', () => {
           description: 'Payment 1',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         error: null,
       });
@@ -713,6 +717,7 @@ describe('Payment Flow Integration', () => {
           description: 'Withdrawal',
           metadata: {},
           moment_id: null,
+          escrow_status: null,
         },
         error: null,
       });
@@ -743,6 +748,7 @@ describe('Payment Flow Integration', () => {
             description: 'Concurrent txn',
             metadata: {},
             moment_id: null,
+            escrow_status: null,
             status: 'completed',
             type: 'payment',
             currency: 'USD',

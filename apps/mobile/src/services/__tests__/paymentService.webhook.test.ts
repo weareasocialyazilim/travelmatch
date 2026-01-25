@@ -18,8 +18,18 @@ jest.mock('../../config/supabase', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),
+      getSession: jest.fn(),
     },
     from: jest.fn(),
+    functions: {
+      invoke: jest.fn(),
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    })),
+    removeChannel: jest.fn(),
   },
 }));
 
@@ -119,7 +129,7 @@ describe('PaymentService - Webhook Failures', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
+      data: { user: mockUser as any },
       error: null,
     });
   });
@@ -189,8 +199,8 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
         moment_id: null,
+        metadata: {},
         escrow_status: null,
       };
 
@@ -240,8 +250,8 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        metadata: {},
         moment_id: null,
+        metadata: {},
         escrow_status: null,
       };
 

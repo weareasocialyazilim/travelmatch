@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Meta, StoryObj } from 'storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
-import { Button } from './Button';
+import { Button } from '../Button';
 
 const meta = {
   title: 'Components/Button',
@@ -13,8 +13,9 @@ const meta = {
         'secondary',
         'outline',
         'ghost',
-        'destructive',
-        'link',
+        'danger',
+        'neon',
+        'glass',
       ],
       control: { type: 'select' },
     },
@@ -30,7 +31,7 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <View style={{ padding: 16, backgroundColor: '#f9fafb' }}>
         <Story />
       </View>
@@ -48,6 +49,7 @@ export const Primary: Story = {
     children: 'Primary Button',
     disabled: false,
     loading: false,
+    onPress: () => {},
   },
 };
 
@@ -56,6 +58,7 @@ export const Secondary: Story = {
     variant: 'secondary',
     size: 'md',
     children: 'Secondary Button',
+    onPress: () => {},
   },
 };
 
@@ -64,6 +67,7 @@ export const Outline: Story = {
     variant: 'outline',
     size: 'md',
     children: 'Outline Button',
+    onPress: () => {},
   },
 };
 
@@ -72,14 +76,16 @@ export const Ghost: Story = {
     variant: 'ghost',
     size: 'md',
     children: 'Ghost Button',
+    onPress: () => {},
   },
 };
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
+    variant: 'danger',
     size: 'md',
     children: 'Delete Account',
+    onPress: () => {},
   },
 };
 
@@ -88,6 +94,7 @@ export const Small: Story = {
     variant: 'primary',
     size: 'sm',
     children: 'Small Button',
+    onPress: () => {},
   },
 };
 
@@ -96,6 +103,7 @@ export const Large: Story = {
     variant: 'primary',
     size: 'lg',
     children: 'Large Button',
+    onPress: () => {},
   },
 };
 
@@ -105,6 +113,7 @@ export const Disabled: Story = {
     size: 'md',
     children: 'Disabled Button',
     disabled: true,
+    onPress: () => {},
   },
 };
 
@@ -114,6 +123,7 @@ export const Loading: Story = {
     size: 'md',
     children: 'Loading Button',
     loading: true,
+    onPress: () => {},
   },
 };
 
@@ -122,39 +132,74 @@ export const WithIcon: Story = {
     variant: 'primary',
     size: 'md',
     children: 'Button with Icon',
-    icon: 'heart',
+    leftIcon: 'heart',
+    onPress: () => {},
   },
 };
 
 export const AllVariants: Story = {
+  args: {
+    onPress: () => {},
+  },
   render: () => (
     <View style={{ gap: 12 }}>
-      <Button variant="primary">Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="destructive">Destructive</Button>
-      <Button variant="link">Link</Button>
+      <Button variant="primary" onPress={() => {}}>
+        Primary
+      </Button>
+      <Button variant="secondary" onPress={() => {}}>
+        Secondary
+      </Button>
+      <Button variant="outline" onPress={() => {}}>
+        Outline
+      </Button>
+      <Button variant="ghost" onPress={() => {}}>
+        Ghost
+      </Button>
+      <Button variant="danger" onPress={() => {}}>
+        Danger
+      </Button>
+      <Button variant="neon" onPress={() => {}}>
+        Neon
+      </Button>
+      <Button variant="glass" onPress={() => {}}>
+        Glass
+      </Button>
     </View>
   ),
 };
 
 export const AllSizes: Story = {
+  args: {
+    onPress: () => {},
+  },
   render: () => (
     <View style={{ gap: 12 }}>
-      <Button size="sm">Small Button</Button>
-      <Button size="md">Medium Button</Button>
-      <Button size="lg">Large Button</Button>
+      <Button size="sm" onPress={() => {}}>
+        Small Button
+      </Button>
+      <Button size="md" onPress={() => {}}>
+        Medium Button
+      </Button>
+      <Button size="lg" onPress={() => {}}>
+        Large Button
+      </Button>
     </View>
   ),
 };
 
 export const InteractiveStates: Story = {
+  args: {
+    onPress: () => {},
+  },
   render: () => (
     <View style={{ gap: 12 }}>
-      <Button>Normal State</Button>
-      <Button disabled>Disabled State</Button>
-      <Button loading>Loading State</Button>
+      <Button onPress={() => {}}>Normal State</Button>
+      <Button onPress={() => {}} disabled>
+        Disabled State
+      </Button>
+      <Button onPress={() => {}} loading>
+        Loading State
+      </Button>
     </View>
   ),
 };

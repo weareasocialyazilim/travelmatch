@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Meta, StoryObj } from 'storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-native';
 import { View, Text, StyleSheet } from 'react-native';
-import { Badge } from './Badge';
+import { Badge } from '../Badge';
 
 const meta = {
   title: 'Components/Badge',
@@ -25,13 +25,13 @@ const meta = {
       control: { type: 'text' },
       description: 'Material icon name',
     },
-    dot: {
+    showDot: {
       control: { type: 'boolean' },
       description: 'Show dot indicator',
     },
   },
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <View
         style={{
           padding: 16,
@@ -134,7 +134,7 @@ export const WithDot: Story = {
     label: 'Active',
     variant: 'success',
     size: 'md',
-    dot: true,
+    showDot: true,
   },
 };
 
@@ -144,7 +144,7 @@ export const WithIconAndDot: Story = {
     variant: 'primary',
     size: 'md',
     icon: 'star',
-    dot: true,
+    showDot: true,
   },
 };
 
@@ -205,8 +205,8 @@ export const CategoryBadges: Story = {
 export const NotificationBadges: Story = {
   render: () => (
     <View style={styles.grid}>
-      <Badge label="3 new" variant="error" dot />
-      <Badge label="Online" variant="success" dot />
+      <Badge label="3 new" variant="error" showDot />
+      <Badge label="Online" variant="success" showDot />
       <Badge label="2 messages" variant="primary" icon="message" />
       <Badge label="Alert" variant="warning" icon="alert" />
     </View>
@@ -281,7 +281,13 @@ export const InteractiveBadges: Story = {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Paris Adventure Trip</Text>
         <View style={styles.badgeGroup}>
-          <Badge label="Trending" variant="warning" icon="fire" size="sm" dot />
+          <Badge
+            label="Trending"
+            variant="warning"
+            icon="fire"
+            size="sm"
+            showDot
+          />
           <Badge label="5 spots left" variant="error" size="sm" />
           <Badge
             label="Dec 15-20"
@@ -306,7 +312,7 @@ export const CompactList: Story = {
       ].map((user, index) => (
         <View key={index} style={styles.compactItem}>
           <Text style={styles.compactName}>{user.name}</Text>
-          <Badge label={user.status} variant={user.variant} size="sm" dot />
+          <Badge label={user.status} variant={user.variant} size="sm" showDot />
         </View>
       ))}
     </View>

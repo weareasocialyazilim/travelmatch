@@ -17,7 +17,7 @@ import {
   deleteAccount,
   onAuthStateChange,
 } from '@/services/supabaseAuthService';
-import { auth, supabase } from '@/config/supabase';
+import { auth as supabaseAuth, supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
@@ -52,7 +52,8 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
-const mockAuth = auth as jest.Mocked<typeof auth>;
+const auth = supabaseAuth as jest.Mocked<typeof supabaseAuth>;
+const mockAuth = auth;
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
 
@@ -302,7 +303,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle OAuth errors', async () => {
       auth.signInWithOAuth.mockResolvedValue({
-        data: { url: null, provider: null },
+        data: { url: null, provider: 'google' },
         error: mockAuthError,
       });
 
@@ -424,7 +425,7 @@ describe('supabaseAuthService', () => {
 
     it('should return null when no user is authenticated', async () => {
       auth.getUser.mockResolvedValue({
-        data: { user: null },
+        data: { user: null as any },
         error: null,
       });
 
@@ -467,7 +468,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('resetPassword', () => {
     it('should send password reset email successfully', async () => {
-      auth.resetPasswordForEmail.mockResolvedValue({ error: null });
+      auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
 
       const result = await resetPassword('test@example.com');
 
@@ -486,6 +487,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle reset password errors', async () => {
       auth.resetPasswordForEmail.mockResolvedValue({
+        data: null,
         error: mockAuthError,
       });
 

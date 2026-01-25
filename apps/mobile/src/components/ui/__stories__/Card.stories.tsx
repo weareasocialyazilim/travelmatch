@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Meta, StoryObj } from 'storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-native';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card } from './Card';
+import { Card } from '../Card';
 
 const styles = StyleSheet.create({
   title: {
@@ -62,7 +62,7 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <View style={{ padding: 16, backgroundColor: '#f9fafb' }}>
         <Story />
       </View>
@@ -171,6 +171,9 @@ export const WithImage: Story = {
 };
 
 export const AllVariants: Story = {
+  args: {
+    children: <Text />,
+  },
   render: () => (
     <View style={{ gap: 16 }}>
       <Card variant="elevated" padding="md">
@@ -187,6 +190,9 @@ export const AllVariants: Story = {
 };
 
 export const AllPaddings: Story = {
+  args: {
+    children: <Text />,
+  },
   render: () => (
     <View style={{ gap: 16 }}>
       <Card variant="outlined" padding="none">
@@ -214,6 +220,9 @@ export const AllPaddings: Story = {
 };
 
 export const NestedCards: Story = {
+  args: {
+    children: <Text />,
+  },
   render: () => (
     <Card variant="elevated" padding="lg">
       <Text style={styles.title}>Parent Card</Text>
@@ -230,6 +239,9 @@ export const NestedCards: Story = {
 };
 
 export const TripCard: Story = {
+  args: {
+    children: <Text />,
+  },
   render: () => (
     <Card
       variant="elevated"

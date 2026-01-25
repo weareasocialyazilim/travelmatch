@@ -14,8 +14,18 @@ jest.mock('../../config/supabase', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),
+      getSession: jest.fn(),
     },
     from: jest.fn(),
+    functions: {
+      invoke: jest.fn(),
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    })),
+    removeChannel: jest.fn(),
   },
 }));
 
@@ -47,6 +57,9 @@ async function processPaymentWithRetry(
     currency: string;
     paymentMethodId: string;
     description?: string;
+    metadata?: Record<string, unknown>;
+    moment_id?: string | null;
+    escrow_status?: 'locked' | 'released' | 'refunded' | null;
   },
   maxRetries = 3,
 ): Promise<any> {
@@ -78,8 +91,8 @@ describe('PaymentService - Retry Logic', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
+    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      data: { user: mockUser as any },
       error: null,
     });
   });
@@ -95,6 +108,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // First 2 attempts fail with network error, 3rd succeeds
@@ -108,6 +124,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(result).toHaveProperty('transaction');
@@ -129,6 +148,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Two failures then success
@@ -142,6 +164,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(result).toHaveProperty('transaction');
@@ -165,6 +190,9 @@ describe('PaymentService - Retry Logic', () => {
           currency: 'USD',
           paymentMethodId: 'pm_123',
           description: 'Gift sent',
+          metadata: {},
+          moment_id: null,
+          escrow_status: null,
         }),
       ).rejects.toThrow('Error 4');
 
@@ -186,6 +214,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // First attempt fails, second succeeds
@@ -198,6 +229,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(result).toHaveProperty('transaction');
@@ -217,6 +251,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Fail 3 times, succeed on 4th (last) attempt
@@ -231,6 +268,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(result).toHaveProperty('transaction');
@@ -250,6 +290,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValueOnce({
@@ -262,6 +305,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(result).toHaveProperty('transaction');
@@ -272,7 +318,7 @@ describe('PaymentService - Retry Logic', () => {
 
   describe('Permanent Failure Handling', () => {
     it('should not retry on authentication errors', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
+      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -315,6 +361,9 @@ describe('PaymentService - Retry Logic', () => {
             currency: 'USD',
             paymentMethodId: 'pm_123',
             description: 'Gift sent',
+            metadata: {},
+            moment_id: null,
+            escrow_status: null,
           },
           0,
         ),
@@ -356,8 +405,8 @@ describe('PaymentService - Retry Logic', () => {
         .spyOn(paymentService, 'withdrawFunds')
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({
-          success: true,
-          transaction: mockTransaction,
+          settlementId: 'sett-123',
+          fiatAmount: 100,
         });
 
       const result = await withdrawWithRetry({
@@ -366,8 +415,8 @@ describe('PaymentService - Retry Logic', () => {
         bankAccountId: 'ba_123',
       });
 
-      expect(result.success).toBe(true);
-      expect(result.transaction.type).toBe('withdrawal');
+      expect(result.settlementId).toBe('sett-123');
+      expect(result.fiatAmount).toBe(100);
     });
   });
 
@@ -385,6 +434,9 @@ describe('PaymentService - Retry Logic', () => {
             currency: 'USD',
             paymentMethodId: 'pm_123',
             description: 'Gift sent',
+            metadata: {},
+            moment_id: null,
+            escrow_status: null,
           },
           1,
         ),
@@ -404,6 +456,9 @@ describe('PaymentService - Retry Logic', () => {
             currency: 'USD',
             paymentMethodId: 'pm_123',
             description: 'Gift sent',
+            metadata: {},
+            moment_id: null,
+            escrow_status: null,
           },
           0,
         ),
@@ -427,6 +482,9 @@ describe('PaymentService - Retry Logic', () => {
           currency: 'USD',
           paymentMethodId: 'pm_123',
           description: 'Gift sent',
+          metadata: {},
+          moment_id: null,
+          escrow_status: null,
         }),
       ).rejects.toThrow();
 
@@ -446,6 +504,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -457,6 +518,9 @@ describe('PaymentService - Retry Logic', () => {
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       });
 
       expect(mockLogger.info).toHaveBeenCalledWith(

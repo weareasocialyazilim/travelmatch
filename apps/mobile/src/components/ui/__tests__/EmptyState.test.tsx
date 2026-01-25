@@ -469,7 +469,7 @@ describe('EmptyState Component', () => {
     });
 
     it('handles null style prop', () => {
-      render(<EmptyState title="Empty" style={null} />);
+      render(<EmptyState title="Empty" style={undefined} />);
     });
   });
 

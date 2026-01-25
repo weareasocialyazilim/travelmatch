@@ -14,8 +14,18 @@ jest.mock('../../config/supabase', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),
+      getSession: jest.fn(),
     },
     from: jest.fn(),
+    functions: {
+      invoke: jest.fn(),
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    })),
+    removeChannel: jest.fn(),
   },
 }));
 
@@ -96,8 +106,8 @@ describe('PaymentService - Payment Cancellation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
+    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
+      data: { user: mockUser as any },
       error: null,
     });
   });
@@ -149,6 +159,9 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -198,6 +211,9 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -242,6 +258,9 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       const mockRefundTransaction = {
@@ -254,6 +273,8 @@ describe('PaymentService - Payment Cancellation', () => {
         created_at: new Date().toISOString(),
         description: 'Refund for tx-123',
         metadata: { originalTransactionId: 'tx-123' },
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -297,6 +318,9 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -339,6 +363,9 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -348,7 +375,7 @@ describe('PaymentService - Payment Cancellation', () => {
 
       mockTransactionsService.update.mockResolvedValue({
         data: null,
-        error: { message: 'Cleanup failed' },
+        error: new Error('Cleanup failed'),
       });
 
       await paymentService.processPayment({
@@ -411,7 +438,7 @@ describe('PaymentService - Payment Cancellation', () => {
     });
 
     it('should handle invalid payment data', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
+      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
         error: null,
       });

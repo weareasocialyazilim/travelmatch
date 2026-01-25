@@ -57,7 +57,7 @@ describe('BiometricAuthContext', () => {
     jest.clearAllMocks();
 
     // Setup default mock implementations
-    mockBiometricAuth.initialize.mockResolvedValue(undefined);
+    mockBiometricAuth.initialize.mockResolvedValue(undefined as any);
     mockBiometricAuth.getCapabilities.mockResolvedValue({
       isAvailable: true,
       isEnrolled: true,

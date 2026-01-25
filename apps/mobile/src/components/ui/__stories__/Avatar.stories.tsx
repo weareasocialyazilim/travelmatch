@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Meta, StoryObj } from 'storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-native';
 import { View, Text, StyleSheet } from 'react-native';
-import { Avatar } from './Avatar';
+import { Avatar } from '../Avatar';
 
 const meta = {
   title: 'Components/Avatar',
@@ -20,13 +20,14 @@ const meta = {
       control: { type: 'select' },
       description: 'Avatar size',
     },
-    showBadge: {
+    showStatus: {
       control: { type: 'boolean' },
-      description: 'Show online status badge',
+      description: 'Show status indicator',
     },
-    badgeColor: {
-      control: { type: 'color' },
-      description: 'Badge indicator color',
+    status: {
+      options: ['online', 'offline', 'away'],
+      control: { type: 'select' },
+      description: 'User status',
     },
     showVerified: {
       control: { type: 'boolean' },
@@ -34,7 +35,7 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <View
         style={{
           padding: 16,
@@ -78,7 +79,8 @@ export const WithBadge: Story = {
   args: {
     source: SAMPLE_IMAGE,
     size: 'lg',
-    showBadge: true,
+    showStatus: true,
+    status: 'online',
   },
 };
 
@@ -94,7 +96,8 @@ export const WithBadgeAndVerified: Story = {
   args: {
     source: SAMPLE_IMAGE,
     size: 'xl',
-    showBadge: true,
+    showStatus: true,
+    status: 'online',
     showVerified: true,
   },
 };
@@ -188,39 +191,19 @@ export const OnlineStatuses: Story = {
   render: () => (
     <View style={styles.grid}>
       <View style={styles.gridItem}>
-        <Avatar
-          source={SAMPLE_IMAGE}
-          size="lg"
-          showBadge
-          badgeColor="#22c55e"
-        />
+        <Avatar source={SAMPLE_IMAGE} size="lg" showStatus status="online" />
         <Text style={styles.label}>Online</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar
-          source={SAMPLE_IMAGE}
-          size="lg"
-          showBadge
-          badgeColor="#ef4444"
-        />
+        <Avatar source={SAMPLE_IMAGE} size="lg" showStatus status="away" />
         <Text style={styles.label}>Busy</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar
-          source={SAMPLE_IMAGE}
-          size="lg"
-          showBadge
-          badgeColor="#f59e0b"
-        />
+        <Avatar source={SAMPLE_IMAGE} size="lg" showStatus status="away" />
         <Text style={styles.label}>Away</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar
-          source={SAMPLE_IMAGE}
-          size="lg"
-          showBadge
-          badgeColor="#6b7280"
-        />
+        <Avatar source={SAMPLE_IMAGE} size="lg" showStatus status="offline" />
         <Text style={styles.label}>Offline</Text>
       </View>
     </View>
@@ -239,7 +222,13 @@ export const VerifiedUsers: Story = {
         <Text style={styles.label}>Verified (Initials)</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar source={SAMPLE_IMAGE} size="lg" showBadge showVerified />
+        <Avatar
+          source={SAMPLE_IMAGE}
+          size="lg"
+          showStatus
+          status="online"
+          showVerified
+        />
         <Text style={styles.label}>Online + Verified</Text>
       </View>
     </View>
@@ -260,7 +249,8 @@ export const UserList: Story = {
             source={`https://i.pravatar.cc/150?img=${index + 1}`}
             name={user.name}
             size="md"
-            showBadge={user.online}
+            showStatus={user.online}
+            status={user.online ? 'online' : 'offline'}
             showVerified={user.verified}
           />
           <View style={styles.listContent}>

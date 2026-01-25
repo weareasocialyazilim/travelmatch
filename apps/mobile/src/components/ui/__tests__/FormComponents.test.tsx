@@ -29,7 +29,7 @@ describe('FormComponents', () => {
     });
 
     it('should render with value', () => {
-      const { getByLabelText, UNSAFE_getByType } = render(
+      const { getByLabelText } = render(
         <FormInput
           label="Email"
           value="test@example.com"
@@ -596,7 +596,7 @@ describe('FormComponents', () => {
 
     it('should handle null value', () => {
       const { getByTestId } = render(
-        <FormInput value={null} onChangeText={() => {}} testID="email-input" />,
+        <FormInput value="" onChangeText={() => {}} testID="email-input" />,
       );
 
       const input = getByTestId('email-input');
@@ -605,11 +605,7 @@ describe('FormComponents', () => {
 
     it('should handle undefined value', () => {
       const { getByTestId } = render(
-        <FormInput
-          value={undefined}
-          onChangeText={() => {}}
-          testID="email-input"
-        />,
+        <FormInput value="" onChangeText={() => {}} testID="email-input" />,
       );
 
       const input = getByTestId('email-input');

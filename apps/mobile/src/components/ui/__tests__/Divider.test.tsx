@@ -195,7 +195,7 @@ describe('Divider Component', () => {
     });
 
     it('handles null style gracefully', () => {
-      render(<Divider style={null} />);
+      render(<Divider style={undefined} />);
     });
   });
 

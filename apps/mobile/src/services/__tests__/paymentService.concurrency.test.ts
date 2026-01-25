@@ -21,6 +21,15 @@ jest.mock('../../config/supabase', () => ({
       getSession: jest.fn(),
     },
     from: jest.fn(),
+    functions: {
+      invoke: jest.fn(),
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    })),
+    removeChannel: jest.fn(),
   },
 }));
 
@@ -128,6 +137,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift sent',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -173,6 +183,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 1',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       const mockTransaction2 = {
@@ -186,6 +197,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 2',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -229,6 +241,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 1',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       const mockTransaction2 = {
@@ -242,6 +255,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 2',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -286,6 +300,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift for Moment 1',
         moment_id: 'moment-1',
         metadata: { momentId: 'moment-1' },
+        escrow_status: null,
       };
 
       const mockTransaction2 = {
@@ -299,6 +314,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift for Moment 2',
         moment_id: 'moment-2',
         metadata: { momentId: 'moment-2' },
+        escrow_status: null,
       };
 
       const mockTransaction3 = {
@@ -312,6 +328,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift for Moment 3',
         moment_id: 'moment-3',
         metadata: { momentId: 'moment-3' },
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -367,6 +384,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 1',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       mockTransactionsService.create
@@ -379,6 +397,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
             description: 'Gift 3',
             moment_id: null,
             metadata: {},
+            escrow_status: null,
           },
           error: null,
         });
@@ -568,6 +587,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       (mockTransactionsService.create as jest.Mock).mockResolvedValue({

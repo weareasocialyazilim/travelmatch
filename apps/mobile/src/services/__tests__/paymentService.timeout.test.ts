@@ -23,6 +23,15 @@ jest.mock('../../config/supabase', () => ({
       getSession: jest.fn(),
     },
     from: jest.fn(),
+    functions: {
+      invoke: jest.fn(),
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    })),
+    removeChannel: jest.fn(),
   },
 }));
 
@@ -100,6 +109,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Gift sent',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -140,8 +150,9 @@ describe('PaymentService - Timeout Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        moment_id: null,
         metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Mock fast response (2 seconds)
@@ -185,8 +196,9 @@ describe('PaymentService - Timeout Edge Cases', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
-        moment_id: null,
         metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Create transaction first
@@ -248,6 +260,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Withdrawal to bank account',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -288,6 +301,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         description: 'Withdrawal to bank account',
         moment_id: null,
         metadata: {},
+        escrow_status: null,
       };
 
       // Mock wallet balance
@@ -512,14 +526,17 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'completed',
               created_at: new Date().toISOString(),
               description: 'Gift sent',
+              metadata: {},
+              moment_id: null,
+              escrow_status: null,
             },
             error: null,
           });
         }, 35000);
-      });
+      }) as Promise<any>;
 
       mockTransactionsService.create
-        .mockReturnValueOnce(slowPromise) // First call: slow
+        .mockReturnValueOnce(slowPromise as any) // First call: slow
         .mockResolvedValueOnce({
           // Second call: fast
           data: {
@@ -533,6 +550,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
             description: 'Gift sent (retry)',
             moment_id: null,
             metadata: {},
+            escrow_status: null,
           },
           error: null,
         });
@@ -590,6 +608,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Payment 1',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -610,6 +629,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Payment 2',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });

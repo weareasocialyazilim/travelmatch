@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Meta, StoryObj } from 'storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
-import { Input } from './Input';
+import { LiquidInput as Input } from '../LiquidInput';
 
 const meta = {
   title: 'Components/Input',
@@ -16,7 +16,7 @@ const meta = {
     error: {
       control: { type: 'text' },
     },
-    disabled: {
+    editable: {
       control: { type: 'boolean' },
     },
     secureTextEntry: {
@@ -25,9 +25,12 @@ const meta = {
     multiline: {
       control: { type: 'boolean' },
     },
+    icon: {
+      control: { type: 'text' },
+    },
   },
   decorators: [
-    (Story) => (
+    (Story: React.ComponentType) => (
       <View style={{ padding: 16, backgroundColor: '#f9fafb' }}>
         <Story />
       </View>
@@ -75,7 +78,7 @@ export const Disabled: Story = {
     label: 'Email',
     placeholder: 'Enter your email',
     value: 'user@example.com',
-    disabled: true,
+    editable: false,
   },
 };
 
@@ -92,7 +95,7 @@ export const WithIcon: Story = {
   args: {
     label: 'Search',
     placeholder: 'Search destinations',
-    leftIcon: 'search',
+    icon: 'search',
   },
 };
 
@@ -101,7 +104,7 @@ export const WithRightIcon: Story = {
     label: 'Email',
     placeholder: 'Enter your email',
     value: 'user@example.com',
-    rightIcon: 'check-circle',
+    icon: 'checkmark-circle',
   },
 };
 
@@ -111,7 +114,7 @@ export const AllStates: Story = {
       <Input label="Normal" placeholder="Enter value" />
       <Input label="With Value" value="Example value" />
       <Input label="With Error" error="This field is required" />
-      <Input label="Disabled" value="Disabled input" disabled />
+      <Input label="Disabled" value="Disabled input" editable={false} />
       <Input label="Password" secureTextEntry placeholder="Enter password" />
     </View>
   ),

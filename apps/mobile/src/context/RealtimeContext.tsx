@@ -12,7 +12,7 @@ import { AppState, type AppStateStatus } from 'react-native';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
-import { useAuthOptional } from './AuthContext';
+import { useAuth } from './AuthContext';
 import {
   realtimeChannelManager,
   ConnectionHealth,
@@ -133,7 +133,7 @@ const RealtimeContext = createContext<RealtimeContextType | undefined>(
 export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const auth = useAuthOptional();
+  const auth = useAuth();
   const user = auth?.user ?? null;
   const isAuthenticated = auth?.isAuthenticated ?? false;
   const hasAuthProvider = Boolean(auth);
@@ -405,7 +405,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
     const exponentialDelay = Math.min(
       BASE_DELAY_MS * Math.pow(2, attempt),
-      MAX_DELAY_MS
+      MAX_DELAY_MS,
     );
     // Add jitter: +/- 25% randomization to prevent thundering herd
     const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1);
@@ -427,7 +427,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     if (reconnectAttemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
       logger.error(
         'RealtimeContext',
-        `Max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) exceeded`
+        `Max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) exceeded`,
       );
       setConnectionState('disconnected');
       return;
@@ -441,7 +441,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
     logger.info(
       'RealtimeContext',
-      `Reconnecting in ${delay}ms (attempt ${reconnectAttemptRef.current}/${MAX_RECONNECT_ATTEMPTS})`
+      `Reconnecting in ${delay}ms (attempt ${reconnectAttemptRef.current}/${MAX_RECONNECT_ATTEMPTS})`,
     );
 
     reconnectTimeoutRef.current = setTimeout(() => {
