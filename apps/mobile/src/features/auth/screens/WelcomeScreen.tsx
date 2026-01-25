@@ -124,6 +124,7 @@ interface AnimatedButtonProps {
   accessibilityHint?: string;
   disabled?: boolean;
   showComingSoon?: boolean;
+  testID?: string;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -135,6 +136,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   accessibilityHint,
   disabled = false,
   showComingSoon = false,
+  testID,
 }) => {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -197,6 +199,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         accessibilityHint={accessibilityHint}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
+        testID={testID}
       >
         <View style={styles.buttonContent}>{children}</View>
         {showComingSoon && (
@@ -266,7 +269,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <View testID="screen-welcome" style={styles.container}>
       {/* Ambient Background */}
       <LinearGradient
         colors={[COLORS.bg.primary, COLORS.bg.tertiary]}
@@ -317,6 +320,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={600}
             accessibilityLabel="Apple ile devam et"
             accessibilityHint="Apple hesabınızla giriş yaparsınız"
+            testID="btn-apple-signin"
           >
             <MaterialCommunityIcons
               name="apple"
@@ -362,6 +366,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={800}
             accessibilityLabel="Hesap oluştur"
             accessibilityHint="Yeni bir hesap oluşturmak için kayıt sayfasına gider"
+            testID="btn-create-account"
           >
             <LinearGradient
               colors={GRADIENTS.gift}
@@ -381,6 +386,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             delay={900}
             accessibilityLabel="Giriş yap"
             accessibilityHint="Mevcut hesabınızla giriş sayfasına gider"
+            testID="btn-login"
           >
             <Text style={styles.secondaryButtonText}>{t('welcome.login')}</Text>
           </AnimatedButton>

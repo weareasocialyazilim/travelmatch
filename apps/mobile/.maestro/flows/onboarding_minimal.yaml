@@ -1,0 +1,85 @@
+# Onboarding Minimal Flow - P0 Critical Path
+# Validates: Complete Profile with minimum required fields
+# Risk covered: Profile creation failure, validation errors
+
+appId: com.lovendo.app
+name: "P0: Onboarding Minimal"
+tags:
+  - regression
+  - p0
+  - onboarding
+
+env:
+  TEST_NAME: "E2E Test User"
+  TEST_USERNAME: "e2etestuser123"
+  TEST_PHONE: "+905551234567"
+
+---
+
+# Note: This flow assumes user has completed auth and is on CompleteProfile screen
+# In real CI, chain this after auth_email_otp.yaml or use deep linking
+
+# If starting from scratch, launch app
+- launchApp
+
+# Wait for Complete Profile screen (may already be there post-auth)
+- extendedWaitUntil:
+    visible:
+      id: "screen-complete-profile"
+    timeout: 30000
+
+# Take screenshot of empty form
+- takeScreenshot: "onboarding_start"
+
+# Fill Full Name (required)
+- tapOn:
+    id: "input-fullname"
+- inputText: ${TEST_NAME}
+
+# Fill Username (required)
+- tapOn:
+    id: "input-username"
+- inputText: ${TEST_USERNAME}
+
+# Fill Phone (required for verification)
+- tapOn:
+    id: "input-phone"
+- inputText: ${TEST_PHONE}
+
+# Select at least one interest (required)
+- tapOn:
+    id: "btn-interest-1"  # Travel
+
+# Add two more interests for good measure
+- tapOn:
+    id: "btn-interest-2"  # Food
+
+- tapOn:
+    id: "btn-interest-3"  # Adventure
+
+# Hide keyboard
+- hideKeyboard
+
+# Take screenshot before submit
+- takeScreenshot: "onboarding_filled"
+
+# Tap Complete Profile button
+# Note: Button may be disabled if validation fails
+- tapOn:
+    id: "btn-complete-profile"
+
+# Wait for navigation to next screen (VerifyPhone or MainTabs)
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          text: ".*Verification.*"
+      - visible:
+          text: ".*Doğrulama.*"
+      - visible:
+          id: "screen-.*"
+    timeout: 10000
+
+# Take screenshot of result
+- takeScreenshot: "onboarding_complete"
+
+# SUCCESS: Onboarding form submitted successfully

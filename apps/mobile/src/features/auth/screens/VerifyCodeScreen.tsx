@@ -149,7 +149,7 @@ export const VerifyCodeScreen: React.FC = () => {
   const isCodeComplete = code.every((digit) => digit !== '');
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView testID="screen-verify-code" style={styles.container} edges={['top']}>
       {isLoading && <LoadingState type="overlay" message="Verifying..." />}
 
       {/* Header */}
@@ -198,6 +198,7 @@ export const VerifyCodeScreen: React.FC = () => {
               maxLength={1}
               selectTextOnFocus
               accessibilityLabel={`Digit ${index + 1}`}
+              testID={`otp-digit-${index}`}
             />
           ))}
         </View>
@@ -210,6 +211,7 @@ export const VerifyCodeScreen: React.FC = () => {
           ) : (
             <TouchableOpacity
               onPress={handleResend}
+              testID="btn-resend-code"
               {...a11y.button('Resend code')}
             >
               <Text style={styles.resendLink}>Resend Code</Text>
@@ -226,6 +228,7 @@ export const VerifyCodeScreen: React.FC = () => {
           onPress={() => handleVerify()}
           disabled={!isCodeComplete || isLoading}
           activeOpacity={0.8}
+          testID="btn-verify"
           {...a11y.button(
             'Verify code',
             undefined,
