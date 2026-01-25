@@ -22,6 +22,8 @@ interface GlassModalProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  /** Test ID for automation */
+  testID?: string;
 }
 
 export const GlassModal = ({
@@ -33,6 +35,7 @@ export const GlassModal = ({
   onCancel,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  testID,
 }: GlassModalProps) => {
   const getIcon = () => {
     switch (type) {
@@ -48,8 +51,19 @@ export const GlassModal = ({
   const iconData = getIcon();
 
   return (
-    <Modal transparent visible={visible} animationType="fade">
-      <View style={styles.overlay}>
+    <Modal
+      transparent
+      visible={visible}
+      animationType="fade"
+      accessibilityViewIsModal={true}
+      testID={testID}
+    >
+      <View
+        style={styles.overlay}
+        accessible={true}
+        accessibilityRole="alert"
+        accessibilityLabel={`${title}. ${message}`}
+      >
         <BlurView intensity={40} tint="dark" style={styles.container}>
           <View
             style={[
@@ -68,7 +82,15 @@ export const GlassModal = ({
           <Text style={styles.message}>{message}</Text>
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={onCancel}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={cancelText}
+              accessibilityHint="Dismiss this dialog"
+              testID={testID ? `${testID}-cancel` : undefined}
+            >
               <Text style={styles.cancelText}>{cancelText}</Text>
             </TouchableOpacity>
 
@@ -83,6 +105,15 @@ export const GlassModal = ({
                 },
               ]}
               onPress={onConfirm}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={confirmText}
+              accessibilityHint={
+                type === 'danger'
+                  ? 'This action cannot be undone'
+                  : 'Confirm this action'
+              }
+              testID={testID ? `${testID}-confirm` : undefined}
             >
               <Text
                 style={[

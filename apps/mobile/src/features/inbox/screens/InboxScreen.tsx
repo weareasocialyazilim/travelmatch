@@ -22,9 +22,9 @@ import {
   StatusBar,
   RefreshControl,
   TouchableOpacity,
-  ActivityIndicator,
   Platform,
 } from 'react-native';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -238,8 +238,19 @@ const InboxScreen: React.FC = () => {
 
       {/* Chat List */}
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={VIBE_ROOM_COLORS.neon.lime} />
+        <View
+          style={styles.loadingContainer}
+          accessible={true}
+          accessibilityLabel={t('common.loading')}
+          accessibilityRole="progressbar"
+        >
+          <Skeleton
+            type="list"
+            listType="chat"
+            count={5}
+            show={true}
+            testID="inbox-skeleton"
+          />
         </View>
       ) : (
         <FlashList
@@ -339,8 +350,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: INBOX_SPACING.screenPadding,
+    paddingTop: 8,
   },
 
   // Empty State
