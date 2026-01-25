@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   DollarSign,
@@ -119,14 +119,29 @@ export default function FinancePage() {
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
   // Use real API data
-  const { stats, transactions, isLoading, loadData, exportData, error } =
-    useFinance(dateRange);
+  const { data, isLoading, error, refetch } = useFinance({ period });
+  const stats = data?.summary;
+  const transactions = data?.transactions || [];
+  const loadData = refetch;
+  const exportData = () => {
+    if (data?.transactions) {
+      const columns = [
+        { key: 'id' as const, header: 'ID' },
+        { key: 'type' as const, header: 'Type' },
+        { key: 'amount' as const, header: 'Amount' },
+        { key: 'currency' as const, header: 'Currency' },
+        { key: 'status' as const, header: 'Status' },
+        { key: 'created_at' as const, header: 'Date' },
+      ];
+      exportToCSV(data.transactions as any, columns as any, generateExportFilename('finance') + '.csv');
+    }
+  };
 
   useEffect(() => {
     // Load Titan Health independently
     const loadTitanHealth = async () => {
       try {
-        const { createClient } = await import('@/lib/supabase/client'); // Dynamic import to avoid SSR issues if any
+        const { createClient } = await import('@/lib/supabase'); // Dynamic import to avoid SSR issues if any
         const supabase = createClient();
         const { data, error } = await supabase
           .from('view_financial_health')

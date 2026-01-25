@@ -169,7 +169,7 @@ function useAnalyticsChartData(period: DateRange) {
       const supabase = getClient();
 
       // Try to fetch from Supabase RPC
-      const { data, error } = await supabase.rpc('get_admin_analytics_charts', {
+      const { data, error } = await (supabase.rpc as any)('get_admin_analytics_charts', {
         period_days:
           period === '7d'
             ? 7
@@ -201,8 +201,8 @@ function useAnalyticsChartData(period: DateRange) {
         );
 
         // Attempt to fetch real data from available tables
-        const { data: userActivityData, error: activityError } = await supabase
-          .from('user_activity_logs')
+        const { data: userActivityData, error: activityError } = await (supabase
+          .from('user_activity_logs') as any)
           .select('created_at, user_id')
           .gte('created_at', startDate.toISOString())
           .order('created_at', { ascending: true });
@@ -214,7 +214,7 @@ function useAnalyticsChartData(period: DateRange) {
 
         // Process user activity data into daily active users format
         const dauMap = new Map<string, Set<string>>();
-        userActivityData?.forEach((activity) => {
+        userActivityData?.forEach((activity: { created_at: string; user_id: string }) => {
           const date = new Date(activity.created_at).toLocaleDateString(
             'tr-TR',
             { day: '2-digit', month: '2-digit' },
@@ -236,8 +236,8 @@ function useAnalyticsChartData(period: DateRange) {
           }));
 
         // Fetch revenue data
-        const { data: transactionData } = await supabase
-          .from('transactions')
+        const { data: transactionData } = await (supabase
+          .from('transactions') as any)
           .select('created_at, amount')
           .gte('created_at', startDate.toISOString())
           .order('created_at', { ascending: true });
@@ -246,7 +246,7 @@ function useAnalyticsChartData(period: DateRange) {
           string,
           { revenue: number; transactions: number }
         >();
-        transactionData?.forEach((tx) => {
+        transactionData?.forEach((tx: { created_at: string; amount: number }) => {
           const date = new Date(tx.created_at).toLocaleDateString('tr-TR', {
             day: '2-digit',
             month: '2-digit',
@@ -270,13 +270,13 @@ function useAnalyticsChartData(period: DateRange) {
           }));
 
         // Fetch user acquisition sources
-        const { data: usersData } = await supabase
-          .from('users')
+        const { data: usersData } = await (supabase
+          .from('users') as any)
           .select('acquisition_source')
           .gte('created_at', startDate.toISOString());
 
         const sourceMap = new Map<string, number>();
-        usersData?.forEach((user) => {
+        usersData?.forEach((user: { acquisition_source: string | null }) => {
           const source = user.acquisition_source || 'Organik';
           sourceMap.set(source, (sourceMap.get(source) || 0) + 1);
         });
@@ -299,13 +299,13 @@ function useAnalyticsChartData(period: DateRange) {
         }));
 
         // Fetch top cities
-        const { data: cityData } = await supabase
-          .from('users')
+        const { data: cityData } = await (supabase
+          .from('users') as any)
           .select('city')
           .not('city', 'is', null);
 
         const cityMap = new Map<string, number>();
-        cityData?.forEach((user) => {
+        cityData?.forEach((user: { city: string | null }) => {
           if (user.city) {
             cityMap.set(user.city, (cityMap.get(user.city) || 0) + 1);
           }
@@ -440,8 +440,8 @@ export default function AnalyticsPage() {
     isLoading: isMetricsLoading,
     error: metricsError,
   } = useAnalytics({ period: dateRange });
-  const { data: userMetricsData } = useUserMetrics(dateRange);
-  const { data: revenueMetricsData } = useRevenueMetrics(dateRange);
+  const userMetricsData = useUserMetrics(dateRange);
+  const revenueMetricsData = useRevenueMetrics(dateRange);
 
   // Use chart data hook for all chart-related data
   const {
@@ -782,7 +782,7 @@ export default function AnalyticsPage() {
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            data={userAcquisition}
+                            data={userAcquisition as any}
                             cx="50%"
                             cy="50%"
                             innerRadius={50}

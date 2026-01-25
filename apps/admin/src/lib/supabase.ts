@@ -12,9 +12,9 @@ export function createClient() {
   );
 }
 
-// Re-export server client for backwards compatibility
-// IMPORTANT: Only import createServiceClient in server components/API routes
-export { createServiceClient } from './supabase.server';
+// NOTE: For server-side Supabase client with service role,
+// import createServiceClient directly from '@/lib/supabase.server'
+// Do NOT re-export it here to avoid 'server-only' import in client bundles
 
 // Export singleton for client-side usage
 let clientInstance: ReturnType<typeof createClient> | null = null;

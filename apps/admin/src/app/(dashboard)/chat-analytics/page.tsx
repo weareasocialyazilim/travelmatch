@@ -366,7 +366,7 @@ export default function ChatAnalyticsPage() {
               </CanvaCardHeader>
               <CanvaCardBody>
                 <AdminAreaChart
-                  data={hourlyMessageData}
+                  data={hourlyMessageData as any}
                   xAxisKey="hour"
                   height={250}
                   areas={[
@@ -412,7 +412,7 @@ export default function ChatAnalyticsPage() {
             </CanvaCardHeader>
             <CanvaCardBody>
               <AdminLineChart
-                data={weeklyTrendData}
+                data={weeklyTrendData as any}
                 xAxisKey="date"
                 height={300}
                 lines={[

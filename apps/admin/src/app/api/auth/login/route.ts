@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import { createClient } from '@supabase/supabase-js';
 import { createAuditLog } from '@/lib/auth';
 import {

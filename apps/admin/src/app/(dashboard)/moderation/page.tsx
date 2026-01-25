@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
