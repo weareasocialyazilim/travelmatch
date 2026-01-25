@@ -1,4 +1,25 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
+
+// Onfido API response types
+interface OnfidoReport {
+  result: string;
+  breakdown?: Array<{ result: string }>;
+}
+
+interface OnfidoCheckResult {
+  id: string;
+  status: string;
+  result?: string;
+  reports?: OnfidoReport[];
+}
+
+// Idenfy API response types
+interface IdenfyVerificationResult {
+  status: 'APPROVED' | 'DENIED' | 'SUSPECTED' | 'REVIEWING' | 'ACTIVE';
+  deniedReason?: string;
+  autoStatus?: string;
+  manualStatus?: string;
+}
 import { createClient } from '@supabase/supabase-js';
 import { KycJobData, KycJobResult, KycJobSchema } from '../jobs/index.js';
 import Redis from 'ioredis';
@@ -138,7 +159,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   let attempts = 0;
   const maxAttempts = 20; // 20 * 3s = 60s max wait
 
-  let checkResult: any;
+  let checkResult: OnfidoCheckResult | null = null;
 
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3s
@@ -158,7 +179,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
       );
     }
 
-    checkResult = await resultResponse.json();
+    checkResult = (await resultResponse.json()) as OnfidoCheckResult;
 
     if (checkResult.status === 'complete') {
       break;
@@ -174,11 +195,9 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   // 5. Parse result
   const isVerified = checkResult.result === 'clear';
   const rejectionReasons = checkResult.reports
-
-    ?.filter((r: any) => r.result !== 'clear')
-
-    .map((r: any) => r.breakdown?.map((b: any) => b.result).join(', '))
-    .filter(Boolean);
+    ?.filter((r: OnfidoReport) => r.result !== 'clear')
+    .map((r: OnfidoReport) => r.breakdown?.map((b) => b.result).join(', '))
+    .filter((reason): reason is string => Boolean(reason));
 
   return {
     success: true,
@@ -236,7 +255,7 @@ async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
   let attempts = 0;
   const maxAttempts = 40; // idenfy can take longer
 
-  let verificationResult: any;
+  let verificationResult: IdenfyVerificationResult | null = null;
 
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -256,7 +275,8 @@ async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
       );
     }
 
-    verificationResult = await resultResponse.json();
+    verificationResult =
+      (await resultResponse.json()) as IdenfyVerificationResult;
 
     if (
       verificationResult.status === 'APPROVED' ||
@@ -459,7 +479,7 @@ export function createKycWorker(connection: Redis) {
       }
     },
     {
-      connection: connection as any,
+      connection: connection as unknown as ConnectionOptions,
       concurrency: 5, // Process up to 5 KYC verifications in parallel
       limiter: {
         max: 10, // Max 10 jobs per interval

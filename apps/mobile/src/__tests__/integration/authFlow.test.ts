@@ -125,6 +125,8 @@ describe('Auth Flow Integration', () => {
     momentCount: 0,
     giftsSent: 0,
     giftsReceived: 0,
+    coinsBalance: 0,
+    pendingBalance: 0,
     createdAt: '2024-01-15T10:00:00Z',
     lastActiveAt: '2024-01-15T10:00:00Z',
   };

@@ -51,7 +51,6 @@ interface AIAnalysisOverlayProps {
   currentStep: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AIAnalysisOverlay: React.FC<AIAnalysisOverlayProps> = ({
   isVisible,
   progress,
