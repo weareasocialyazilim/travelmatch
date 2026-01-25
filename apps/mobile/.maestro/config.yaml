@@ -1,0 +1,40 @@
+# Maestro Configuration for Lovendo Mobile
+# https://maestro.mobile.dev/reference/maestro-configuration
+
+appId: "com.lovendo.app"
+name: "Lovendo E2E Tests"
+
+# Default timeout for assertions (10 seconds)
+timeout: 10000
+
+# Flows to include in test runs
+flows:
+  - flows/cold_start.yaml
+  - flows/auth_email_otp.yaml
+  - flows/onboarding_minimal.yaml
+  - flows/empty_state.yaml
+  - flows/purchase_revenuecat.yaml
+  - flows/image_upload.yaml
+  - flows/logout_login_cycle.yaml
+
+# Environment variables for test runs
+env:
+  TEST_EMAIL: "e2e-test@lovendo.xyz"
+  TEST_PASSWORD: "TestPassword123!"
+  TEST_PHONE: "+905551234567"
+
+# Tags for selective test runs
+tags:
+  smoke:
+    - flows/cold_start.yaml
+    - flows/auth_email_otp.yaml
+  regression:
+    - flows/onboarding_minimal.yaml
+    - flows/empty_state.yaml
+    - flows/purchase_revenuecat.yaml
+    - flows/image_upload.yaml
+    - flows/logout_login_cycle.yaml
+  critical:
+    - flows/cold_start.yaml
+    - flows/auth_email_otp.yaml
+    - flows/purchase_revenuecat.yaml

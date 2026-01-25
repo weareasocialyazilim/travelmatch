@@ -55,9 +55,9 @@ const nextConfig = {
   reactStrictMode: true,
   // Note: ESLint configuration moved to eslint.config.mjs (Next.js 16+ requirement)
   typescript: {
-    // Allow production builds to complete even with type errors
-    // This is needed because Supabase types aren't generated for this project
-    ignoreBuildErrors: true,
+    // SECURITY: Type errors must be fixed before deployment
+    // Generate Supabase types with: pnpm supabase gen types typescript
+    ignoreBuildErrors: false,
   },
   images: {
     remotePatterns: [

@@ -1,22 +1,21 @@
-// supabase/functions/handle-storage-upload/index.ts (AWS Rekognition LIVE Build)
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { RekognitionClient, DetectModerationLabelsCommand } from "https://esm.sh/@aws-sdk/client-rekognition";
+// supabase/functions/handle-storage-upload/index.ts
+// AWS Rekognition Image Moderation - LIVE Build
+// Handles storage upload webhooks and scans images for policy violations
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-<<<<<<< Updated upstream
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
-import { getCorsHeaders } from '../_shared/cors.ts';
 import {
   RekognitionClient,
   DetectModerationLabelsCommand,
   DetectLabelsCommand,
   DetectFacesCommand,
 } from 'npm:@aws-sdk/client-rekognition@3.454.0';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type',
+};
 
 interface StorageWebhookPayload {
   type: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -35,59 +34,59 @@ interface StorageWebhookPayload {
   old_record: null | Record<string, unknown>;
 }
 
-Deno.serve(async (req) => {
-  const origin = req.headers.get('origin');
-  const corsHeaders = getCorsHeaders(origin);
-
+serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const awsAccessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID');
     const awsSecretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY');
     const awsRegion = Deno.env.get('AWS_REGION') || 'eu-central-1';
 
+    // FAIL-CLOSED: If required credentials missing, reject
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase credentials');
+      return new Response(
+        JSON.stringify({ error: 'Service configuration error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     const payload: StorageWebhookPayload = await req.json();
-
-    // Debug log for development only
 
     // Only process INSERT events on storage.objects
     if (payload.type !== 'INSERT' || payload.table !== 'objects') {
       return new Response(
         JSON.stringify({ message: 'Skipping non-INSERT event' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-=======
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-
-  try {
-    const payload = await req.json();
->>>>>>> Stashed changes
     const { record } = payload;
-    // record format: { name: 'folder/filename.jpg', bucket_id: 'moments', owner: 'user-uuid', id: 'object-uuid', ... }
 
     if (!record || !record.name) {
-      return new Response("No record found", { status: 200, headers: corsHeaders });
+      return new Response(
+        JSON.stringify({ message: 'No record found' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Critical: Only scan 'moments' or 'verification' buckets
+    // Only scan 'moments' or 'kyc-documents' buckets
     if (!['moments', 'kyc-documents'].includes(record.bucket_id)) {
-      return new Response("Skipped Bucket", { status: 200, headers: corsHeaders });
+      return new Response(
+        JSON.stringify({ message: 'Skipped bucket' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-<<<<<<< Updated upstream
     // --- AWS Rekognition Analysis ---
     let moderationStatus = 'pending';
-    let moderationLabels: any[] = [];
+    let moderationLabels: unknown[] = [];
     let moderationScore = 0;
     let verificationResult = {
       isVerified: false,
@@ -95,11 +94,11 @@ serve(async (req) => {
       detectedContext: [] as string[],
     };
 
-    // Only scan if credentials exist and it's an image
+    // Only scan if AWS credentials exist and it's an image
     if (
       awsAccessKeyId &&
       awsSecretAccessKey &&
-      record.metadata?.mimetype?.startsWith('image/')
+      (record.metadata?.mimetype as string)?.startsWith('image/')
     ) {
       try {
         console.log(`🔍 Scanning image with Rekognition: ${record.name}`);
@@ -115,11 +114,10 @@ serve(async (req) => {
           const arrayBuffer = await fileBlob.arrayBuffer();
           const imageBytes = new Uint8Array(arrayBuffer);
 
-          // AWS Rekognition 5MB Limit check
+          // AWS Rekognition 5MB limit check
           if (arrayBuffer.byteLength > 5 * 1024 * 1024) {
-            console.warn(
-              '⚠️ Image too large for Rekognition (>5MB), skipping.',
-            );
+            console.warn('⚠️ Image too large for Rekognition (>5MB), skipping.');
+            moderationStatus = 'skipped_size';
           } else {
             const client = new RekognitionClient({
               region: awsRegion,
@@ -137,26 +135,49 @@ serve(async (req) => {
 
             const modResponse = await client.send(modCommand);
 
-            if (
-              modResponse.ModerationLabels &&
-              modResponse.ModerationLabels.length > 0
-            ) {
+            if (modResponse.ModerationLabels && modResponse.ModerationLabels.length > 0) {
               const labels = modResponse.ModerationLabels;
               const hasExplicit = labels.some(
                 (l) =>
                   l.ParentName === 'Explicit Nudity' ||
                   l.Name === 'Explicit Nudity' ||
                   l.ParentName === 'Violence' ||
-                  l.Name === 'Violence',
+                  l.Name === 'Violence'
               );
 
               if (hasExplicit) {
                 moderationStatus = 'rejected';
                 moderationScore = 100;
-                console.log(
-                  '❌ Content REJECTED (Explicit):',
-                  JSON.stringify(labels),
-                );
+                console.log('❌ Content REJECTED (Explicit):', JSON.stringify(labels));
+
+                // Block the content
+                if (record.bucket_id === 'moments') {
+                  await supabase
+                    .from('moments')
+                    .update({
+                      is_approved: false,
+                      is_hidden: true,
+                      moderation_status: 'rejected',
+                    })
+                    .eq('media_url', record.name);
+                }
+
+                // Log to moderation_logs
+                await supabase.from('moderation_logs').insert({
+                  user_id: record.owner,
+                  content_type: 'image',
+                  severity: 'high',
+                  violations: labels.map((l) => l.Name),
+                  action_taken: 'blocked',
+                  metadata: {
+                    provider: 'aws_rekognition',
+                    labels,
+                    bucket: record.bucket_id,
+                    path: record.name,
+                  },
+                });
+
+                // Increment user risk score
                 await supabase.rpc('increment_risk_score', {
                   target_user_id: record.owner,
                   increment_amount: 50,
@@ -164,11 +185,8 @@ serve(async (req) => {
                 });
               } else {
                 moderationStatus = 'pending_review';
-                moderationScore = labels[0].Confidence || 50;
-                console.log(
-                  '⚠️ Content SUSPICIOUS (Review):',
-                  JSON.stringify(labels),
-                );
+                moderationScore = labels[0]?.Confidence || 50;
+                console.log('⚠️ Content SUSPICIOUS (Review):', JSON.stringify(labels));
               }
               moderationLabels = labels;
             } else {
@@ -188,16 +206,14 @@ serve(async (req) => {
                   MinConfidence: 70,
                 });
                 const labelResponse = await client.send(labelCommand);
-                const labels = labelResponse.Labels || [];
-                const foodRelated = labels.some((l) =>
-                  ['Food', 'Meal', 'Dish', 'Beverage', 'Drink'].includes(
-                    l.Name || '',
-                  ),
+                const detectedLabels = labelResponse.Labels || [];
+                const foodRelated = detectedLabels.some((l) =>
+                  ['Food', 'Meal', 'Dish', 'Beverage', 'Drink'].includes(l.Name || '')
                 );
                 verificationResult = {
                   isVerified: foodRelated,
                   matchConfidence: foodRelated ? 90 : 0,
-                  detectedContext: labels.map((l) => l.Name || ''),
+                  detectedContext: detectedLabels.map((l) => l.Name || ''),
                 };
               } else if (aiMode.includes('selfie') || aiMode.includes('face')) {
                 const faceCommand = new DetectFacesCommand({
@@ -211,31 +227,23 @@ serve(async (req) => {
                   matchConfidence: hasFace ? 95 : 0,
                   detectedContext: hasFace ? ['Face Detected'] : ['No Face'],
                 };
-              } else if (
-                aiMode.includes('landscape') ||
-                aiMode.includes('outdoors')
-              ) {
+              } else if (aiMode.includes('landscape') || aiMode.includes('outdoors')) {
                 const labelCommand = new DetectLabelsCommand({
                   Image: { Bytes: imageBytes },
                   MaxLabels: 10,
                   MinConfidence: 70,
                 });
                 const labelResponse = await client.send(labelCommand);
-                const labels = labelResponse.Labels || [];
-                const outdoors = labels.some((l) =>
-                  [
-                    'Nature',
-                    'Outdoors',
-                    'Landscape',
-                    'City',
-                    'Building',
-                    'Sky',
-                  ].includes(l.Name || ''),
+                const detectedLabels = labelResponse.Labels || [];
+                const outdoors = detectedLabels.some((l) =>
+                  ['Nature', 'Outdoors', 'Landscape', 'City', 'Building', 'Sky'].includes(
+                    l.Name || ''
+                  )
                 );
                 verificationResult = {
                   isVerified: outdoors,
                   matchConfidence: outdoors ? 85 : 0,
-                  detectedContext: labels.map((l) => l.Name || ''),
+                  detectedContext: detectedLabels.map((l) => l.Name || ''),
                 };
               }
             }
@@ -243,114 +251,41 @@ serve(async (req) => {
         }
       } catch (modErr) {
         console.error('Moderation/Verification Process Error:', modErr);
+        moderationStatus = 'error';
       }
-    }
-
-    // Insert into uploaded_images table
-    const { data, error } = await supabase
-      .from('uploaded_images')
-      .insert({
-        user_id: record.owner,
-        bucket_id: record.bucket_id,
-        storage_path: record.name,
-        public_url: publicUrl,
-        image_type: imageType,
-        file_size: record.metadata?.size || null,
-        mime_type: record.metadata?.mimetype || null,
-        metadata: {
-          ...record.metadata,
-          verification_result: verificationResult, // Store extra AI data
-        },
-        moderation_status: moderationStatus,
-        moderation_labels: moderationLabels,
-        moderation_score: moderationScore,
-        moderation_details: {
-          scanned_at: new Date().toISOString(),
-          provider: 'aws_rekognition',
-          ai_mode: record.metadata?.aiMode,
-        },
-      })
-      .select()
-      .single();
-=======
-    // Initialize Supabase Admin Client
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    // 1. AWS Rekognition Analizi
-    const rekognition = new RekognitionClient({
-      region: Deno.env.get("AWS_REGION"),
-      credentials: {
-        accessKeyId: Deno.env.get("AWS_ACCESS_KEY_ID")!,
-        secretAccessKey: Deno.env.get("AWS_SECRET_ACCESS_KEY")!,
-      },
-    });
-
-    const command = new DetectModerationLabelsCommand({
-      Image: { S3Object: { Bucket: record.bucket_id, Name: record.name } },
-      MinConfidence: 75,
-    });
-
-    let response;
-    try {
-        // Note: For S3Object to work, the bucket and name must match what AWS expects (usually an S3 bucket).
-        // If Supabase Storage is S3-compatible or backed by S3, this might work if 'bucket_id' maps to the S3 bucket name.
-        // However, usually we send bytes or use a public URL if the bucket is not directly accessible by this Rekognition role in this way.
-        // The user provided code uses `S3Object`, implying Supabase is backed by S3 and we are using the underlying S3 bucket.
-        // If this fails, we might need to fetch the image bytes and send `Bytes`.
-        // Given the prompt explicitly provided `{ S3Object: ... }`, I will stick to it, but add a comment.
-        response = await rekognition.send(command);
-    } catch (awsError) {
-        console.error("AWS Rekognition Error:", awsError);
-        // Fallback or re-throw? 
-        // If we can't scan, we might fail-open or fail-closed. Failsafe: log and return.
-        return new Response(JSON.stringify({ error: "AWS Scan Failed", details: awsError.message }), { status: 500, headers: corsHeaders });
-    }
-
-    // 2. İhlal Tespit Edilirse (Xcode 26/Guideline 1.2 Uyumlu)
-    if (response.ModerationLabels && response.ModerationLabels.length > 0) {
-      console.warn(`[AI SCAN] FLAGGED: ${record.name} - Labels: ${response.ModerationLabels.map(l => l.Name).join(", ")}`);
-
-      // İçeriği otomatik blokla
-      // Both tables for safety
-      if (record.bucket_id === 'moments') {
-        await supabase.from('moments').update({ is_approved: false, is_hidden: true, moderation_status: 'rejected' }).eq('media_url', record.name);
-      }
-      
-      // Admin Dashboard'u besleyen log kaydı
-      await supabase.from('moderation_logs').insert({
-        user_id: record.owner,
-        content_type: 'moment_description',
-        severity: 'high',
-        violations: response.ModerationLabels.map(l => l.Name),
-        action_taken: 'blocked',
-        metadata: { provider: 'AWS_Rekognition', labels: response.ModerationLabels }
-      });
->>>>>>> Stashed changes
-
-      return new Response(JSON.stringify({ status: "unsafe", action: "blocked", labels: response.ModerationLabels }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+    } else if (!awsAccessKeyId || !awsSecretAccessKey) {
+      console.warn('⚠️ AWS credentials not configured, skipping moderation');
+      moderationStatus = 'skipped_no_aws';
     }
 
     // Auto-approve if safe
-    if (record.bucket_id === 'moments') {
-         await supabase.from('moments').update({ is_approved: true, moderation_status: 'approved' }).eq('media_url', record.name);
+    if (moderationStatus === 'approved' && record.bucket_id === 'moments') {
+      await supabase
+        .from('moments')
+        .update({ is_approved: true, moderation_status: 'approved' })
+        .eq('media_url', record.name);
     }
 
-    return new Response(JSON.stringify({ status: "safe" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-
+    return new Response(
+      JSON.stringify({
+        status: moderationStatus,
+        score: moderationScore,
+        labels: moderationLabels,
+        verification: verificationResult,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
   } catch (error) {
-    console.error("Handler Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    console.error('Handler Error:', error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    );
   }
 });

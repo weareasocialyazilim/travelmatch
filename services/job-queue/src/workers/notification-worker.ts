@@ -1,4 +1,9 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
+
+// Extended job data with priority
+interface NotificationJobDataWithPriority extends NotificationJobData {
+  priority?: 'critical' | 'high' | 'normal' | 'low';
+}
 import { createClient } from '@supabase/supabase-js';
 import {
   NotificationJobData,
@@ -286,7 +291,8 @@ export function createNotificationWorker(connection: Redis) {
   const worker = new Worker<NotificationJobData, PushResult>(
     QueueNames.NOTIFICATION,
     async (job: Job<NotificationJobData>) => {
-      const priority = (job.data as any).priority || 'normal';
+      const priority =
+        (job.data as NotificationJobDataWithPriority).priority || 'normal';
       console.info(
         `[Notification Worker] Processing job ${job.id} (priority: ${priority}) for user ${job.data.userId}`,
       );
@@ -366,7 +372,7 @@ export function createNotificationWorker(connection: Redis) {
       }
     },
     {
-      connection: connection as any,
+      connection: connection as unknown as ConnectionOptions,
       concurrency: 20, // Process up to 20 notifications in parallel
       limiter: {
         max: 500, // Max 500 notifications per interval

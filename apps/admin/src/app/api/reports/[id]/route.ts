@@ -1,11 +1,11 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Auth check - P0 Security Fix
@@ -18,6 +18,7 @@ export async function GET(
       return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
     }
 
+    const { id } = await params;
     const supabase = createServiceClient();
 
     const { data: report, error } = await (supabase.from('reports') as any)
@@ -30,7 +31,7 @@ export async function GET(
         actions:report_actions(*)
       `,
       )
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) throw error;
@@ -51,7 +52,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Auth check - P0 Security Fix
@@ -64,6 +65,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
     }
 
+    const { id } = await params;
     const supabase = createServiceClient();
     const body = await request.json();
 
@@ -77,7 +79,7 @@ export async function PATCH(
           body.status === 'resolved' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 

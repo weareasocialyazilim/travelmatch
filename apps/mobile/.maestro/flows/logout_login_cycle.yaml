@@ -1,0 +1,150 @@
+# Logout-Login Cycle Flow - P1 Regression
+# Validates: Clean logout, state cleared, successful re-login
+# Risk covered: Session persistence bugs, state leakage, auth race conditions
+
+appId: com.lovendo.app
+name: "P1: Logout-Login Cycle"
+tags:
+  - regression
+  - p1
+  - auth
+  - session
+
+env:
+  TEST_EMAIL: "e2e-test@lovendo.xyz"
+
+---
+
+# This flow requires starting from an authenticated state
+- launchApp
+
+# Wait for app to load
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          id: "screen-discover"
+      - visible:
+          id: "screen-welcome"
+    timeout: 20000
+
+# If already on welcome, we're logged out - start fresh
+- runFlow:
+    when:
+      visible:
+        id: "screen-welcome"
+    commands:
+      - takeScreenshot: "logout_cycle_already_logged_out"
+      # Continue to login flow below
+
+# If authenticated, perform logout first
+- runFlow:
+    when:
+      visible:
+        id: "screen-discover"
+    commands:
+      # Take screenshot of authenticated state
+      - takeScreenshot: "logout_cycle_authenticated"
+
+      # Navigate to Settings
+      # Usually: Profile tab -> Settings icon
+      - tapOn:
+          text: ".*Profile.*"
+          optional: true
+
+      # Wait for profile screen
+      - wait: 1000
+
+      # Navigate to Settings (gear icon or "Settings" text)
+      - tapOn:
+          text: ".*Settings.*"
+          optional: true
+      - tapOn:
+          id: "btn-settings"
+          optional: true
+
+# Wait for Settings screen
+- extendedWaitUntil:
+    visible:
+      id: "screen-settings"
+    timeout: 10000
+    optional: true
+
+# If on Settings, perform logout
+- runFlow:
+    when:
+      visible:
+        id: "screen-settings"
+    commands:
+      # Take screenshot of settings
+      - takeScreenshot: "logout_settings_screen"
+
+      # Scroll to sign out button if needed
+      - scroll:
+          direction: "down"
+          duration: 500
+
+      # Tap Sign Out button
+      - tapOn:
+          id: "btn-sign-out"
+
+      # Handle confirmation dialog
+      - extendedWaitUntil:
+          anyOf:
+            - visible:
+                text: ".*Sign Out.*"
+            - visible:
+                text: ".*Çıkış.*"
+          timeout: 5000
+
+      # Confirm logout
+      - tapOn:
+          text: ".*Sign Out.*"
+          optional: true
+      - tapOn:
+          text: ".*Çıkış.*"
+          optional: true
+      - tapOn:
+          text: ".*OK.*"
+          optional: true
+
+# Wait for return to Welcome screen (logged out state)
+- extendedWaitUntil:
+    visible:
+      id: "screen-welcome"
+    timeout: 15000
+
+# Take screenshot of logged out state
+- takeScreenshot: "logout_successful"
+
+# Now verify we can log back in
+- tapOn:
+    id: "btn-login"
+
+# Wait for auth screen
+- extendedWaitUntil:
+    visible:
+      id: "screen-unified-auth"
+    timeout: 5000
+
+# Enter credentials
+- tapOn:
+    id: "input-identifier"
+
+- inputText: ${TEST_EMAIL}
+
+- tapOn:
+    id: "btn-continue"
+
+# Wait for password or OTP step
+- extendedWaitUntil:
+    anyOf:
+      - visible:
+          id: "input-password"
+      - visible:
+          id: "screen-verify-code"
+    timeout: 10000
+
+# Take screenshot
+- takeScreenshot: "logout_cycle_re_login"
+
+# SUCCESS: Logout completed and login flow started successfully

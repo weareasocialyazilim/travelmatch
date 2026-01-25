@@ -116,7 +116,6 @@ describe('Skeleton Component', () => {
       'transaction',
       'notification',
       'request',
-      'trip',
     ] as const;
 
     listTypes.forEach((type) => {

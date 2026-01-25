@@ -143,7 +143,7 @@ const AppSettingsScreen: React.FC = () => {
   ].filter(Boolean).length;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView testID="screen-settings" style={styles.container} edges={['top']}>
       {/* Offline Banner */}
       {!isConnected && (
         <OfflineState
@@ -448,6 +448,7 @@ const AppSettingsScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.signOutButton}
             onPress={handleSignOut}
+            testID="btn-sign-out"
           >
             <MaterialCommunityIcons name="logout" size={20} color="#FFFFFF" />
             <Text style={styles.signOutText}>Sign Out</Text>

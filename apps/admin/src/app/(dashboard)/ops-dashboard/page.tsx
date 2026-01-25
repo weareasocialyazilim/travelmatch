@@ -666,7 +666,7 @@ export default function OpsDashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CanvaBadge variant="secondary" size="sm">
+                      <CanvaBadge variant="default" size="sm">
                         {error.count}x
                       </CanvaBadge>
                       <CanvaBadge variant="default" size="sm">

@@ -623,14 +623,14 @@ const DiscoverScreen = () => {
   if (!loading && activeMoments.length === 0) {
     return (
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
-        <View style={styles.emptyContainer}>
+        <View testID="empty-moments" style={styles.emptyContainer}>
           <Ionicons
             name="compass-outline"
             size={64}
             color={COLORS.text.muted}
             style={styles.emptyIcon}
           />
-          <Text style={styles.emptyTitle}>
+          <Text testID="text-empty-title" style={styles.emptyTitle}>
             {t('emptyState.noMomentsNearby')}
           </Text>
           <Text style={styles.emptySubtitle}>
@@ -639,6 +639,7 @@ const DiscoverScreen = () => {
           <TouchableOpacity
             style={styles.emptyCTAButton}
             onPress={() => navigation.navigate('CreateMoment')}
+            testID="btn-create-moment-empty"
           >
             <LinearGradient
               colors={[COLORS.primary, '#22C55E']}

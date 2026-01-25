@@ -82,6 +82,7 @@ interface LiquidInputProps {
   autoFocus?: boolean;
   error?: string;
   accessibilityLabel: string;
+  testID?: string;
 }
 
 const LiquidInput: React.FC<LiquidInputProps> = ({
@@ -95,6 +96,7 @@ const LiquidInput: React.FC<LiquidInputProps> = ({
   autoFocus = false,
   error,
   accessibilityLabel,
+  testID,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const borderColor = useSharedValue<string>(COLORS.border.default);
@@ -141,6 +143,7 @@ const LiquidInput: React.FC<LiquidInputProps> = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           accessibilityLabel={accessibilityLabel}
+          testID={testID}
         />
       </Reanimated.View>
       {error && (
@@ -381,7 +384,7 @@ export const UnifiedAuthScreen: React.FC = () => {
   }));
 
   return (
-    <View style={styles.container}>
+    <View testID="screen-unified-auth" style={styles.container}>
       {/* Background Gradient */}
       <LinearGradient
         colors={[COLORS.bg.primary, COLORS.bg.tertiary]}
@@ -408,6 +411,7 @@ export const UnifiedAuthScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.backButton}
             onPress={handleBack}
+            testID="btn-back"
             {...a11y.button('Geri dön')}
           >
             <MaterialCommunityIcons
@@ -449,6 +453,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   keyboardType="email-address"
                   autoFocus
                   accessibilityLabel="E-posta veya telefon numarası"
+                  testID="input-identifier"
                 />
 
                 <Button
@@ -458,6 +463,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   disabled={!identifier || isCheckingUser}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-continue"
                 >
                   {isCheckingUser ? 'Kontrol ediliyor...' : 'Devam Et'}
                 </Button>
@@ -494,6 +500,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   secureTextEntry={!showPassword}
                   autoFocus
                   accessibilityLabel="Şifre"
+                  testID="input-password"
                 />
 
                 <TouchableOpacity
@@ -511,6 +518,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   disabled={!password}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-login"
                 >
                   Giriş Yap
                 </Button>
@@ -518,6 +526,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.switchMode}
                   onPress={switchToRegister}
+                  testID="btn-switch-to-register"
                 >
                   <Text style={styles.switchModeText}>
                     Hesabın yok mu?{' '}
@@ -557,6 +566,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   autoCapitalize="words"
                   autoFocus
                   accessibilityLabel="Ad Soyad"
+                  testID="input-name"
                 />
 
                 <LiquidInput
@@ -566,6 +576,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   icon="lock-outline"
                   secureTextEntry={!showPassword}
                   accessibilityLabel="Şifre"
+                  testID="input-register-password"
                 />
 
                 <LiquidInput
@@ -575,6 +586,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   icon="lock-check-outline"
                   secureTextEntry={!showPassword}
                   accessibilityLabel="Şifreyi onayla"
+                  testID="input-confirm-password"
                 />
 
                 <View style={styles.policySection}>
@@ -596,6 +608,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   disabled={!name || !password || !confirmPassword}
                   fullWidth
                   style={styles.submitButton}
+                  testID="btn-register"
                 >
                   Hesabımı Oluştur
                 </Button>

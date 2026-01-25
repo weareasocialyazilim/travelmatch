@@ -14,6 +14,9 @@ module.exports = {
     '!src/app/**/*.tsx', // Exclude Next.js page components
   ],
   moduleNameMapper: {
+    // Mock Upstash modules to avoid ESM compatibility issues in Jest
+    '^@upstash/ratelimit$': '<rootDir>/src/__mocks__/@upstash/ratelimit.ts',
+    '^@upstash/redis$': '<rootDir>/src/__mocks__/@upstash/redis.ts',
     // Explicit mappings for jest.mock hoisting (must come first)
     '^@/lib/utils$': '<rootDir>/src/lib/utils',
     // General path alias
@@ -39,6 +42,10 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/.next/',
+  ],
+  // Transform ESM modules from node_modules
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@upstash|uncrypto)/)',
   ],
   roots: ['<rootDir>/src'],
 };

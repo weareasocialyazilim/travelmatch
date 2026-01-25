@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
 import { createClient } from '@supabase/supabase-js';
 import { EmailJobData, EmailJobSchema, QueueNames } from '../jobs/index.js';
 import Redis from 'ioredis';
@@ -275,7 +275,7 @@ export function createEmailWorker(connection: Redis) {
       }
     },
     {
-      connection: connection as any,
+      connection: connection as unknown as ConnectionOptions,
       concurrency: 10, // Process up to 10 emails in parallel
       limiter: {
         max: 100, // Max 100 emails per interval

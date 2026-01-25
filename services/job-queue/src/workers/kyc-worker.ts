@@ -1,4 +1,12 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
+
+// Idenfy API response types
+interface IdenfyVerificationResult {
+  status: 'APPROVED' | 'DENIED' | 'SUSPECTED' | 'REVIEWING' | 'ACTIVE';
+  deniedReason?: string;
+  autoStatus?: string;
+  manualStatus?: string;
+}
 import { createClient } from '@supabase/supabase-js';
 import { KycJobData, KycJobResult, KycJobSchema } from '../jobs/index.js';
 import Redis from 'ioredis';
@@ -57,145 +65,6 @@ async function updateKycStatus(
 }
 
 /**
- * Verify KYC documents using Onfido
- */
-async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
-  const apiKey = process.env.ONFIDO_API_KEY;
-  if (!apiKey) {
-    throw new Error('ONFIDO_API_KEY not configured');
-  }
-
-  // 1. Create applicant
-  const applicantResponse = await fetch(
-    'https://api.onfido.com/v3/applicants',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Token token=${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        first_name: 'User',
-        last_name: data.userId.slice(0, 8), // Use part of UUID as last name (temporary)
-      }),
-    },
-  );
-
-  if (!applicantResponse.ok) {
-    throw new Error(
-      `Onfido applicant creation failed: ${applicantResponse.statusText}`,
-    );
-  }
-
-  const applicant = (await applicantResponse.json()) as { id: string };
-
-  // 2. Upload document (front image)
-  const documentFormData = new FormData();
-  documentFormData.append('type', data.documentType);
-  documentFormData.append('file', data.frontImageUrl); // In production, download and upload actual file
-  if (data.backImageUrl) {
-    documentFormData.append('back', data.backImageUrl);
-  }
-
-  const documentResponse = await fetch('https://api.onfido.com/v3/documents', {
-    method: 'POST',
-    headers: {
-      Authorization: `Token token=${apiKey}`,
-    },
-    body: documentFormData,
-  });
-
-  if (!documentResponse.ok) {
-    throw new Error(
-      `Onfido document upload failed: ${documentResponse.statusText}`,
-    );
-  }
-
-  const document = (await documentResponse.json()) as { id: string };
-
-  // 3. Create check (document + identity verification)
-  const checkResponse = await fetch('https://api.onfido.com/v3/checks', {
-    method: 'POST',
-    headers: {
-      Authorization: `Token token=${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      applicant_id: applicant.id,
-      report_names: ['document', 'identity_enhanced'],
-    }),
-  });
-
-  if (!checkResponse.ok) {
-    throw new Error(
-      `Onfido check creation failed: ${checkResponse.statusText}`,
-    );
-  }
-
-  const check = (await checkResponse.json()) as { id: string };
-
-  // 4. Poll for results (in production, use webhooks)
-  let attempts = 0;
-  const maxAttempts = 20; // 20 * 3s = 60s max wait
-
-  let checkResult: any;
-
-  while (attempts < maxAttempts) {
-    await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3s
-
-    const resultResponse = await fetch(
-      `https://api.onfido.com/v3/checks/${check.id}`,
-      {
-        headers: {
-          Authorization: `Token token=${apiKey}`,
-        },
-      },
-    );
-
-    if (!resultResponse.ok) {
-      throw new Error(
-        `Onfido check retrieval failed: ${resultResponse.statusText}`,
-      );
-    }
-
-    checkResult = await resultResponse.json();
-
-    if (checkResult.status === 'complete') {
-      break;
-    }
-
-    attempts++;
-  }
-
-  if (!checkResult || checkResult.status !== 'complete') {
-    throw new Error('Onfido verification timed out');
-  }
-
-  // 5. Parse result
-  const isVerified = checkResult.result === 'clear';
-  const rejectionReasons = checkResult.reports
-
-    ?.filter((r: any) => r.result !== 'clear')
-
-    .map((r: any) => r.breakdown?.map((b: any) => b.result).join(', '))
-    .filter(Boolean);
-
-  return {
-    success: true,
-    status: isVerified ? 'verified' : 'rejected',
-    provider: 'onfido',
-    providerId: check.id,
-    rejectionReasons,
-    completedAt: new Date().toISOString(),
-    metadata: {
-      applicantId: applicant.id,
-      checkId: check.id,
-      documentId: document.id,
-    },
-  };
-}
-
-/**
  * Verify KYC documents using idenfy
  * Documentation: https://documentation.idenfy.com/
  */
@@ -236,7 +105,7 @@ async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
   let attempts = 0;
   const maxAttempts = 40; // idenfy can take longer
 
-  let verificationResult: any;
+  let verificationResult: IdenfyVerificationResult | null = null;
 
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -256,7 +125,8 @@ async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
       );
     }
 
-    verificationResult = await resultResponse.json();
+    verificationResult =
+      (await resultResponse.json()) as IdenfyVerificationResult;
 
     if (
       verificationResult.status === 'APPROVED' ||
@@ -378,7 +248,7 @@ export function createKycWorker(connection: Redis) {
         await updateKycStatus(validatedData.userId, 'processing');
         await job.updateProgress(10);
 
-        // 3. Call appropriate KYC provider
+        // 3. Call idenfy KYC provider
         let result: KycJobResult;
 
         if (
@@ -387,16 +257,9 @@ export function createKycWorker(connection: Redis) {
         ) {
           logger.debug('[KYC Worker] Using mock verification');
           result = await verifyMock(validatedData);
-        } else if (validatedData.provider === 'onfido') {
-          logger.info('[KYC Worker] Verifying with Onfido');
-          result = await verifyWithOnfido(validatedData);
-        } else if (validatedData.provider === 'idenfy') {
+        } else {
           logger.info('[KYC Worker] Verifying with idenfy');
           result = await verifyWithIdenfy(validatedData);
-        } else {
-          throw new Error(
-            `Unsupported KYC provider: ${validatedData.provider}`,
-          );
         }
 
         await job.updateProgress(60);
@@ -459,7 +322,7 @@ export function createKycWorker(connection: Redis) {
       }
     },
     {
-      connection: connection as any,
+      connection: connection as unknown as ConnectionOptions,
       concurrency: 5, // Process up to 5 KYC verifications in parallel
       limiter: {
         max: 10, // Max 10 jobs per interval

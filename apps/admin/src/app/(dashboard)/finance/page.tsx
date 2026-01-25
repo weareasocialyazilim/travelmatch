@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   DollarSign,
@@ -119,14 +119,29 @@ export default function FinancePage() {
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
   // Use real API data
-  const { stats, transactions, isLoading, loadData, exportData, error } =
-    useFinance(dateRange);
+  const { data, isLoading, error, refetch } = useFinance({ period });
+  const stats = data?.summary;
+  const transactions = data?.transactions || [];
+  const loadData = refetch;
+  const exportData = () => {
+    if (data?.transactions) {
+      const columns = [
+        { key: 'id' as const, header: 'ID' },
+        { key: 'type' as const, header: 'Type' },
+        { key: 'amount' as const, header: 'Amount' },
+        { key: 'currency' as const, header: 'Currency' },
+        { key: 'status' as const, header: 'Status' },
+        { key: 'created_at' as const, header: 'Date' },
+      ];
+      exportToCSV(data.transactions as any, columns as any, generateExportFilename('finance') + '.csv');
+    }
+  };
 
   useEffect(() => {
     // Load Titan Health independently
     const loadTitanHealth = async () => {
       try {
-        const { createClient } = await import('@/lib/supabase/client'); // Dynamic import to avoid SSR issues if any
+        const { createClient } = await import('@/lib/supabase'); // Dynamic import to avoid SSR issues if any
         const supabase = createClient();
         const { data, error } = await supabase
           .from('view_financial_health')
@@ -144,7 +159,9 @@ export default function FinancePage() {
 
   const handleApprove = async (id: string) => {
     try {
-      const response = await fetch(`/api/finance/payout/${id}/approve`, { method: 'POST' });
+      const response = await fetch(`/api/finance/payout/${id}/approve`, {
+        method: 'POST',
+      });
       if (!response.ok) throw new Error('Onay başarısız');
       toast.success('Ödeme başarıyla onaylandı');
       loadData();
@@ -155,7 +172,9 @@ export default function FinancePage() {
 
   const handleReject = async (id: string) => {
     try {
-      const response = await fetch(`/api/finance/payout/${id}/reject`, { method: 'POST' });
+      const response = await fetch(`/api/finance/payout/${id}/reject`, {
+        method: 'POST',
+      });
       if (!response.ok) throw new Error('Red başarısız');
       toast.success('Ödeme reddedildi');
       loadData();
@@ -321,7 +340,9 @@ export default function FinancePage() {
                 ? formatCurrency(titanHealth.pending_withdrawals_amount)
                 : '...'}
             </p>
-            <p className="text-xs text-muted-foreground">Manual Check Required if > 1k</p>
+            <p className="text-xs text-muted-foreground">
+              Manual Check Required if &gt; 1k
+            </p>
           </div>
         </div>
 
@@ -333,12 +354,17 @@ export default function FinancePage() {
             </span>
             <div className="flex items-baseline space-x-2">
               <span className="text-2xl font-bold">
-                {titanHealth ? titanHealth.total_coins_sold?.toLocaleString() : '...'}
+                {titanHealth
+                  ? titanHealth.total_coins_sold?.toLocaleString()
+                  : '...'}
               </span>
               <span className="text-xs text-blue-500">Units</span>
             </div>
             <p className="text-sm font-medium">
-              Gross: {titanHealth ? formatCurrency(titanHealth.total_coins_sold * 1.5) : '...'}
+              Gross:{' '}
+              {titanHealth
+                ? formatCurrency(titanHealth.total_coins_sold * 1.5)
+                : '...'}
             </p>
             <p className="text-xs text-muted-foreground">Consumable Revenue</p>
           </div>
@@ -352,9 +378,13 @@ export default function FinancePage() {
             </span>
             <div className="flex items-baseline space-x-2">
               <span className="text-2xl font-bold">
-                {titanHealth ? formatCurrency(titanHealth.apple_pending_funds) : '...'}
+                {titanHealth
+                  ? formatCurrency(titanHealth.apple_pending_funds)
+                  : '...'}
               </span>
-              <span className="text-xs text-emerald-500 font-medium">Verified</span>
+              <span className="text-xs text-emerald-500 font-medium">
+                Verified
+              </span>
             </div>
             <p className="text-xs text-muted-foreground">
               Estimated Payout from App Store

@@ -62,8 +62,7 @@ export type SkeletonListType =
   | 'gift'
   | 'transaction'
   | 'notification'
-  | 'request'
-  | 'trip';
+  | 'request';
 
 export type SkeletonScreenType =
   | 'generic'
@@ -487,8 +486,6 @@ const SkeletonListInternal: React.FC<SkeletonListInternalProps> = ({
         return <NotificationSkeletonItem />;
       case 'request':
         return <RequestSkeletonItem />;
-      case 'trip':
-        return <TripSkeletonItem />;
       default:
         return <ChatSkeletonItem />;
     }
@@ -598,20 +595,6 @@ const RequestSkeletonItem: React.FC = () => (
     <View style={styles.requestActions}>
       <SkeletonBase width="48%" height={44} borderRadius={10} />
       <SkeletonBase width="48%" height={44} borderRadius={10} />
-    </View>
-  </View>
-);
-
-const TripSkeletonItem: React.FC = () => (
-  <View style={styles.tripCard}>
-    <SkeletonBase width="100%" height={140} borderRadius={12} />
-    <View style={styles.tripInfo}>
-      <SkeletonBase width="80%" height={18} style={styles.mt12} />
-      <SkeletonBase width="50%" height={14} style={styles.mt6} />
-      <View style={styles.tripFooter}>
-        <SkeletonBase width={90} height={14} />
-        <SkeletonBase width={60} height={14} />
-      </View>
     </View>
   </View>
 );
@@ -1053,19 +1036,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
-  },
-  tripCard: {
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  tripInfo: { padding: 12 },
-  tripFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
   },
 
   // Screen skeleton

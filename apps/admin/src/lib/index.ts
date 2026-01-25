@@ -1,8 +1,9 @@
-// Supabase client
-export * from './supabase';
+// Supabase client (browser-safe only)
+export { createClient, getClient } from './supabase';
 
-// Authentication
-export { getAdminSession, hasPermission, createAuditLog } from './auth';
+// NOTE: Server-only exports should be imported directly:
+// - import { createServiceClient } from '@/lib/supabase.server';
+// - import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
 // Audit logging
 export { logAuditAction, AuditActions, withAudit } from './audit';

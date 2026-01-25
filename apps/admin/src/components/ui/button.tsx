@@ -70,12 +70,15 @@ export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
+  /** Show loading spinner and disable button */
   loading?: boolean;
+  /** Custom loading text for screen readers (default: "Loading") */
+  loadingLabel?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, loading, children, disabled, ...props },
+    { className, variant, size, loading, loadingLabel = 'Loading', children, disabled, ...props },
     ref,
   ) => {
     return (
@@ -83,9 +86,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={loading || undefined}
+        aria-disabled={disabled || loading || undefined}
         {...props}
       >
-        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading && (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <span className="sr-only">{loadingLabel}</span>
+          </>
+        )}
         {children}
       </button>
     );

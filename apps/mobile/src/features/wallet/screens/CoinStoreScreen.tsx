@@ -181,6 +181,7 @@ const CoinStoreScreen = () => {
           onPress={() => handlePurchase(item)}
           disabled={purchasing}
           activeOpacity={0.8}
+          testID={`card-coin-package-${index}`}
         >
           <BlurView
             intensity={20}
@@ -217,7 +218,7 @@ const CoinStoreScreen = () => {
 
   return (
     <LiquidScreenWrapper variant="dark" safeAreaTop={false}>
-      <View style={styles.container}>
+      <View testID="screen-coin-store" style={styles.container}>
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity
@@ -250,7 +251,7 @@ const CoinStoreScreen = () => {
                 size={28}
                 color={DARK_THEME.accentGold}
               />
-              <Text style={styles.balanceText}>{userCoins}</Text>
+              <Text testID="text-balance" style={styles.balanceText}>{userCoins}</Text>
             </View>
             <Text style={styles.balanceSubtext}>
               {t(

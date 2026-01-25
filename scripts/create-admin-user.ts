@@ -152,9 +152,22 @@ async function createAdminUser(
 }
 
 // Main
-const email = process.argv[2] || 'kemal@weareasocial.com';
-const password = process.argv[3] || 'Kemal!Lovendo!Kemal!19875';
-const fullName = process.argv[4] || 'Kemal Teksal';
+const email = process.argv[2];
+const password = process.argv[3] || process.env.ADMIN_PASSWORD;
+const fullName = process.argv[4] || 'Admin User';
+
+if (!email) {
+  console.error('❌ Error: Email is required');
+  console.error('Usage: npx ts-node scripts/create-admin-user.ts <email> [password] [fullName]');
+  console.error('Or set ADMIN_PASSWORD environment variable');
+  process.exit(1);
+}
+
+if (!password) {
+  console.error('❌ Error: Password is required');
+  console.error('Provide password as second argument or set ADMIN_PASSWORD env var');
+  process.exit(1);
+}
 
 createAdminUser(email, password, fullName)
   .then(() => process.exit(0))

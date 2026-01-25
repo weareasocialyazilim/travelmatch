@@ -198,7 +198,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView testID="screen-complete-profile" style={styles.container} edges={['top', 'bottom']}>
       {loading && <LoadingState type="overlay" message="Creating Profile..." />}
 
       {/* Header with Back Button & Progress */}
@@ -238,6 +238,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
             style={styles.avatarContainer}
             onPress={handleSelectAvatar}
             activeOpacity={0.8}
+            testID="btn-avatar-select"
           >
             {watch('avatar') ? (
               <Image source={{ uri: watch('avatar') }} style={styles.avatar} />
@@ -276,6 +277,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   onChangeText={onChange}
                   onBlur={onBlur}
                   autoCapitalize="words"
+                  testID="input-fullname"
                 />
               </View>
               {error && <Text style={styles.errorText}>{error.message}</Text>}
@@ -305,6 +307,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   onChangeText={onChange}
                   onBlur={onBlur}
                   autoCapitalize="none"
+                  testID="input-username"
                 />
               </View>
               {error && <Text style={styles.errorText}>{error.message}</Text>}
@@ -338,6 +341,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   onBlur={onBlur}
                   multiline
                   maxLength={150}
+                  testID="input-bio"
                 />
               </View>
               <Text style={styles.charCount}>{value?.length || 0}/150</Text>
@@ -369,6 +373,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   onBlur={onBlur}
                   keyboardType="phone-pad"
                   autoCapitalize="none"
+                  testID="input-phone"
                 />
               </View>
               <Text style={styles.phoneHint}>
@@ -397,6 +402,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   ]}
                   onPress={() => toggleInterest(interest.id)}
                   activeOpacity={0.7}
+                  testID={`btn-interest-${interest.id}`}
                 >
                   <Icon
                     name={interest.icon}
@@ -436,12 +442,13 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
             loading
           }
           activeOpacity={0.8}
+          testID="btn-complete-profile"
         >
           <Text style={styles.buttonText}>Complete Profile</Text>
         </TouchableOpacity>
 
         {/* Skip */}
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} testID="btn-skip">
           <Text style={styles.skipText}>Skip for now</Text>
         </TouchableOpacity>
       </ScrollView>

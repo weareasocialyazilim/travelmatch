@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { Queue } from 'bullmq';
+import { Queue, ConnectionOptions } from 'bullmq';
 import Redis from 'ioredis';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
@@ -139,19 +139,22 @@ const redis = new Redis(process.env.REDIS_URL!, {
   password: process.env.REDIS_PASSWORD,
 });
 
+// Type assertion for BullMQ compatibility
+const redisConnection = redis as unknown as ConnectionOptions;
+
 // Create queues
 const kycQueue = new Queue(QueueNames.KYC_VERIFICATION, {
-  connection: redis as any,
+  connection: redisConnection,
 });
 const imageQueue = new Queue(QueueNames.IMAGE_PROCESSING, {
-  connection: redis as any,
+  connection: redisConnection,
 });
-const emailQueue = new Queue(QueueNames.EMAIL, { connection: redis as any });
+const emailQueue = new Queue(QueueNames.EMAIL, { connection: redisConnection });
 const notificationQueue = new Queue(QueueNames.NOTIFICATION, {
-  connection: redis as any,
+  connection: redisConnection,
 });
 const analyticsQueue = new Queue(QueueNames.ANALYTICS, {
-  connection: redis as any,
+  connection: redisConnection,
 });
 
 // Setup Bull Board (job monitoring UI)

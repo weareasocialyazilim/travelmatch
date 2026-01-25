@@ -1,7 +1,10 @@
 import { createBrowserClient } from '@supabase/ssr';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
+/**
+ * Browser-safe Supabase client using anon key
+ * Safe to use in client components
+ */
 export function createClient() {
   return createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,19 +12,9 @@ export function createClient() {
   );
 }
 
-// Server-side client with service role (use with caution)
-export function createServiceClient() {
-  return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    },
-  );
-}
+// NOTE: For server-side Supabase client with service role,
+// import createServiceClient directly from '@/lib/supabase.server'
+// Do NOT re-export it here to avoid 'server-only' import in client bundles
 
 // Export singleton for client-side usage
 let clientInstance: ReturnType<typeof createClient> | null = null;

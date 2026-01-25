@@ -5,8 +5,21 @@
 
 import OpenAI from 'openai';
 
+// Environment compatibility: Support both Deno and Node.js
+const getEnvVar = (key: string): string => {
+  // Try Deno first
+  if (typeof (globalThis as unknown as { Deno?: { env: { get: (k: string) => string | undefined } } }).Deno !== 'undefined') {
+    return (globalThis as unknown as { Deno: { env: { get: (k: string) => string | undefined } } }).Deno.env.get(key) ?? '';
+  }
+  // Fallback to Node.js
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] ?? '';
+  }
+  return '';
+};
+
 const openai = new OpenAI({
-  apiKey: Deno.env.get('OPENAI_API_KEY') ?? '',
+  apiKey: getEnvVar('OPENAI_API_KEY'),
 });
 
 /**
