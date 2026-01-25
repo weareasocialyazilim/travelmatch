@@ -450,7 +450,8 @@ services:
       SUPABASE_URL: ${SUPABASE_URL:-http://kong:8000}
       # SECURITY: SERVICE_KEY must be set via .env file - no defaults allowed
       SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?SUPABASE_SERVICE_KEY is required - check .env file}
-      ONFIDO_API_KEY: ${ONFIDO_API_KEY:-}
+      IDENFY_API_KEY: ${IDENFY_API_KEY:-}
+      IDENFY_API_SECRET: ${IDENFY_API_SECRET:-}
       PAYTR_MERCHANT_KEY: ${PAYTR_MERCHANT_KEY:-}
       USE_MOCK_KYC: ${USE_MOCK_KYC:-true}
       PORT: 3002
@@ -491,7 +492,8 @@ services:
       SUPABASE_URL: ${SUPABASE_URL:-http://kong:8000}
       # SECURITY: SERVICE_KEY must be set via .env file - no defaults allowed
       SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?SUPABASE_SERVICE_KEY is required - check .env file}
-      ONFIDO_API_KEY: ${ONFIDO_API_KEY:-}
+      IDENFY_API_KEY: ${IDENFY_API_KEY:-}
+      IDENFY_API_SECRET: ${IDENFY_API_SECRET:-}
       PAYTR_MERCHANT_KEY: ${PAYTR_MERCHANT_KEY:-}
       USE_MOCK_KYC: ${USE_MOCK_KYC:-true}
     volumes:
