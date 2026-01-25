@@ -1,11 +1,14 @@
 /**
  * Rate Limiting for API Routes
  *
- * Provides in-memory rate limiting for API protection.
+ * Provides distributed rate limiting via Upstash Redis with in-memory fallback.
  * Cloudflare handles DDoS and edge-level protection.
  *
  * @module lib/rate-limit
  */
+
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 interface RateLimitEntry {
   count: number;
@@ -13,7 +16,40 @@ interface RateLimitEntry {
 }
 
 // ============================================================================
-// IN-MEMORY STORE
+// UPSTASH REDIS CLIENT (if configured)
+// ============================================================================
+
+let redis: Redis | null = null;
+let upstashRateLimiter: Ratelimit | null = null;
+
+// Initialize Upstash if environment variables are available
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
+  try {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+
+    upstashRateLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(100, '1 m'),
+      analytics: true,
+      prefix: 'lovendo:ratelimit',
+    });
+
+    console.log('[RateLimit] Upstash Redis initialized successfully');
+  } catch (error) {
+    console.warn('[RateLimit] Failed to initialize Upstash, using in-memory fallback:', error);
+    redis = null;
+    upstashRateLimiter = null;
+  }
+}
+
+// ============================================================================
+// IN-MEMORY STORE (fallback)
 // ============================================================================
 
 const memoryStore = new Map<string, RateLimitEntry>();
@@ -41,6 +77,8 @@ export interface RateLimitConfig {
   windowMs: number;
   /** Optional custom key generator */
   keyGenerator?: (identifier: string) => string;
+  /** Use Upstash Redis if available (default: true) */
+  useRedis?: boolean;
 }
 
 export interface RateLimitResult {
@@ -51,18 +89,57 @@ export interface RateLimitResult {
 }
 
 /**
- * Check if a request is rate limited
+ * Check if Upstash Redis is available
+ */
+export function isRedisAvailable(): boolean {
+  return redis !== null && upstashRateLimiter !== null;
+}
+
+/**
+ * Reset in-memory store (for testing)
  */
 export function resetToInMemoryStore() {
   memoryStore.clear();
 }
 
+/**
+ * Check if a request is rate limited (async - supports Redis)
+ */
 export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
-  const { limit, windowMs, keyGenerator } = config;
+  const { limit, windowMs, keyGenerator, useRedis = true } = config;
   const key = keyGenerator ? keyGenerator(identifier) : identifier;
+
+  // Try Upstash Redis first if available and enabled
+  if (useRedis && upstashRateLimiter) {
+    try {
+      const result = await upstashRateLimiter.limit(key);
+      return {
+        success: result.success,
+        remaining: result.remaining,
+        resetTime: result.reset,
+        retryAfter: result.success ? undefined : Math.ceil((result.reset - Date.now()) / 1000),
+      };
+    } catch (error) {
+      console.warn('[RateLimit] Upstash error, falling back to in-memory:', error);
+      // Fall through to in-memory
+    }
+  }
+
+  // In-memory fallback
+  return checkRateLimitInMemory(key, limit, windowMs);
+}
+
+/**
+ * In-memory rate limit check
+ */
+function checkRateLimitInMemory(
+  key: string,
+  limit: number,
+  windowMs: number,
+): RateLimitResult {
   const now = Date.now();
 
   let entry = memoryStore.get(key);
@@ -102,7 +179,7 @@ export async function checkRateLimit(
 }
 
 /**
- * Synchronous rate limit check
+ * Synchronous rate limit check (in-memory only)
  */
 export function checkRateLimitSync(
   identifier: string,
@@ -110,39 +187,7 @@ export function checkRateLimitSync(
 ): RateLimitResult {
   const { limit, windowMs, keyGenerator } = config;
   const key = keyGenerator ? keyGenerator(identifier) : identifier;
-  const now = Date.now();
-
-  let entry = memoryStore.get(key);
-
-  if (!entry || entry.resetTime < now) {
-    entry = {
-      count: 1,
-      resetTime: now + windowMs,
-    };
-    memoryStore.set(key, entry);
-    return {
-      success: true,
-      remaining: limit - 1,
-      resetTime: entry.resetTime,
-    };
-  }
-
-  entry.count++;
-
-  if (entry.count > limit) {
-    return {
-      success: false,
-      remaining: 0,
-      resetTime: entry.resetTime,
-      retryAfter: Math.ceil((entry.resetTime - now) / 1000),
-    };
-  }
-
-  return {
-    success: true,
-    remaining: limit - entry.count,
-    resetTime: entry.resetTime,
-  };
+  return checkRateLimitInMemory(key, limit, windowMs);
 }
 
 /**
@@ -251,4 +296,25 @@ export function withRateLimit<
  */
 export function resetRateLimitStore(): void {
   memoryStore.clear();
+}
+
+/**
+ * Create a custom rate limiter with Upstash Redis
+ */
+export function createRateLimiter(
+  requests: number,
+  window: `${number} s` | `${number} m` | `${number} h` | `${number} d`,
+  prefix?: string,
+): Ratelimit | null {
+  if (!redis) {
+    console.warn('[RateLimit] Redis not available for custom rate limiter');
+    return null;
+  }
+
+  return new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(requests, window),
+    analytics: true,
+    prefix: prefix || 'lovendo:custom',
+  });
 }
