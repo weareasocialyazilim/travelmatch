@@ -11,8 +11,7 @@
         "VITE_SUPABASE_URL",
         "VITE_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "SUPABASE_SERVICE_ROLE_KEY"
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ]
     },
     "mobile#build": {
@@ -51,12 +50,7 @@
       "inputs": ["src/**", "app/**", "public/**", "next.config.js", "package.json"],
       "env": [
         "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "SUPABASE_SERVICE_ROLE_KEY",
-        "SENTRY_AUTH_TOKEN",
-        "SENTRY_DSN",
-        "SENTRY_ORG",
-        "SENTRY_PROJECT"
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ]
     },
     "admin#lint": {

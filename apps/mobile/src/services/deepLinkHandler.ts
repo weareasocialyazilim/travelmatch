@@ -17,12 +17,25 @@
 
 import { z } from 'zod';
 import { Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NavigationContainerRef } from '@react-navigation/native';
 // NOTE: Using inline type to avoid circular dependency with AppNavigator
 // AppNavigator imports deepLinkHandler, so we can't import RootStackParamList from there
 type DeepLinkNavigator = NavigationContainerRef<Record<string, unknown>>;
 import { logger } from '../utils/logger';
 import { sessionManager } from '../services/sessionManager';
+
+// P2 FIX: AsyncStorage key for persisted deep link queue
+const DEEP_LINK_QUEUE_KEY = '@deep_link_queue';
+
+/**
+ * Queued deep link entry with metadata
+ */
+interface QueuedDeepLink {
+  url: string;
+  options?: ValidationOptions;
+  queuedAt: string; // ISO timestamp for ordering
+}
 
 /**
  * Deep link types
@@ -121,12 +134,106 @@ interface ValidationOptions {
  */
 class DeepLinkHandler {
   private navigation: NavigationContainerRef<any> | null = null;
+  // P2 FIX: Queue deep links when navigation not ready (now persisted)
+  private linkQueue: QueuedDeepLink[] = [];
+  private isInitialized = false;
 
   /**
    * Set navigation reference
    */
-  setNavigation(nav: NavigationContainerRef<any>) {
+  async setNavigation(nav: NavigationContainerRef<any>) {
     this.navigation = nav;
+    this.isInitialized = true;
+
+    // P2 FIX: Restore persisted queue first
+    await this.restoreQueue();
+
+    // P2 FIX: Process queued deep links after navigation is ready
+    if (this.linkQueue.length > 0) {
+      logger.info('[DeepLink] Processing queued links:', this.linkQueue.length);
+      const queueToProcess = [...this.linkQueue];
+      this.linkQueue = [];
+
+      // Process all queued links
+      for (const { url, options } of queueToProcess) {
+        await this.handleDeepLink(url, options);
+      }
+
+      // Clear persisted queue after processing
+      await this.clearPersistedQueue();
+    }
+  }
+
+  /**
+   * P2 FIX: Queue deep link for later processing if navigation not ready
+   */
+  private canProcessLink(): boolean {
+    return !!(this.navigation && this.navigation.isReady());
+  }
+
+  /**
+   * P2 FIX: Queue or process deep link with AsyncStorage persistence
+   */
+  private queueOrProcess(url: string, options?: ValidationOptions): boolean {
+    if (!this.navigation || !this.navigation.isReady()) {
+      logger.warn('[DeepLink] Navigation not ready, queuing link');
+      const entry: QueuedDeepLink = {
+        url,
+        options,
+        queuedAt: new Date().toISOString(),
+      };
+      this.linkQueue.push(entry);
+      this.persistQueue();
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * P2 FIX: Persist queue to AsyncStorage for app restart recovery
+   */
+  private async persistQueue(): Promise<void> {
+    try {
+      const queueData = JSON.stringify(this.linkQueue);
+      await AsyncStorage.setItem(DEEP_LINK_QUEUE_KEY, queueData);
+      logger.debug('[DeepLink] Queue persisted:', this.linkQueue.length);
+    } catch (error) {
+      logger.warn('[DeepLink] Failed to persist queue:', error);
+    }
+  }
+
+  /**
+   * P2 FIX: Restore queue from AsyncStorage on app start
+   */
+  async restoreQueue(): Promise<void> {
+    try {
+      const storedQueue = await AsyncStorage.getItem(DEEP_LINK_QUEUE_KEY);
+      if (storedQueue) {
+        const parsed: QueuedDeepLink[] = JSON.parse(storedQueue);
+        // Filter out stale entries (older than 24 hours)
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const validEntries = parsed.filter((entry) => entry.queuedAt > oneDayAgo);
+
+        if (validEntries.length > 0) {
+          logger.info('[DeepLink] Restored queued links:', validEntries.length);
+          this.linkQueue = validEntries;
+        }
+      }
+    } catch (error) {
+      logger.warn('[DeepLink] Failed to restore queue:', error);
+    }
+  }
+
+  /**
+   * P2 FIX: Clear persisted queue after processing
+   */
+  private async clearPersistedQueue(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(DEEP_LINK_QUEUE_KEY);
+      logger.debug('[DeepLink] Persisted queue cleared');
+    } catch (error) {
+      logger.warn('[DeepLink] Failed to clear persisted queue:', error);
+    }
   }
 
   /**
@@ -330,11 +437,21 @@ class DeepLinkHandler {
 
   /**
    * Main deep link handler
+   * P2 FIX: Queue link if navigation not ready
    */
   async handleDeepLink(
     url: string,
     options: ValidationOptions = {},
   ): Promise<DeepLinkResult> {
+    // P2 FIX: Queue if navigation not ready
+    if (!this.queueOrProcess(url, options)) {
+      return {
+        success: true,
+        queued: true,
+        message: 'Link queued for processing',
+      };
+    }
+
     try {
       logger.info('[DeepLink] Handling:', url);
 
@@ -558,12 +675,21 @@ class DeepLinkHandler {
   /**
    * Initialize deep link listening
    */
-  initialize() {
+  async initialize() {
+    // P2 FIX: Restore persisted queue on app start
+    await this.restoreQueue();
+
+    // P2 FIX: Check if navigation is ready before processing
+    if (!this.navigation?.isReady()) {
+      logger.warn('[DeepLink] Navigation not ready during initialize');
+    }
+
     // Listen to initial URL (app opened from link)
     Linking.getInitialURL().then((url) => {
       if (url) {
         logger.info('[DeepLink] Initial URL:', url);
         this.handleDeepLink(url, { checkExists: true }).then((result) => {
+          // P2 FIX: Only navigate to error if not queued and actually failed
           if (!result.success && result.error) {
             this.navigateToError(result.error.code, result.error.message);
           }
@@ -575,6 +701,7 @@ class DeepLinkHandler {
     const subscription = Linking.addEventListener('url', ({ url }) => {
       logger.info('[DeepLink] URL received:', url);
       this.handleDeepLink(url, { checkExists: true }).then((result) => {
+        // P2 FIX: Only navigate to error if not queued and actually failed
         if (!result.success && result.error) {
           this.navigateToError(result.error.code, result.error.message);
         }

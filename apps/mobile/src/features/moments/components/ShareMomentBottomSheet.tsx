@@ -8,9 +8,9 @@ import {
   ScrollView,
   Dimensions,
   Share,
-  Clipboard,
   Linking,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '@/constants/colors';
 import { logger } from '@/utils/logger';
@@ -54,9 +54,9 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
 }) => {
   const { showToast } = useToast();
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     try {
-      Clipboard.setString(momentUrl);
+      await Clipboard.setStringAsync(momentUrl);
       showToast('Link copied to clipboard!', 'success');
       onClose();
     } catch (err) {
@@ -64,7 +64,7 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
         momentUrl,
         error: err,
       });
-      showToast('Link kopyalanamadı', 'error');
+      showToast('Link kopyalanamadi', 'error');
     }
   };
 

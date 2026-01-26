@@ -57,6 +57,14 @@ export type RootStackParamList = {
     details?: Record<string, unknown>;
   };
 
+  // Dispute Status - track dispute resolution
+  DisputeStatus: {
+    disputeId: string;
+  };
+
+  // My Disputes - list all user disputes
+  MyDisputes: undefined;
+
   CompleteProfile: {
     email?: string;
     phone?: string;

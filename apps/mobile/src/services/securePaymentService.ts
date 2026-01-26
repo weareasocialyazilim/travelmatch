@@ -17,7 +17,7 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { callRpc } from './supabaseRpc';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
-import { invalidateAllPaymentCache } from './cacheInvalidationService';
+import { paymentCache } from './cacheService';
 import { walletService } from './walletService';
 import { transactionService } from './transactionService';
 import {
@@ -117,41 +117,12 @@ export interface PaymentIntent {
   momentId?: string;
 }
 
-// ============================================
-// ESCROW SYSTEM TYPES (Titan Protocol)
-// ============================================
-
-export type EscrowMode = 'direct' | 'optional' | 'mandatory';
-
-export interface EscrowDecision {
-  mode: EscrowMode;
-  useEscrow: boolean;
-  reason: string;
-}
-
-// 1 Coin = $0.10 (Example Value)
-// Escrow Thresholds in COINS
-// $30 -> 300 Coins
-// $100 -> 1000 Coins
-
 export interface WithdrawalLimits {
   minAmount: number; // in Coins
   maxAmount: number; // in Coins
   dailyLimit: number; // in Coins
   weeklyLimit: number; // in Coins
   monthlyLimit: number; // in Coins
-}
-
-export interface EscrowTransaction {
-  id: string;
-  sender_id: string;
-  recipient_id: string;
-  amount: number;
-  status: 'pending' | 'released' | 'refunded';
-  release_condition: string;
-  created_at: string;
-  expires_at: string;
-  moment_id?: string;
 }
 
 // RPC Response Types
@@ -167,56 +138,6 @@ interface CreateEscrowResponse {
 
 interface EscrowOperationResponse {
   success: boolean;
-}
-
-// ============================================
-// ESCROW UTILITY FUNCTIONS
-// ============================================
-
-/**
- * Titan Protocol Escrow Matrix:
- * - $0-$30: Direct payment (no escrow)
- * - $30-$100: Optional escrow (user chooses)
-/**
- * Titan Protocol Escrow Matrix (COIN BASED):
- * - 0-300 Coins: Direct payment (no escrow)
- * - 300-1000 Coins: Optional escrow (user chooses)
- * - 1000+ Coins: Mandatory escrow (forced protection)
- */
-export function determineEscrowMode(coinAmount: number): EscrowMode {
-  // Thresholds from VALUES (LVND Coins)
-  // 30 LVND = Direct Max
-  // 100 LVND = Optional Max
-  // 100+ = Mandatory
-
-  if (coinAmount <= VALUES.ESCROW_THRESHOLDS.DIRECT_MAX) {
-    return 'direct'; // <= 30 LVND
-  } else if (coinAmount <= VALUES.ESCROW_THRESHOLDS.OPTIONAL_MAX) {
-    return 'optional'; // 31-100 LVND
-  } else {
-    return 'mandatory'; // > 100 LVND
-  }
-}
-
-/**
- * Get user-friendly escrow explanation
- */
-export function getEscrowExplanation(
-  mode: EscrowMode,
-  coinAmount: number,
-): string {
-  const { DIRECT_MAX, OPTIONAL_MAX, CURRENCY } = VALUES.ESCROW_THRESHOLDS;
-
-  switch (mode) {
-    case 'direct':
-      return `Transfer of ${coinAmount} ${CURRENCY} will be sent directly to the recipient.`;
-
-    case 'optional':
-      return `For amounts between ${DIRECT_MAX}-${OPTIONAL_MAX} ${CURRENCY}, you can choose escrow protection. Coins are held until proof is verified.`;
-
-    case 'mandatory':
-      return `Transfers over ${OPTIONAL_MAX} ${CURRENCY} must use escrow protection. Coins will be released when proof is verified.`;
-  }
 }
 
 export interface KYCStatus {
@@ -359,7 +280,7 @@ class SecurePaymentService {
       if (!user) return;
 
       // Invalidate all caches
-      await invalidateAllPaymentCache(user.id);
+      await paymentCache.invalidateAll(user.id);
 
       // Fetch fresh data using delegated services
       await Promise.all([
@@ -1171,7 +1092,7 @@ class SecurePaymentService {
             data: { user },
           } = await supabase.auth.getUser();
           if (user) {
-            await invalidateAllPaymentCache(user.id);
+            await paymentCache.invalidateAll(user.id);
           }
 
           callback(payload);

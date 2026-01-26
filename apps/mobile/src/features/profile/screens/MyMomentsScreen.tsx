@@ -89,7 +89,6 @@ const MyMomentsScreen: React.FC = () => {
         type: 'local',
         isVerified: true,
         location: locationStr,
-        travelDays: 0,
       },
       giftCount: 0,
       category: {

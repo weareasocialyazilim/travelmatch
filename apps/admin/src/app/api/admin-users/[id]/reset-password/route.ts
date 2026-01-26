@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import type { Database } from '@/types/database';
 import crypto from 'crypto';
 
 // Simple password hashing using Node.js crypto
@@ -42,18 +43,20 @@ export async function POST(
 
     // Hedef admini kontrol et
     const supabase = createServiceClient();
-    const { data: targetAdmin, error: fetchError } = await supabase
+    const { data: targetAdminRecord, error: fetchError } = await supabase
       .from('admin_users')
       .select('id, email, name')
       .eq('id', id)
       .single();
 
-    if (fetchError || !targetAdmin) {
+    if (fetchError || !targetAdminRecord) {
       return NextResponse.json(
         { error: 'Admin kullanıcı bulunamadı' },
         { status: 404 },
       );
     }
+
+    const targetAdmin = targetAdminRecord as { id: string; email: string; name: string };
 
     // Kendini sıfırlayamaz (güvenlik için)
     if (targetAdmin.id === session.admin.id) {
@@ -74,7 +77,7 @@ export async function POST(
         password_hash: hashedPassword,
         force_password_change: true,
         updated_at: new Date().toISOString(),
-      } as Record<string, unknown>)
+      } as Database['public']['Tables']['admin_users']['Update'])
       .eq('id', id);
 
     if (updateError) {

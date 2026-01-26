@@ -4,6 +4,7 @@
  * Content Moderation Admin Panel
  *
  * Manage moderation logs, blocked content, warnings, and dictionary.
+ * Features evidence panel with AI moderation details, PII detection, and decision rationale.
  */
 
 import { useState, useEffect } from 'react';
@@ -56,6 +57,15 @@ import {
   Shield,
   Trash2,
   XCircle,
+  Eye,
+  ExternalLink,
+  Phone,
+  Hash,
+  Mail,
+  AlertOctagon,
+  Info,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { getClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
@@ -72,6 +82,7 @@ interface ModerationLog {
   violations: Array<{ type: string; message: string }>;
   action_taken: string;
   created_at: string;
+  metadata?: Record<string, unknown>;
   user?: {
     full_name: string;
     username: string;
@@ -118,6 +129,32 @@ interface DictionaryWord {
   created_at: string;
 }
 
+interface ThankYouEvent {
+  id: string;
+  moment_id: string;
+  author_id: string;
+  recipient_id: string | null;
+  message: string;
+  message_type: 'single' | 'bulk';
+  moderation_status: 'approved' | 'flagged' | 'rejected' | 'pending_review';
+  flagged_reason: string | null;
+  created_at: string;
+  author?: {
+    full_name: string;
+    avatar_url: string | null;
+    username: string | null;
+  };
+  recipient?: {
+    full_name: string;
+    avatar_url: string | null;
+    username: string | null;
+  } | null;
+  moment?: {
+    id: string;
+    title: string;
+  } | null;
+}
+
 interface ModerationStats {
   totalLogs: number;
   blockedToday: number;
@@ -131,26 +168,286 @@ interface ModerationStats {
   };
 }
 
+// Enhanced triage item with evidence
 export interface TriageQueueItem {
   moment_id: string;
   title: string;
   user_id: string;
   username: string;
-  media_url: string; // bucket path
+  media_url: string;
   created_at: string;
   is_approved: boolean;
   is_hidden: boolean;
+  moderation_status: string;
   ai_moderation_score?: number;
-  ai_moderation_labels?: string[];
+  ai_moderation_labels?: string;
+  ai_moderation_reasons?: string;
+  ai_moderation_pii?: string;
+  evidence?: {
+    moderationLabels: Array<{
+      name: string;
+      parent: string;
+      confidence: number;
+      category: string;
+      threshold: number;
+    }>;
+    detectedText: Array<{
+      type: string;
+      value: string;
+    }>;
+    processingMetadata: {
+      timestamp: string;
+      bucket: string;
+      fileSize: number;
+      aiModels: string[];
+    };
+  };
 }
 
 // =============================================================================
-// Component
+// Helper Functions
+// =============================================================================
+
+function getSeverityColor(severity: string): string {
+  switch (severity) {
+    case 'critical':
+      return 'bg-red-500';
+    case 'high':
+      return 'bg-orange-500';
+    case 'medium':
+      return 'bg-yellow-500';
+    case 'low':
+      return 'bg-blue-500';
+    default:
+      return 'bg-muted-foreground';
+  }
+}
+
+function getActionColor(action: string): string {
+  switch (action) {
+    case 'blocked':
+    case 'rejected':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+    case 'approved':
+    case 'auto_approved':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+    case 'pending_review':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+    case 'flagged':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+    case 'sanitized':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+    default:
+      return 'bg-muted text-foreground';
+  }
+}
+
+function getCategoryIcon(category: string) {
+  switch (category) {
+    case 'explicit':
+      return <AlertOctagon className="h-3 w-3 text-red-500" />;
+    case 'violence':
+      return <AlertTriangle className="h-3 w-3 text-orange-500" />;
+    case 'substances':
+      return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
+    case 'suggestive':
+      return <Info className="h-3 w-3 text-blue-500" />;
+    case 'pii':
+      return <Eye className="h-3 w-3 text-purple-500" />;
+    default:
+      return <Hash className="h-3 w-3 text-gray-500" />;
+  }
+}
+
+function formatDate(date: string): string {
+  return new Date(date).toLocaleString('tr-TR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function parseModerationLabels(labelsJson?: string): TriageQueueItem['evidence']['moderationLabels'] {
+  if (!labelsJson) return [];
+  try {
+    return JSON.parse(labelsJson);
+  } catch {
+    return [];
+  }
+}
+
+function parsePiiData(piiJson?: string): Array<{ type: string; value: string }> {
+  if (!piiJson) return [];
+  try {
+    return JSON.parse(piiJson);
+  } catch {
+    return [];
+  }
+}
+
+function parseReasons(reasonsJson?: string): string[] {
+  if (!reasonsJson) return [];
+  try {
+    return JSON.parse(reasonsJson);
+  } catch {
+    return [];
+  }
+}
+
+// =============================================================================
+// Evidence Panel Component
+// =============================================================================
+
+function EvidencePanel({ item }: { item: TriageQueueItem }) {
+  const [expanded, setExpanded] = useState(false);
+  const labels = parseModerationLabels(item.ai_moderation_labels);
+  const pii = parsePiiData(item.ai_moderation_pii);
+  const reasons = parseReasons(item.ai_moderation_reasons);
+
+  const maxConfidence = Math.max(...labels.map(l => l.confidence), 0);
+  const threshold = labels[0]?.threshold || 90;
+
+  return (
+    <div className="mt-3 border-t pt-3">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {expanded ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+        <span>AI Evidence {expanded ? '(Hide)' : '(Show)'}</span>
+      </button>
+
+      {expanded && (
+        <div className="mt-3 space-y-4">
+          {/* Decision Summary */}
+          <div className="p-3 rounded-lg bg-muted/50">
+            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              Decision Rationale
+            </h4>
+            <div className="text-sm space-y-1">
+              {reasons.length > 0 ? (
+                reasons.map((reason, i) => (
+                  <p key={i} className="text-muted-foreground">- {reason}</p>
+                ))
+              ) : (
+                <p className="text-muted-foreground">No specific reasons recorded</p>
+              )}
+            </div>
+          </div>
+
+          {/* Confidence Score */}
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <div className="flex justify-between text-xs mb-1">
+                <span>Confidence</span>
+                <span className={maxConfidence >= threshold ? 'text-red-500' : 'text-yellow-500'}>
+                  {Math.round(maxConfidence)}% / {threshold}%
+                </span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${
+                    maxConfidence >= threshold ? 'bg-red-500' : 'bg-yellow-500'
+                  }`}
+                  style={{ width: `${Math.min((maxConfidence / 100) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Moderation Labels */}
+          {labels.length > 0 && (
+            <div>
+              <h4 className="text-xs font-medium text-muted-foreground mb-2">
+                DETECTED LABELS
+              </h4>
+              <div className="space-y-2">
+                {labels.map((label, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-2 rounded bg-muted/30"
+                  >
+                    <div className="flex items-center gap-2">
+                      {getCategoryIcon(label.category)}
+                      <div>
+                        <p className="text-sm font-medium">{label.name}</p>
+                        {label.parent && (
+                          <p className="text-xs text-muted-foreground">
+                            Parent: {label.parent}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{Math.round(label.confidence)}%</p>
+                      <p className="text-xs text-muted-foreground">
+                        threshold: {label.threshold}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* PII Detection */}
+          {pii.length > 0 && (
+            <div>
+              <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                <Eye className="h-3 w-3" />
+                DETECTED PII
+              </h4>
+              <div className="space-y-2">
+                {pii.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 p-2 rounded bg-purple-500/10 border border-purple-500/20"
+                  >
+                    {item.type === 'contact' && <Phone className="h-4 w-4 text-purple-500" />}
+                    {item.type === 'url' && <ExternalLink className="h-4 w-4 text-purple-500" />}
+                    {item.type === 'handle' && <Hash className="h-4 w-4 text-purple-500" />}
+                    {item.type === 'email' && <Mail className="h-4 w-4 text-purple-500" />}
+                    <span className="text-sm font-mono">{item.value}</span>
+                    <CanvaBadge variant="primary" className="text-xs">
+                      {item.type}
+                    </CanvaBadge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Processing Metadata */}
+          <div className="text-xs text-muted-foreground">
+            <p>Processed: {formatDate(item.created_at)}</p>
+            <p>Status: {item.moderation_status}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// Main Component
 // =============================================================================
 
 export default function ModerationPage() {
   const [activeTab, setActiveTab] = useState<
-    'logs' | 'blocked' | 'warnings' | 'dictionary' | 'triage'
+    'logs' | 'blocked' | 'warnings' | 'dictionary' | 'triage' | 'thank-you'
   >('triage');
   const [stats, setStats] = useState<ModerationStats | null>(null);
   const [logs, setLogs] = useState<ModerationLog[]>([]);
@@ -158,12 +455,9 @@ export default function ModerationPage() {
   const [warnings, setWarnings] = useState<UserWarning[]>([]);
   const [dictionary, setDictionary] = useState<DictionaryWord[]>([]);
   const [triageQueue, setTriageQueue] = useState<TriageQueueItem[]>([]);
+  const [thankYouEvents, setThankYouEvents] = useState<ThankYouEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState({
-    from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    to: new Date(),
-  });
   const [severityFilter, setSeverityFilter] = useState<string>('all');
 
   // New word dialog
@@ -178,9 +472,7 @@ export default function ModerationPage() {
 
   useEffect(() => {
     loadData();
-    // loadData is stable - it only depends on state setters which never change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, dateRange]);
+  }, [activeTab]);
 
   async function loadData() {
     setLoading(true);
@@ -193,8 +485,9 @@ export default function ModerationPage() {
           activeTab === 'warnings' && loadWarnings(),
           activeTab === 'dictionary' && loadDictionary(),
           activeTab === 'triage' && loadTriageQueue(),
+          activeTab === 'thank-you' && loadThankYouEvents(),
         ].filter(Boolean),
-      ); // Filter out false values from conditional loads
+      );
     } catch (error) {
       logger.error('Failed to load moderation data', error);
     } finally {
@@ -223,7 +516,6 @@ export default function ModerationPage() {
           .eq('appeal_status', 'pending'),
       ]);
 
-    // Calculate severity breakdown
     const severityBreakdown = { critical: 0, high: 0, medium: 0, low: 0 };
     if (logsResult.data) {
       (logsResult.data as Array<{ severity: string }>).forEach((log) => {
@@ -246,12 +538,7 @@ export default function ModerationPage() {
   async function loadLogs() {
     const { data, error } = await supabase
       .from('moderation_logs')
-      .select(
-        `
-        *,
-        user:profiles(full_name, username)
-      `,
-      )
+      .select('*, user:profiles(full_name, username)')
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -266,12 +553,7 @@ export default function ModerationPage() {
   async function loadBlockedContent() {
     const { data, error } = await supabase
       .from('blocked_content')
-      .select(
-        `
-        *,
-        user:profiles(full_name, username)
-      `,
-      )
+      .select('*, user:profiles(full_name, username)')
       .order('created_at', { ascending: false })
       .limit(50);
 
@@ -286,12 +568,7 @@ export default function ModerationPage() {
   async function loadWarnings() {
     const { data, error } = await supabase
       .from('user_moderation_warnings')
-      .select(
-        `
-        *,
-        user:profiles(full_name, username)
-      `,
-      )
+      .select('*, user:profiles(full_name, username)')
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -303,10 +580,8 @@ export default function ModerationPage() {
     setWarnings((data as UserWarning[]) || []);
   }
 
-  const loadDictionary = async () => {
-    setLoading(true); // Assuming setLoading is the correct state to use here
+  async function loadDictionary() {
     try {
-      const supabase = getClient();
       const { data, error } = await supabase
         .from('moderation_dictionary')
         .select('*')
@@ -316,33 +591,126 @@ export default function ModerationPage() {
       setDictionary((data as DictionaryWord[]) || []);
     } catch (error) {
       logger.error('Failed to load dictionary', error);
-      toast.error('Sözlük yüklenemedi');
-    } finally {
-      setLoading(false);
+      toast.error('Sozluk yuklenemedi');
     }
-  };
+  }
 
-  const loadTriageQueue = async () => {
-    setLoading(true); // Assuming setLoading is the correct state to use here
+  async function loadTriageQueue() {
     try {
-      const supabase = getClient();
+      // Load moments pending review with moderation data
       const { data, error } = await supabase
-        .from('view_moderation_queue')
-        .select('*');
+        .from('moments')
+        .select(`
+          id,
+          title,
+          user_id,
+          media_url,
+          created_at,
+          is_approved,
+          is_hidden,
+          moderation_status,
+          ai_moderation_score,
+          ai_moderation_labels,
+          ai_moderation_reasons,
+          ai_moderation_pii,
+          profiles:user_id(username)
+        `)
+        .in('moderation_status', ['pending_review', 'rejected'])
+        .eq('is_hidden', false)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (error) throw error;
-      setTriageQueue((data as TriageQueueItem[]) || []);
+
+      const queueItems: TriageQueueItem[] = (data || []).map(item => ({
+        moment_id: item.id,
+        title: item.title,
+        user_id: item.user_id,
+        username: item.profiles?.username || 'unknown',
+        media_url: item.media_url,
+        created_at: item.created_at,
+        is_approved: item.is_approved,
+        is_hidden: item.is_hidden,
+        moderation_status: item.moderation_status,
+        ai_moderation_score: item.ai_moderation_score,
+        ai_moderation_labels: item.ai_moderation_labels,
+        ai_moderation_reasons: item.ai_moderation_reasons,
+        ai_moderation_pii: item.ai_moderation_pii,
+      }));
+
+      setTriageQueue(queueItems);
     } catch (error) {
       logger.error('Failed to load triage queue', error);
-      toast.error('Bekleyen içerikler yüklenemedi');
-    } finally {
-      setLoading(false);
+      toast.error('Bekleyen icerikler yuklenemedi');
     }
-  };
+  }
 
-  const handleApproveContent = async (momentId: string) => {
+  async function loadThankYouEvents() {
     try {
-      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('thank_you_events')
+        .select(`
+          id,
+          moment_id,
+          author_id,
+          recipient_id,
+          message,
+          message_type,
+          moderation_status,
+          flagged_reason,
+          created_at,
+          author:author_id(full_name, avatar_url, username),
+          recipient:recipient_id(full_name, avatar_url, username),
+          moment:moments(id, title)
+        `)
+        .in('moderation_status', ['flagged', 'pending_review'])
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      setThankYouEvents((data as ThankYouEvent[]) || []);
+    } catch (error) {
+      logger.error('Failed to load thank you events', error);
+      toast.error('Tesekkuk etkinlikleri yuklenemedi');
+    }
+  }
+
+  async function handleThankYouModeration(id: string, action: 'approve' | 'reject' | 'flag', reason?: string) {
+    try {
+      const response = await fetch('/api/thank-you/moderation', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action, reason }),
+      });
+
+      if (!response.ok) throw new Error('Moderation failed');
+
+      toast.success(
+        action === 'approve'
+          ? 'Teşekkür onaylandı'
+          : action === 'reject'
+            ? 'Teşekkür reddedildi'
+            : 'Teşekkür işaretlendi'
+      );
+
+      // Reload the list
+      loadThankYouEvents();
+    } catch (error) {
+      logger.error('Thank you moderation failed', error);
+      toast.error('İşlem başarısız');
+    }
+  }
+
+  async function handleApproveContent(momentId: string, reason?: string) {
+    try {
+      // Get current moderation status for audit log
+      const { data: current } = await supabase
+        .from('moments')
+        .select('moderation_status, user_id')
+        .eq('id', momentId)
+        .single();
+
       const { error } = await supabase
         .from('moments')
         .update({
@@ -353,18 +721,42 @@ export default function ModerationPage() {
         .eq('id', momentId);
 
       if (error) throw error;
-      toast.success('İçerik onaylandı ve yayına alındı');
-      loadTriageQueue(); // Refresh
+
+      // Log admin override if AI previously rejected/pending_review
+      if (current?.moderation_status && ['rejected', 'pending_review'].includes(current.moderation_status)) {
+        await supabase.from('admin_audit_logs').insert({
+          admin_id: 'current-admin-id', // Replace with actual admin ID from auth
+          action: 'moderation_override',
+          resource_type: 'moment',
+          resource_id: momentId,
+          old_value: current.moderation_status,
+          new_value: 'approved',
+          reason: reason || 'Admin manual approval',
+          metadata: {
+            timestamp: new Date().toISOString(),
+            provider: 'manual',
+          },
+        });
+      }
+
+      toast.success('Icerik onaylandi ve yayina alindi');
+      loadTriageQueue();
       loadStats();
     } catch (error) {
       logger.error('Failed to approve content', error);
-      toast.error('İşlem başarısız');
+      toast.error('Islem basarisiz');
     }
-  };
+  }
 
-  const handleRejectContent = async (momentId: string) => {
+  async function handleRejectContent(momentId: string, reason?: string) {
     try {
-      const supabase = getClient();
+      // Get current moderation status for audit log
+      const { data: current } = await supabase
+        .from('moments')
+        .select('moderation_status, user_id')
+        .eq('id', momentId)
+        .single();
+
       const { error } = await supabase
         .from('moments')
         .update({
@@ -375,15 +767,32 @@ export default function ModerationPage() {
         .eq('id', momentId);
 
       if (error) throw error;
-      toast.success('İçerik reddedildi (gizli tutuluyor)');
-      loadTriageQueue(); // Refresh
+
+      // Log admin override if AI previously approved/pending_review
+      if (current?.moderation_status && ['approved', 'pending_review'].includes(current.moderation_status)) {
+        await supabase.from('admin_audit_logs').insert({
+          admin_id: 'current-admin-id', // Replace with actual admin ID from auth
+          action: 'moderation_override',
+          resource_type: 'moment',
+          resource_id: momentId,
+          old_value: current.moderation_status,
+          new_value: 'rejected',
+          reason: reason || 'Admin manual rejection',
+          metadata: {
+            timestamp: new Date().toISOString(),
+            provider: 'manual',
+          },
+        });
+      }
+
+      toast.success('Icerik reddedildi (gizli tutuluyor)');
+      loadTriageQueue();
     } catch (error) {
       logger.error('Failed to reject content', error);
-      toast.error('İşlem başarısız');
+      toast.error('Islem basarisiz');
     }
-  };
+  }
 
-  // P1 FIX: Remove 'as any' type casts - use proper Supabase typing
   async function handleApproveAppeal(id: string) {
     const { error } = await supabase
       .from('blocked_content')
@@ -421,13 +830,15 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await supabase.from('moderation_dictionary').insert({
-      word: newWord.word.toLowerCase().trim(),
-      severity: newWord.severity,
-      category: newWord.category,
-      is_regex: false,
-      is_active: true,
-    });
+    const { error } = await supabase
+      .from('moderation_dictionary')
+      .insert({
+        word: newWord.word.toLowerCase().trim(),
+        severity: newWord.severity,
+        category: newWord.category,
+        is_regex: false,
+        is_active: true,
+      });
 
     if (error) {
       logger.error('Failed to add word', error);
@@ -465,46 +876,6 @@ export default function ModerationPage() {
     }
 
     loadDictionary();
-  }
-
-  function getSeverityColor(severity: string) {
-    switch (severity) {
-      case 'critical':
-        return 'bg-red-500';
-      case 'high':
-        return 'bg-orange-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'low':
-        return 'bg-blue-500';
-      default:
-        return 'bg-muted-foreground';
-    }
-  }
-
-  function getActionColor(action: string) {
-    switch (action) {
-      case 'blocked':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      case 'allowed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'flagged':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'sanitized':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      default:
-        return 'bg-muted text-foreground';
-    }
-  }
-
-  function formatDate(date: string) {
-    return new Date(date).toLocaleString('tr-TR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   }
 
   const filteredLogs = logs.filter((log) => {
@@ -591,7 +962,12 @@ export default function ModerationPage() {
       )}
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as 'logs' | 'blocked' | 'warnings' | 'dictionary' | 'triage' | 'thank-you')
+        }
+      >
         <TabsList>
           <TabsTrigger value="triage">
             <Shield className="mr-2 h-4 w-4" />
@@ -612,6 +988,10 @@ export default function ModerationPage() {
           <TabsTrigger value="dictionary">
             <FileText className="mr-2 h-4 w-4" />
             Dictionary
+          </TabsTrigger>
+          <TabsTrigger value="thank-you">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Thank You
           </TabsTrigger>
         </TabsList>
 
@@ -634,7 +1014,6 @@ export default function ModerationPage() {
                     className="group relative overflow-hidden rounded-xl border bg-card transition-all hover:shadow-md"
                   >
                     <div className="aspect-[9/16] w-full bg-muted/20 relative">
-                      {/* In real app, use a secure Image component that can sign the URL */}
                       <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
                         Preview: {item.media_url}
                       </div>
@@ -652,10 +1031,21 @@ export default function ModerationPage() {
                             by @{item.username}
                           </p>
                         </div>
-                        <span className="text-xs text-orange-500 font-mono bg-orange-500/10 px-2 py-0.5 rounded">
-                          Pending
-                        </span>
+                        <CanvaBadge className={getActionColor(item.moderation_status)}>
+                          {item.moderation_status?.replace('_', ' ')}
+                        </CanvaBadge>
                       </div>
+
+                      {/* Quick reasons */}
+                      {item.ai_moderation_reasons && (
+                        <div className="mb-3">
+                          {parseReasons(item.ai_moderation_reasons).slice(0, 2).map((reason, i) => (
+                            <p key={i} className="text-xs text-muted-foreground truncate">
+                              - {reason}
+                            </p>
+                          ))}
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-2 gap-2 mt-4">
                         <CanvaButton
@@ -673,6 +1063,9 @@ export default function ModerationPage() {
                           Approve
                         </CanvaButton>
                       </div>
+
+                      {/* Evidence Panel */}
+                      <EvidencePanel item={item} />
                     </div>
                   </div>
                 ))
@@ -762,9 +1155,7 @@ export default function ModerationPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge
-                          className={getActionColor(log.action_taken)}
-                        >
+                        <CanvaBadge className={getActionColor(log.action_taken)}>
                           {log.action_taken}
                         </CanvaBadge>
                       </TableCell>
@@ -1107,6 +1498,124 @@ export default function ModerationPage() {
               </Table>
             </CanvaCardBody>
           </CanvaCard>
+        </TabsContent>
+
+        {/* Thank You Events Moderation */}
+        <TabsContent value="thank-you" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium">Teşekkür Moderasyonu</h3>
+              <p className="text-sm text-muted-foreground">
+                İşaretlenen teşekkür mesajlarını incele
+              </p>
+            </div>
+            <CanvaButton variant="secondary" onClick={loadThankYouEvents}>
+              Yenile
+            </CanvaButton>
+          </div>
+
+          {thankYouEvents.length === 0 ? (
+            <div className="p-12 text-center text-muted-foreground border border-dashed rounded-lg">
+              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-green-500" />
+              <h3 className="text-lg font-medium text-foreground">
+                İşaretlenmiş Teşekkür Yok!
+              </h3>
+              <p>Şu anda incelenmesi gereken teşekkür mesajı yok.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {thankYouEvents.map((event) => (
+                <CanvaCard key={event.id}>
+                  <CanvaCardBody>
+                    <div className="flex gap-4">
+                      {/* Message Content */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CanvaBadge
+                            className={
+                              event.moderation_status === 'flagged'
+                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            }
+                          >
+                            {event.moderation_status}
+                          </CanvaBadge>
+                          <CanvaBadge variant="primary">
+                            {event.message_type === 'single' ? 'Bireysel' : 'Toplu'}
+                          </CanvaBadge>
+                          <span className="text-sm text-muted-foreground">
+                            {formatDate(event.created_at)}
+                          </span>
+                        </div>
+
+                        <p className="text-sm mb-3 p-3 bg-muted/50 rounded-lg">
+                          {event.message}
+                        </p>
+
+                        {/* Context */}
+                        <div className="flex gap-4 text-sm text-muted-foreground">
+                          <div>
+                            <span className="font-medium">Gönderen:</span>{' '}
+                            {event.author?.full_name || 'Bilinmiyor'}
+                          </div>
+                          {event.recipient && (
+                            <div>
+                              <span className="font-medium">Alan:</span>{' '}
+                              {event.recipient.full_name}
+                            </div>
+                          )}
+                          {event.moment && (
+                            <div>
+                              <span className="font-medium">Moment:</span>{' '}
+                              {event.moment.title}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Flagged reason */}
+                        {event.flagged_reason && (
+                          <div className="mt-3 p-2 bg-orange-500/10 border border-orange-500/20 rounded text-sm">
+                            <span className="font-medium text-orange-600 dark:text-orange-400">
+                              İşaretlenme Nedeni:
+                            </span>{' '}
+                            {event.flagged_reason}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col gap-2">
+                        <CanvaButton
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleThankYouModeration(event.id, 'approve')}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Onayla
+                        </CanvaButton>
+                        <CanvaButton
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleThankYouModeration(event.id, 'flag', 'Manual inceleme')}
+                        >
+                          <AlertTriangle className="h-4 w-4 mr-1" />
+                          İşaretle
+                        </CanvaButton>
+                        <CanvaButton
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleThankYouModeration(event.id, 'reject', 'Uygunsuz içerik')}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Reddet
+                        </CanvaButton>
+                      </div>
+                    </div>
+                  </CanvaCardBody>
+                </CanvaCard>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -2,6 +2,13 @@
  * Upload Service
  * Image and file upload operations using Supabase Storage
  *
+ * DEPRECATED: PATCH-003
+ * This service has been merged into MediaService.upload.secure
+ * Please use MediaService.upload.secure.image() instead
+ *
+ * @deprecated Use MediaService.upload.secure.image() instead
+ * @see MediaService.upload.secure
+ *
  * Security Features:
  * - File type validation (whitelist)
  * - File size limits

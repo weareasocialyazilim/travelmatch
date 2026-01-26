@@ -98,7 +98,7 @@ const _SearchMapScreen = React.lazy(() =>
     default: m.default,
   })),
 );
-import { InboxScreen } from '../features/inbox';
+// InboxScreen removed - deprecated, use Notifications or Messages instead
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payments';
 // REMOVED: ChatDetailScreen - duplicate of ChatScreen (zombie cleanup)
@@ -352,7 +352,10 @@ const AppNavigator = () => {
 
     // Setup deep link handler with navigation
     if (navigationRef.current) {
-      deepLinkHandler.setNavigation(navigationRef.current);
+      // P2 FIX: setNavigation is now async for queue persistence
+      deepLinkHandler.setNavigation(navigationRef.current).catch((err) => {
+        logger.error('[AppNavigator] Failed to setup deep link handler:', err);
+      });
     }
 
     // Handle deep links for email verification and password reset
@@ -584,11 +587,7 @@ const AppNavigator = () => {
               options={{ animation: 'fade' }}
             />
             {/* Search removed - platform is filter-based only */}
-            <Stack.Screen
-              name="Inbox"
-              component={InboxScreen}
-              options={{ animation: 'fade' }}
-            />
+            {/* Inbox removed - deprecated, use Notifications or Messages */}
             <Stack.Screen name="Requests" component={RequestsScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
             <Stack.Screen

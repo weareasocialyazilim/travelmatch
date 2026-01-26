@@ -11,8 +11,8 @@ interface ThankYouModalProps {
 }
 
 /**
- * ThankYouModal - Payment/Support Confirmation Modal
- * Shows a thank you message after receiving support
+ * ThankYouModal - Trust Note Confirmation Modal
+ * Shows a confirmation after leaving a trust note for a received gift
  */
 export const ThankYouModal: React.FC<ThankYouModalProps> = ({
   visible,
@@ -39,12 +39,12 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>Teşekkürler! 🎉</Text>
+          <Text style={styles.title}>Tesekkur Notu Gonderildi</Text>
 
           {/* Message */}
           <Text style={styles.message}>
-            {giverName} sana destek gönderdi
-            {amount ? ` (₺${amount.toLocaleString('tr-TR')})` : ''}.
+            {giverName} hediye gonderdi
+            {amount ? ` (${amount.toLocaleString('tr-TR')} TL)` : ''}.
           </Text>
 
           <Text style={styles.subtitle}>

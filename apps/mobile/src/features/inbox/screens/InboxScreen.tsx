@@ -1,6 +1,14 @@
 /**
  * Lovendo Inbox Screen - Awwwards Edition
  *
+ * DEPRECATED: PATCH-004
+ * This screen has been consolidated into MessagesScreen.
+ * The "Messages" tab now redirects to MessagesScreen.
+ * The "Requests" tab remains for gift offer management.
+ *
+ * @deprecated Use MessagesScreen for conversations
+ * @see MessagesScreen
+ *
  * Premium inbox experience with:
  * - Twilight Zinc dark theme
  * - Liquid Glass segmented control

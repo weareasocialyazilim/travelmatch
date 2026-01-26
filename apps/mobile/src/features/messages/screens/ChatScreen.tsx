@@ -127,10 +127,9 @@ const ChatScreen: React.FC = () => {
         user: {
           name: otherUser.name,
           avatar: otherUser.avatar,
-          type: otherUser.type || 'traveler',
+          type: otherUser.type || 'host',
           isVerified: otherUser.isVerified || true,
           location: 'Paris, France',
-          travelDays: 7,
         },
       },
     });

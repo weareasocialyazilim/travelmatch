@@ -188,6 +188,24 @@ export const messagesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // RATE LIMITING: Max 10 chat unlocks per hour per host
+    const ONE_HOUR_AGO = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: recentUnlocks, error: rateLimitError } = await supabase
+      .from('gift_approval_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('host_id', user.id)
+      .gte('created_at', ONE_HOUR_AGO);
+
+    if (rateLimitError) {
+      logger.error('[Messages] Rate limit check failed:', rateLimitError);
+    }
+
+    if (recentUnlocks && recentUnlocks >= 10) {
+      throw new Error(
+        'Çok fazla sohbet açma isteği. 1 saat bekleyin.',
+      );
+    }
+
     // MASTER RULE: First check gift amount meets $30 minimum for chat unlock
     const { data: gift, error: fetchError } = await supabase
       .from('gifts')
@@ -228,6 +246,18 @@ export const messagesApi = {
       .eq('receiver_id', user.id); // Security: Only receiver can approve
 
     if (giftError) throw giftError;
+
+    // Log the approval for rate limiting tracking
+    const { error: logError } = await supabase.from('gift_approval_logs').insert({
+      host_id: user.id,
+      gift_id: giftId,
+      sender_id: senderId,
+      action: 'unlock',
+    });
+
+    if (logError) {
+      logger.error('[Messages] Failed to log approval:', logError);
+    }
 
     // Create notification for sender
     // "[Kullanıcı] seninle bir sohbet başlattı!"
@@ -633,5 +663,27 @@ export const messagesApi = {
 
     if (error) throw error;
     return data;
+  },
+
+  /**
+   * P2 FIX: Konuşmayı arşivden çıkar
+   */
+  unarchiveConversation: async (conversationId: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const upsertPayload = {
+      conversation_id: conversationId,
+      user_id: user.id,
+      is_archived: false,
+    } as unknown as Database['public']['Tables']['conversation_settings']['Insert'];
+
+    const { error } = await supabase
+      .from('conversation_settings')
+      .upsert(upsertPayload);
+
+    if (error) throw error;
   },
 };

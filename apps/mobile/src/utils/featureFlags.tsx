@@ -16,6 +16,7 @@ export interface FeatureFlags {
   paymentsEnabled: boolean;
   proofUploadEnabled: boolean;
   kycEnabled: boolean;
+  aiEnabled: boolean; // AI kill switch - disable all AI features if needed
 
   // UX Improvements
   newOnboardingFlow: boolean;
@@ -54,6 +55,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   paymentsEnabled: true,
   proofUploadEnabled: true,
   kycEnabled: true,
+  aiEnabled: true, // Default ON, can be disabled remotely for safety
 
   newOnboardingFlow: false,
   simplifiedProofUpload: false,

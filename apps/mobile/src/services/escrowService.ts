@@ -32,11 +32,22 @@ export interface EscrowTransaction {
   sender_id: string;
   recipient_id: string;
   amount: number;
-  status: 'pending' | 'released' | 'refunded';
+  // FIXED: Added all statuses from database migration
+  status: 'pending' | 'processing' | 'released' | 'refunded' | 'disputed' | 'expired' | 'cancelled';
   release_condition: string;
   created_at: string;
   expires_at: string;
   moment_id?: string;
+}
+
+// Helper function to check if escrow is in a completed state
+export function isEscrowCompleted(status: EscrowTransaction['status']): boolean {
+  return ['released', 'refunded', 'disputed', 'expired', 'cancelled'].includes(status);
+}
+
+// Helper function to check if escrow can be modified
+export function isEscrowModifiable(status: EscrowTransaction['status']): boolean {
+  return ['pending', 'processing'].includes(status);
 }
 
 // RPC Response Types

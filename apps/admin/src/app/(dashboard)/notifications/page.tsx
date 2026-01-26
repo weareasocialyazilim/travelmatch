@@ -499,7 +499,6 @@ export default function NotificationsPage() {
           value={`%${stats.avgDeliveryRate}`}
           icon={<CheckCircle className="h-5 w-5" />}
           accentColor="emerald"
-          trend="up"
         />
         <CanvaStatCard
           title="Açılma Oranı"

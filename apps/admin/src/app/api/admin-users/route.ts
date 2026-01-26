@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 import { escapeSupabaseFilter } from '@/lib/security';
+import type { Database } from '@/types/database';
 
 export async function GET(request: NextRequest) {
   try {
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
         role,
         requires_2fa,
         created_by: session.admin.id,
-      })
+      } as Database['public']['Tables']['admin_users']['Insert'])
       .select()
       .single();
 

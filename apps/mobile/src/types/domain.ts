@@ -199,9 +199,9 @@ export interface MomentUser {
   name: string;
   avatar?: string | null;
   role?: string;
-  type?: 'traveler' | 'local';
+  type?: 'host' | 'local';
   location?: string;
-  travelDays?: number;
+  momentCount?: number;
   isVerified?: boolean;
   visitingUntil?: string;
 }

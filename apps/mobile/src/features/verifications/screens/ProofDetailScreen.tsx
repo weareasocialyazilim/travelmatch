@@ -83,7 +83,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
       await Share.share({
         message: `Check out this proof: ${proof.title ?? 'Proof'}\n${
           proof.description ?? ''
-        }`,
+        }\n\nView in app: lovendo://proof/${proof.id}\nOr on web: https://www.lovendo.xyz/proofs/${proof.id}`,
         url: `lovendo://proof/${proof.id}`,
       });
     } catch (error) {

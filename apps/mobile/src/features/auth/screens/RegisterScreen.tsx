@@ -1,3 +1,14 @@
+/**
+ * Register Screen
+ *
+ * DEPRECATED: PATCH-008
+ * This screen has been consolidated into UnifiedAuthScreen.
+ *
+ * @deprecated Use UnifiedAuthScreen with { initialMode: 'register' } instead
+ * @see UnifiedAuthScreen
+ *
+ * Standalone registration - now part of the unified liquid auth flow.
+ */
 import React, { useState } from 'react';
 import {
   StyleSheet,

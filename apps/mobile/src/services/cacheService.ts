@@ -4,12 +4,45 @@ import pako from 'pako';
 
 // Cache configuration
 const CACHE_PREFIX = '@lovendo_cache_';
+const CACHE_TTL_PREFIX = 'cache:'; // For cacheInvalidationService compatibility
 const DEFAULT_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE_MB = 50; // Maximum cache size: 50MB
 const MAX_CACHE_SIZE_BYTES = MAX_CACHE_SIZE_MB * 1024 * 1024;
 const MAX_MEMORY_CACHE_ITEMS = 100; // Maximum items in memory cache (LRU)
 const COMPRESSION_THRESHOLD_BYTES = 10 * 1024; // Compress items > 10KB
 const CLEANUP_INTERVAL_MS = 60 * 1000; // Cleanup every minute
+
+// Cache keys for payment-related data (merged from cacheInvalidationService)
+export const CACHE_KEYS = {
+  MOMENTS: 'moments',
+  MY_MOMENTS: 'my_moments',
+  SAVED_MOMENTS: 'saved_moments',
+  CONVERSATIONS: 'conversations',
+  REQUESTS: 'requests',
+  WALLET: 'wallet',
+  PROFILE: 'profile',
+  // Payment-specific keys (from cacheInvalidationService)
+  TRANSACTIONS: 'transactions',
+  PAYMENT_METHODS: 'payment_methods',
+  PAYMENT_INTENT: 'payment_intent',
+  MOMENT_PAYMENTS: 'moment_payments',
+  USER_BALANCE: 'user_balance',
+  ESCROW: 'escrow',
+  USER_PROFILE: (userId: string) => `user_profile_${userId}`,
+  MOMENT_DETAIL: (momentId: string) => `moment_${momentId}`,
+  CONVERSATION: (conversationId: string) => `conversation_${conversationId}`,
+} as const;
+
+// Cache TTL (Time To Live) in milliseconds (merged from cacheInvalidationService)
+export const CACHE_TTL = {
+  WALLET: 60 * 1000, // 1 minute
+  TRANSACTIONS: 5 * 60 * 1000, // 5 minutes
+  PAYMENT_METHODS: 10 * 60 * 1000, // 10 minutes
+  PAYMENT_INTENT: 3 * 60 * 1000, // 3 minutes
+  MOMENT_PAYMENTS: 2 * 60 * 1000, // 2 minutes
+  ESCROW: 30 * 1000, // 30 seconds - escrow changes frequently
+  DEFAULT: DEFAULT_EXPIRY_MS, // 5 minutes
+} as const;
 
 interface CacheItem<T> {
   data: T;
@@ -24,21 +57,13 @@ interface CacheItem<T> {
 interface CacheConfig {
   expiryMs?: number;
   forceRefresh?: boolean;
+  tags?: string[]; // For tag-based invalidation
 }
 
-// Cache keys
-export const CACHE_KEYS = {
-  MOMENTS: 'moments',
-  MY_MOMENTS: 'my_moments',
-  SAVED_MOMENTS: 'saved_moments',
-  CONVERSATIONS: 'conversations',
-  REQUESTS: 'requests',
-  WALLET: 'wallet',
-  PROFILE: 'profile',
-  USER_PROFILE: (userId: string) => `user_profile_${userId}`,
-  MOMENT_DETAIL: (momentId: string) => `moment_${momentId}`,
-  CONVERSATION: (conversationId: string) => `conversation_${conversationId}`,
-} as const;
+// Extended cache item with tags support
+interface CacheItemWithTags<T> extends CacheItem<T> {
+  tags?: string[];
+}
 
 /**
  * Calculate approximate size of data in bytes
@@ -122,7 +147,7 @@ class CacheService {
    * Set data in cache with size limits and compression
    */
   async set<T>(key: string, data: T, config: CacheConfig = {}): Promise<void> {
-    const { expiryMs = DEFAULT_EXPIRY_MS } = config;
+    const { expiryMs = DEFAULT_EXPIRY_MS, tags } = config;
     const now = Date.now();
 
     // Compress large data
@@ -153,7 +178,7 @@ class CacheService {
       }
     }
 
-    const cacheItem: CacheItem<T> = {
+    const cacheItem: CacheItemWithTags<T> = {
       data: finalData,
       timestamp: now,
       expiresAt: now + expiryMs,
@@ -161,6 +186,7 @@ class CacheService {
       accessCount: 0,
       lastAccessed: now,
       compressed,
+      tags,
     };
 
     // Check if adding this item would exceed size limit
@@ -597,7 +623,7 @@ class CacheService {
   }
 
   /**
-   * Invalidate cache by pattern
+   * Invalidate cache by pattern (simple string match)
    */
   async invalidateByPattern(pattern: string): Promise<void> {
     // Clear memory cache
@@ -618,6 +644,102 @@ class CacheService {
       logger.error('CacheService.invalidateByPattern error:', error);
     }
   }
+
+  /**
+   * Invalidate cache by wildcard pattern (regex support)
+   * Supports * (any characters) and ? (single character)
+   */
+  async invalidateByWildcard(pattern: string): Promise<void> {
+    try {
+      const regex = new RegExp(
+        pattern.replace(/\*/g, '.*').replace(/\?/g, '.'),
+      );
+
+      // Clear memory cache
+      for (const key of this.memoryCache.keys()) {
+        if (regex.test(key)) {
+          this.memoryCache.delete(key);
+        }
+      }
+
+      // Clear AsyncStorage
+      const keys = await AsyncStorage.getAllKeys();
+      const matchingKeys = keys.filter(
+        (k) => k.startsWith(CACHE_PREFIX) && regex.test(k),
+      );
+      await AsyncStorage.multiRemove(matchingKeys);
+
+      logger.info('CacheService.invalidateByWildcard:', {
+        pattern,
+        keysRemoved: matchingKeys.length,
+      });
+    } catch (error) {
+      logger.error('CacheService.invalidateByWildcard error:', error);
+    }
+  }
+
+  /**
+   * Invalidate cache by tag (invalidate all items with a specific tag)
+   */
+  async invalidateByTag(tag: string): Promise<void> {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const cacheKeys = keys.filter((k) => k.startsWith(CACHE_PREFIX));
+      const keysToRemove: string[] = [];
+
+      for (const key of cacheKeys) {
+        try {
+          const stored = await AsyncStorage.getItem(key);
+          if (stored) {
+            const item = JSON.parse(stored) as CacheItemWithTags<unknown>;
+            if (item.tags?.includes(tag)) {
+              keysToRemove.push(key);
+              // Also remove from memory cache
+              const memoryKey = key.replace(CACHE_PREFIX, '');
+              this.memoryCache.delete(memoryKey);
+            }
+          }
+        } catch {
+          // Skip invalid cache entries
+        }
+      }
+
+      if (keysToRemove.length > 0) {
+        await AsyncStorage.multiRemove(keysToRemove);
+        logger.info('CacheService.invalidateByTag:', {
+          tag,
+          keysRemoved: keysToRemove.length,
+        });
+      }
+    } catch (error) {
+      logger.error('CacheService.invalidateByTag error:', error);
+    }
+  }
+
+  /**
+   * Invalidate all cache entries for a specific user
+   */
+  async invalidateUser(userId: string): Promise<void> {
+    await this.invalidateByTag(`user:${userId}`);
+    await this.invalidateByWildcard(`*${userId}*`);
+  }
+
+  /**
+   * Invalidate all payment-related cache for user
+   */
+  async invalidatePaymentCache(userId: string): Promise<void> {
+    const paymentPatterns = [
+      `wallet_${userId}`,
+      `transactions_${userId}`,
+      `payment_methods_${userId}`,
+      `user_balance_${userId}`,
+    ];
+
+    for (const pattern of paymentPatterns) {
+      await this.invalidateByPattern(pattern);
+    }
+    await this.invalidateByTag(`user:${userId}`);
+  }
 }
 
 // Export singleton instance
@@ -634,6 +756,93 @@ export const cache = {
   getStats: cacheService.getStats.bind(cacheService),
   has: cacheService.has.bind(cacheService),
   invalidateByPattern: cacheService.invalidateByPattern.bind(cacheService),
+  invalidateByWildcard: cacheService.invalidateByWildcard.bind(cacheService),
+  invalidateByTag: cacheService.invalidateByTag.bind(cacheService),
+  invalidateUser: cacheService.invalidateUser.bind(cacheService),
+  invalidatePaymentCache: cacheService.invalidatePaymentCache.bind(cacheService),
 };
+
+// Payment-specific convenience functions (merged from cacheInvalidationService)
+export const paymentCache = {
+  getWallet: (userId: string) => cache.get(`${CACHE_KEYS.WALLET}_${userId}`),
+  setWallet: (userId: string, data: WalletData, ttlMs?: number) =>
+    cache.set(`${CACHE_KEYS.WALLET}_${userId}`, data, {
+      expiryMs: ttlMs ?? CACHE_TTL.WALLET,
+      tags: ['user', `user:${userId}`, 'wallet'],
+    }),
+  invalidateWallet: (userId: string) =>
+    cache.invalidateByPattern(`${CACHE_KEYS.WALLET}_${userId}`),
+
+  getTransactions: (userId: string) =>
+    cache.get(`${CACHE_KEYS.TRANSACTIONS}_${userId}`),
+  setTransactions: (userId: string, data: TransactionData[], ttlMs?: number) =>
+    cache.set(`${CACHE_KEYS.TRANSACTIONS}_${userId}`, data, {
+      expiryMs: ttlMs ?? CACHE_TTL.TRANSACTIONS,
+      tags: ['user', `user:${userId}`, 'transactions'],
+    }),
+  invalidateTransactions: (userId: string) =>
+    cache.invalidateByPattern(`${CACHE_KEYS.TRANSACTIONS}_${userId}`),
+
+  getPaymentMethods: (userId: string) =>
+    cache.get(`${CACHE_KEYS.PAYMENT_METHODS}_${userId}`),
+  setPaymentMethods: (
+    userId: string,
+    data: PaymentMethodData[],
+    ttlMs?: number,
+  ) =>
+    cache.set(`${CACHE_KEYS.PAYMENT_METHODS}_${userId}`, data, {
+      expiryMs: ttlMs ?? CACHE_TTL.PAYMENT_METHODS,
+      tags: ['user', `user:${userId}`, 'payment_methods'],
+    }),
+  invalidatePaymentMethods: (userId: string) =>
+    cache.invalidateByPattern(`${CACHE_KEYS.PAYMENT_METHODS}_${userId}`),
+
+  // Escrow cache
+  getEscrow: (userId: string) =>
+    cache.get(`${CACHE_KEYS.ESCROW}_${userId}`),
+  setEscrow: (userId: string, data: EscrowData[], ttlMs?: number) =>
+    cache.set(`${CACHE_KEYS.ESCROW}_${userId}`, data, {
+      expiryMs: ttlMs ?? CACHE_TTL.ESCROW,
+      tags: ['user', `user:${userId}`, 'escrow'],
+    }),
+  invalidateEscrow: (userId: string) =>
+    cache.invalidateByPattern(`${CACHE_KEYS.ESCROW}_${userId}`),
+
+  invalidateAll: (userId: string) => cache.invalidatePaymentCache(userId),
+};
+
+// Cache data types
+export interface WalletData {
+  balance: number;
+  coins: number;
+  currency: string;
+  pendingBalance?: number;
+}
+
+export interface TransactionData {
+  id: string;
+  amount: number;
+  type: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface PaymentMethodData {
+  id: string;
+  type: 'card' | 'bank';
+  last4?: string;
+  brand?: string;
+}
+
+export interface EscrowData {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  amount: number;
+  status: 'pending' | 'processing' | 'released' | 'refunded' | 'disputed' | 'expired' | 'cancelled';
+  createdAt: string;
+  expiresAt: string;
+  momentId?: string;
+}
 
 export default cacheService;

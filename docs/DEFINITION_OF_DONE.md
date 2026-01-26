@@ -10,6 +10,7 @@ Applies to all production-facing features across mobile, web, admin, and backend
 - `pnpm qa:rc` before release candidate tagging.
 - Chromatic visual regression check must be green.
 - RLS tests must pass for any Supabase migration or policy changes.
+- **TypeScript check must pass with 0 errors**: `pnpm type-check` or `npx tsc --noEmit`
 
 ## Functional Criteria
 

@@ -4,6 +4,8 @@
  */
 
 export { useMessages } from './useMessages';
+export { useMessagingEligibility } from './useMessagingEligibility';
+export type { MessagingEligibility, GuidedMessageState } from './useMessagingEligibility';
 
 // Email verification hooks
 export { useEmailVerification } from './useEmailVerification';

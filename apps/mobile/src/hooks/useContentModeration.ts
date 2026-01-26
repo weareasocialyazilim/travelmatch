@@ -236,8 +236,9 @@ function normalizeText(text: string): string {
 
 /**
  * Check for bad words in both languages
+ * @deprecated Use validateMessage or the hook instead
  */
-function checkBadWords(text: string, lang: 'tr' | 'en'): string[] {
+export function checkBadWords(text: string, lang: 'tr' | 'en'): string[] {
   const errors: string[] = [];
   const normalized = normalizeText(text);
   const msgs = MESSAGES[lang];
@@ -277,8 +278,9 @@ function checkBadWords(text: string, lang: 'tr' | 'en'): string[] {
 
 /**
  * Check for phone numbers (numeric)
+ * @deprecated Use validateMessage or the hook instead
  */
-function checkPhoneNumbers(text: string, lang: 'tr' | 'en'): string[] {
+export function checkPhoneNumbers(text: string, lang: 'tr' | 'en'): string[] {
   const errors: string[] = [];
   const msgs = MESSAGES[lang];
 
@@ -339,14 +341,15 @@ function checkWrittenPhoneNumbers(text: string, lang: 'tr' | 'en'): string[] {
 
 /**
  * Check for PII (email, TC kimlik, SSN, IBAN, credit card)
+ * @deprecated Use validateMessage or the hook instead
  */
-function checkPII(text: string, lang: 'tr' | 'en'): string[] {
+export function checkPII(text: string, lang: 'tr' | 'en'): string[] {
   const errors: string[] = [];
   const msgs = MESSAGES[lang];
 
-  // Email
+  // Email - supports @ and [at] obfuscation, . and [dot] obfuscation
   if (
-    /[a-zA-Z0-9._%+-]+\s*[@[at]]\s*[a-zA-Z0-9.-]+\s*[.[dot]]\s*[a-zA-Z]{2,}/i.test(
+    /[a-zA-Z0-9._%+-]+\s*(?:@|\[at\])\s*[a-zA-Z0-9.-]+(?:\s*(?:\.|\[dot\])\s*[a-zA-Z]{2,})/i.test(
       text,
     )
   ) {
@@ -420,8 +423,9 @@ function checkSpam(text: string, lang: 'tr' | 'en'): string[] {
 
 /**
  * Check for external contact attempts
+ * @deprecated Use validateMessage or the hook instead
  */
-function checkExternalLinks(text: string, lang: 'tr' | 'en'): string[] {
+export function checkExternalLinks(text: string, lang: 'tr' | 'en'): string[] {
   const errors: string[] = [];
   const msgs = MESSAGES[lang];
 
@@ -456,7 +460,7 @@ function checkExternalLinks(text: string, lang: 'tr' | 'en'): string[] {
 /**
  * Validate TC Kimlik checksum
  */
-function isValidTCKimlik(tc: string): boolean {
+export function isValidTCKimlik(tc: string): boolean {
   const digits = tc.replace(/\D/g, '');
   if (digits.length !== 11 || digits[0] === '0') return false;
 
@@ -505,7 +509,7 @@ function isValidSSN(ssn: string): boolean {
 /**
  * Validate credit card with Luhn algorithm
  */
-function isValidCreditCard(cc: string): boolean {
+export function isValidCreditCard(cc: string): boolean {
   const digits = cc.replace(/\D/g, '');
   if (digits.length < 13 || digits.length > 19) return false;
 

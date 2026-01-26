@@ -160,7 +160,7 @@ export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement>
   subtitle?: string;
   /** @deprecated Use subtitle instead */
   description?: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   change?: {
     value: number;
     label?: string;
@@ -168,7 +168,11 @@ export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement>
   icon?: React.ReactNode;
   valueClassName?: string;
   accentColor?: string;
-  trend?: 'up' | 'down';
+  trend?: {
+    value: number;
+    direction: string;
+    label?: string;
+  };
 }
 
 export const CanvaStatCard = React.forwardRef<

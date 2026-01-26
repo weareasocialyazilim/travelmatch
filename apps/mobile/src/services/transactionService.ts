@@ -7,11 +7,7 @@
 
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
-import {
-  getCachedTransactions,
-  setCachedTransactions,
-  invalidateTransactions,
-} from './cacheInvalidationService';
+import { cache, paymentCache } from './cacheService';
 import { toRecord } from '../utils/jsonHelper';
 import type { Database } from '../types/database.types';
 
@@ -47,7 +43,7 @@ class TransactionService {
       const cacheKey = `${user.id}:${JSON.stringify(filters || {})}`;
 
       // Try cache first
-      const cached = await getCachedTransactions(cacheKey);
+      const cached = await cache.get(cacheKey);
       if (cached && Array.isArray(cached) && cached.length > 0) {
         logger.info('Transactions from cache');
         return cached as Transaction[];
@@ -101,7 +97,7 @@ class TransactionService {
       }));
 
       // Cache the result
-      await setCachedTransactions(
+      await cache.set(
         cacheKey,
         transactions.map((t) => ({
           id: t.id,
@@ -173,7 +169,7 @@ class TransactionService {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      await invalidateTransactions(user.id);
+      await paymentCache.invalidateTransactions(user.id);
     }
   }
 }

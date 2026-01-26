@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Share,
   Image,
-  Clipboard,
   Linking,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -78,7 +78,7 @@ export const ShareMomentScreen: React.FC = () => {
     pricePerGuest: 0,
   };
 
-  const shareUrl = `https://www.lovendo.xyz/moment/${momentId}`;
+  const shareUrl = `https://www.lovendo.xyz/moments/${momentId}`;
   const shareMessage = `Check out this moment on Lovendo: ${displayMoment.title}\n${shareUrl}`;
 
   const handleNativeShare = useCallback(async () => {
@@ -94,8 +94,8 @@ export const ShareMomentScreen: React.FC = () => {
     }
   }, [shareMessage, shareUrl, displayMoment.title]);
 
-  const handleCopyLink = useCallback(() => {
-    Clipboard.setString(shareUrl);
+  const handleCopyLink = useCallback(async () => {
+    await Clipboard.setStringAsync(shareUrl);
     setLinkCopied(true);
     // Clear previous timeout
     if (copyTimeoutRef.current) {

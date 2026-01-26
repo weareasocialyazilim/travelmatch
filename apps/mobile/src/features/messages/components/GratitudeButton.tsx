@@ -2,9 +2,9 @@
  * GratitudeButton - Teşekkür Et Butonu
  *
  * Sohbet açmadan sadece şükran gösterme aksiyonu.
- * OnlyFans tarzı "toplu teşekkür" değil, bireysel teşekkür notu.
+ * Bireysel teşekkür notu - alıcıya özel mesaj.
  *
- * MASTER UX Kuralları:
+ * UX Kuralları:
  * - 0-30$: Sadece bu buton görünür
  * - 30-100$: Bu buton + Sohbeti Başlat butonu birlikte
  * - 100$+: Sadece Sohbeti Başlat (teşekkür otomatik)
@@ -39,7 +39,7 @@ interface GratitudeButtonProps {
   onSendGratitude: (message: string) => Promise<void>;
 }
 
-// Quick gratitude messages (emoji + text)
+// Quick gratitude messages with emoji
 const QUICK_GRATITUDES = [
   { emoji: '🙏', text: 'Çok teşekkürler!' },
   { emoji: '💜', text: 'Desteğin için minnettarım' },

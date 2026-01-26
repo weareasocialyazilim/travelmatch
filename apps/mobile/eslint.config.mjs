@@ -20,6 +20,8 @@ export default [
       'no-case-declarations': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
     },
+    // Service naming policy reference:
+    // See apps/mobile/src/services/SERVICE_NAMING_POLICY.md
   },
   {
     files: ['**/*.stories.tsx', '**/__stories__/**/*.tsx'],

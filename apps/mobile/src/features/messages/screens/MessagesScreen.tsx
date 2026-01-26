@@ -177,7 +177,7 @@ const MessagesScreen: React.FC = () => {
           name: conversation.participantName || 'User',
           avatar: conversation.participantAvatar,
           isVerified: conversation.participantVerified,
-          role: 'Traveler',
+          role: 'Moment Host',
           kyc: 'Verified',
           location: '',
         },

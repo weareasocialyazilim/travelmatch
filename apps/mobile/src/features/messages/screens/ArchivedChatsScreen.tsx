@@ -5,14 +5,10 @@
  * - type: 'traveler' → type: 'moment_host' (Alıcı)
  * - role: 'Traveler' → role: 'Anı Sahibi'
  *
- * NOTE: This screen currently uses mock data as the backend
- * does not yet support archived conversations. Backend work needed:
- * 1. Add is_archived column to conversations table
- * 2. Implement archiveConversation API
- * 3. Add getArchivedConversations query
+ * P2 FIX: Connected to real backend via messagesService
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +16,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -33,6 +30,8 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 import { useTranslation } from 'react-i18next';
+import { messagesApi } from '../services/messagesService';
+import { logger } from '@/utils/logger';
 
 interface ArchivedChat {
   id: string;
@@ -53,32 +52,44 @@ export const ArchivedChatsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
 
-  // Archive feature planned for v1.1 - using placeholder data for now
-  const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
-    {
-      id: '1',
-      name: 'Michael',
-      avatar:
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-      lastMessage: 'Harika bir anıydı!',
-      archivedAt: '3 gün önce',
-      isVerified: true,
-      linkedMoment: {
-        id: 'm1',
-        title: 'Kapadokya Balon Turu',
-      },
-    },
-    {
-      id: '2',
-      name: 'Sophie',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-      lastMessage: 'Öneri için teşekkürler!',
-      archivedAt: '1 hafta önce',
-      isVerified: false,
-    },
-  ]);
+  const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleUnarchive = (id: string) => {
+  // P2 FIX: Load archived conversations from backend
+  useEffect(() => {
+    const loadArchivedChats = async () => {
+      try {
+        setLoading(true);
+        const conversations = await messagesApi.getArchivedConversations();
+
+        // Transform backend data to UI format
+        const chats: ArchivedChat[] = conversations.map((conv: any) => ({
+          id: conv.id,
+          name: conv.other_participant?.display_name || 'Unknown User',
+          avatar: conv.other_participant?.avatar_url || '',
+          lastMessage: conv.last_message?.content || '',
+          archivedAt: conv.conversation_settings?.archived_at
+            ? new Date(conv.conversation_settings.archived_at).toLocaleDateString('tr-TR')
+            : 'Unknown',
+          isVerified: conv.other_participant?.is_verified || false,
+          linkedMoment: conv.moment_id
+            ? { id: conv.moment_id, title: conv.moment?.title || 'Moment' }
+            : undefined,
+        }));
+
+        setArchivedChats(chats);
+      } catch (error) {
+        logger.error('[ArchivedChats] Failed to load:', error);
+        showToast('Arşivlenmiş sohbetler yüklenemedi', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadArchivedChats();
+  }, []);
+
+  const handleUnarchive = async (id: string) => {
     HapticManager.buttonPress();
     showAlert({
       title: t('messages.archived.unarchiveTitle'),
@@ -87,9 +98,15 @@ export const ArchivedChatsScreen: React.FC = () => {
         { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('messages.archived.unarchive'),
-          onPress: () => {
-            setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast(t('messages.archived.unarchiveSuccess'), 'success');
+          onPress: async () => {
+            try {
+              await messagesApi.unarchiveConversation(id);
+              setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
+              showToast(t('messages.archived.unarchiveSuccess'), 'success');
+            } catch (error) {
+              logger.error('[ArchivedChats] Unarchive failed:', error);
+              showToast('Sohbet arşivden çıkarılamadı', 'error');
+            }
           },
         },
       ],
@@ -106,9 +123,17 @@ export const ArchivedChatsScreen: React.FC = () => {
         {
           text: t('common.delete'),
           style: 'destructive',
-          onPress: () => {
-            setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast(t('messages.archived.deleteSuccess'), 'info');
+          onPress: async () => {
+            try {
+              // P2 FIX: Call backend to delete conversation
+              await messagesApi.deleteConversation(id);
+              // Update local state after successful backend delete
+              setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
+              showToast(t('messages.archived.deleteSuccess'), 'info');
+            } catch (error) {
+              logger.error('[ArchivedChats] Delete failed:', error);
+              showToast('Sohbet silinemedi', 'error');
+            }
           },
         },
       ],

@@ -209,12 +209,18 @@ export function ChartLegend({ items, className }: ChartLegendProps) {
 interface AdminLineChartProps {
   data: Record<string, unknown>[];
   xAxisKey: string;
-  lines: {
+  /** @deprecated Use series instead */
+  lines?: {
     dataKey: string;
     name: string;
     color?: string;
     strokeWidth?: number;
     dot?: boolean;
+  }[];
+  series?: {
+    key: string;
+    name: string;
+    color?: string;
   }[];
   title?: string;
   description?: string;
@@ -230,6 +236,7 @@ export function AdminLineChart({
   data,
   xAxisKey,
   lines,
+  series,
   title,
   description,
   height = 300,
@@ -239,6 +246,14 @@ export function AdminLineChart({
   yAxisFormatter,
   className,
 }: AdminLineChartProps) {
+  // Support both 'lines' and 'series' prop (series uses 'key', lines uses 'dataKey')
+  const chartLines = (series || lines)?.map((s: any) => ({
+    dataKey: s.key || s.dataKey,
+    name: s.name,
+    color: s.color,
+    strokeWidth: s.strokeWidth,
+    dot: s.dot,
+  })) || [];
   return (
     <ChartContainer
       title={title}
@@ -269,9 +284,9 @@ export function AdminLineChart({
         />
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
-        {lines &&
-          lines.length > 0 &&
-          lines.map((line, index) => (
+        {chartLines &&
+          chartLines.length > 0 &&
+          chartLines.map((line, index) => (
             <Line
               key={line.dataKey}
               type="monotone"
@@ -299,11 +314,17 @@ export function AdminLineChart({
 interface AdminAreaChartProps {
   data: Record<string, unknown>[];
   xAxisKey: string;
-  areas: {
+  /** @deprecated Use series instead */
+  areas?: {
     dataKey: string;
     name: string;
     color?: string;
     gradientId?: string;
+  }[];
+  series?: {
+    key: string;
+    name: string;
+    color?: string;
   }[];
   title?: string;
   description?: string;
@@ -320,6 +341,7 @@ export function AdminAreaChart({
   data,
   xAxisKey,
   areas,
+  series,
   title,
   description,
   height = 300,
@@ -330,6 +352,14 @@ export function AdminAreaChart({
   yAxisFormatter,
   className,
 }: AdminAreaChartProps) {
+  // Support both 'areas' and 'series' prop
+  const chartAreas = (series || areas)?.map((s: any) => ({
+    dataKey: s.key || s.dataKey,
+    name: s.name,
+    color: s.color,
+    gradientId: s.gradientId,
+  })) || [];
+
   return (
     <ChartContainer
       title={title}
@@ -361,9 +391,9 @@ export function AdminAreaChart({
         />
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
-        {areas &&
-          areas.length > 0 &&
-          areas.map((area, index) => {
+        {chartAreas &&
+          chartAreas.length > 0 &&
+          chartAreas.map((area, index) => {
             const color =
               area.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length];
             const gradientId =
@@ -392,11 +422,17 @@ export function AdminAreaChart({
 interface AdminBarChartProps {
   data: Record<string, unknown>[];
   xAxisKey: string;
-  bars: {
+  /** @deprecated Use series instead */
+  bars?: {
     dataKey: string;
     name: string;
     color?: string;
     radius?: number;
+  }[];
+  series?: {
+    key: string;
+    name: string;
+    color?: string;
   }[];
   title?: string;
   description?: string;
@@ -414,6 +450,7 @@ export function AdminBarChart({
   data,
   xAxisKey,
   bars,
+  series,
   title,
   description,
   height = 300,
@@ -425,6 +462,13 @@ export function AdminBarChart({
   yAxisFormatter,
   className,
 }: AdminBarChartProps) {
+  // Support both 'bars' and 'series' prop
+  const chartBars = (series || bars)?.map((s: any) => ({
+    dataKey: s.key || s.dataKey,
+    name: s.name,
+    color: s.color,
+    radius: s.radius,
+  })) || [];
   return (
     <ChartContainer
       title={title}
@@ -460,7 +504,7 @@ export function AdminBarChart({
         />
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
-        {bars.map((bar, index) => (
+        {chartBars.map((bar, index) => (
           <Bar
             key={bar.dataKey}
             dataKey={bar.dataKey}

@@ -260,17 +260,20 @@ class AnalyticsService {
     if (!this.initialized) return;
 
     try {
+      // Sanitize traits to remove PII before sending
+      const sanitizedTraits = sanitizeProperties(traits);
+
       // PostHog user identification
-      this.posthog?.identify(userId, traits);
+      this.posthog?.identify(userId, sanitizedTraits);
 
       // Sentry user context
       const sentry = await getSentry();
       sentry?.setUser({
         id: userId,
-        ...traits,
+        ...sanitizedTraits,
       });
 
-      logger.info(`[Analytics] User identified: ${userId}`, traits);
+      logger.info(`[Analytics] User identified: ${userId}`, sanitizedTraits);
     } catch (error) {
       logger.error('[Analytics] Failed to identify user:', error);
     }

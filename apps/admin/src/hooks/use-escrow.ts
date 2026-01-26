@@ -107,6 +107,28 @@ async function performEscrowAction(
   action: 'release' | 'refund' | 'extend',
   reason?: string,
 ): Promise<{ escrow: EscrowTransaction; message: string }> {
+  // Audit logging: Log admin action before performing
+  const auditLog = {
+    escrow_id: escrowId,
+    action,
+    reason,
+    timestamp: new Date().toISOString(),
+  };
+
+  try {
+    await fetch('/api/admin/audit-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'escrow_action',
+        ...auditLog,
+      }),
+    });
+  } catch (auditError) {
+    // Log but don't block the action
+    logger.error('[Admin] Failed to log escrow action audit:', auditError);
+  }
+
   const response = await fetch('/api/escrow', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

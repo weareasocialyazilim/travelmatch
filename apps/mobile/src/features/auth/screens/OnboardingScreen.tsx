@@ -59,22 +59,22 @@ const SLIDES = [
     id: '1',
     image:
       'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
-    title: 'Discover Local Vibes',
-    desc: 'Find exclusive moments curated by locals. From hidden bars to sunset dinners.',
+    title: 'Share Moments',
+    desc: 'Discover authentic experiences. Support creators by gifting their moments.',
   },
   {
     id: '2',
     image:
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
-    title: 'Connect & Support',
-    desc: 'Connect with creators who share your vibe and support them with a gift.',
+    title: 'Gift with Purpose',
+    desc: 'Send gifts to show support. Your gift is locked in escrow until the moment is complete.',
   },
   {
     id: '3',
     image:
       'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200',
-    title: 'Secure & Cashless',
-    desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
+    title: 'Safe & Secure',
+    desc: 'Escrow protection for every gift. Transparent, fair, and trusted.',
   },
 ];
 

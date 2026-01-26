@@ -17,6 +17,11 @@
  * - Added 'premium_offer_received' for $100+ offers
  * - Added 'proof_approved_payment_released' (replaces trip_confirmed)
  *
+ * PATCH-002: Merged notificationNavigator.ts into this file
+ * - Added navigation route mapping for all notification types
+ * - Added haptic feedback patterns
+ * - Added pending navigation queue for app launch scenarios
+ *
  * TERMINOLOGY PURGE:
  * - "Seyahat" → REMOVED (use "Anı" / "Moment")
  * - "Trip" → REMOVED (use "Gift" / "Hediye")
@@ -27,6 +32,9 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { notificationsService as dbNotificationsService } from './supabaseDbService';
 import { toRecord } from '../utils/jsonHelper';
+import { navigate, navigationRef } from './navigationService';
+import { HapticManager } from './HapticManager';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 // Types - Updated for Moment platform with PayTR integration
 export type NotificationType =
@@ -666,3 +674,456 @@ export const createSubscriberOfferNotification = async (
     );
   }
 };
+
+// ============================================
+// PATCH-002: Notification Navigation (merged from notificationNavigator.ts)
+// ============================================
+
+// Extended notification types for navigation (includes all types from notificationNavigator)
+export type NavigableNotificationType =
+  | NotificationType
+  | 'payment_received'
+  | 'payment_rejected'
+  | 'new_message'
+  | 'chat_request'
+  | 'moment_commented'
+  | 'moment_expired'
+  | 'profile_viewed'
+  | 'transaction_completed'
+  | 'payout_processed'
+  | 'refund_processed'
+  | 'dispute_opened'
+  | 'dispute_resolved'
+  | 'report_submitted'
+  | 'badge_earned'
+  | 'system_update'
+  | 'verification_complete'
+  | 'account_warning'
+  | 'promotional'
+  | 'general'
+  // Proof system types
+  | 'proof_required'
+  | 'proof_approved'
+  | 'proof_rejected';
+
+export interface NotificationNavigationPayload {
+  /** Notification unique ID */
+  id: string;
+  /** Notification type for routing */
+  type: NavigableNotificationType;
+  /** Related moment ID (for payment/proof notifications) */
+  momentId?: string;
+  /** Related user ID (for profile/chat notifications) */
+  userId?: string;
+  /** Related conversation ID (for chat notifications) */
+  conversationId?: string;
+  /** Related payment/gesture ID */
+  gestureId?: string;
+  /** Related escrow ID (for escrow/proof notifications) */
+  escrowId?: string;
+  /** Transaction ID (for payment notifications) */
+  transactionId?: string;
+  /** Proof ID (for proof review notifications) */
+  proofId?: string;
+  /** Additional metadata */
+  metadata?: Record<string, unknown>;
+}
+
+export interface NavigationRoute {
+  /** Screen name to navigate to */
+  screen: string;
+  /** Screen parameters */
+  params?: Record<string, unknown>;
+  /** Whether navigation succeeded */
+  success: boolean;
+  /** Error message if navigation failed */
+  error?: string;
+}
+
+// Haptic feedback patterns by notification type
+const HAPTIC_BY_TYPE: Partial<Record<NavigableNotificationType, () => void>> = {
+  payment_received: () => HapticManager.paymentComplete(),
+  high_value_offer: () => HapticManager.destructiveAction(),
+  proof_approved: () => HapticManager.proofVerified(),
+  proof_rejected: () => HapticManager.warning(),
+  new_message: () => HapticManager.messageReceived(),
+  milestone_reached: () => HapticManager.success(),
+  dispute_opened: () => HapticManager.warning(),
+};
+
+/**
+ * Navigate to appropriate screen based on notification type
+ */
+export function navigateFromNotification(
+  payload: NotificationNavigationPayload,
+): NavigationRoute {
+  try {
+    // Check if navigation is ready
+    if (!navigationRef.isReady()) {
+      logger.warn('[NotificationService] Navigation not ready, queueing...');
+      return {
+        screen: '',
+        success: false,
+        error: 'Navigation not ready',
+      };
+    }
+
+    // Generate route from payload
+    const route = getNotificationNavigationRoute(payload);
+
+    // Trigger haptic feedback if defined
+    const hapticFn = HAPTIC_BY_TYPE[payload.type];
+    if (hapticFn) {
+      hapticFn();
+    } else {
+      HapticManager.notificationReceived();
+    }
+
+    // Navigate to screen
+    logger.info(
+      `[NotificationService] Navigating to ${route.screen}`,
+      payload,
+    );
+    navigate(route.screen as keyof RootStackParamList, route.params);
+
+    return route;
+  } catch (error) {
+    logger.error('[NotificationService] Navigation failed:', error);
+    return {
+      screen: '',
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Get navigation route for a notification payload
+ */
+export function getNotificationNavigationRoute(
+  payload: NotificationNavigationPayload,
+): NavigationRoute {
+  const { type, metadata, ...rest } = payload;
+
+  switch (type) {
+    // ==================== PAYMENT FLOW ====================
+    case 'gesture_received':
+    case 'high_value_offer':
+    case 'subscriber_offer_received':
+    case 'premium_offer_received':
+      if (!payload.momentId) {
+        return {
+          screen: 'Inbox',
+          params: { initialTab: 'requests' },
+          success: true,
+        };
+      }
+      return {
+        screen: 'GestureReceived',
+        params: {
+          gestureId: payload.gestureId,
+          senderId: payload.userId || '',
+          momentTitle: (metadata as any)?.momentTitle || 'Destek Teklifi',
+          amount: (metadata as any)?.amount || 0,
+          isAnonymous: (metadata as any)?.isAnonymous || false,
+        },
+        success: true,
+      };
+
+    case 'payment_received':
+    case 'payment_sent':
+      return { screen: 'Wallet', params: undefined, success: true };
+
+    case 'payment_confirmed':
+    case 'paytr_authorized':
+      if (!payload.escrowId) {
+        return { screen: 'Wallet', success: true };
+      }
+      return {
+        screen: 'EscrowStatus',
+        params: {
+          escrowId: payload.escrowId,
+          momentTitle: (metadata as any)?.momentTitle || '',
+          amount: (metadata as any)?.amount || 0,
+          receiverName: (metadata as any)?.receiverName || '',
+          status: 'in_escrow',
+        },
+        success: true,
+      };
+
+    case 'payment_rejected':
+      return {
+        screen: 'Inbox',
+        params: { initialTab: 'active' },
+        success: true,
+      };
+
+    case 'payment_completed':
+    case 'proof_approved_payment_released':
+      return {
+        screen: 'Success',
+        params: {
+          type: 'payment_completed' as const,
+          title: 'Ödeme Tamamlandı!',
+          subtitle: 'Tutar hesabınıza aktarıldı.',
+        },
+        success: true,
+      };
+
+    // ==================== PROOF SYSTEM ====================
+    case 'proof_required':
+      if (!payload.escrowId || !payload.gestureId) {
+        return { screen: 'Wallet', success: true };
+      }
+      return {
+        screen: 'ProofFlow',
+        params: {
+          escrowId: payload.escrowId,
+          gestureId: payload.gestureId,
+          momentId: payload.momentId,
+          momentTitle: (metadata as any)?.momentTitle || '',
+          senderId: payload.userId,
+        },
+        success: true,
+      };
+
+    case 'proof_submitted':
+      if (!payload.proofId) {
+        return {
+          screen: 'ProofHistory',
+          params: { momentId: payload.momentId || '' },
+          success: true,
+        };
+      }
+      return {
+        screen: 'ProofDetail',
+        params: { proofId: payload.proofId },
+        success: true,
+      };
+
+    case 'proof_approved':
+      return {
+        screen: 'Success',
+        params: {
+          type: 'proof_verified' as const,
+          title: 'Kanıt Onaylandı!',
+          subtitle: 'Ödeme hesabınıza aktarıldı.',
+        },
+        success: true,
+      };
+
+    case 'proof_rejected':
+      if (!payload.escrowId || !payload.gestureId) {
+        return { screen: 'Wallet', success: true };
+      }
+      return {
+        screen: 'ProofFlow',
+        params: {
+          escrowId: payload.escrowId,
+          gestureId: payload.gestureId,
+          momentId: payload.momentId,
+          momentTitle: (metadata as any)?.momentTitle || '',
+          senderId: payload.userId,
+        },
+        success: true,
+      };
+
+    // ==================== MESSAGING ====================
+    case 'message':
+    case 'new_message':
+      if (!payload.conversationId || !payload.userId) {
+        return { screen: 'Messages', success: true };
+      }
+      return {
+        screen: 'Chat',
+        params: {
+          conversationId: payload.conversationId,
+          otherUser: {
+            id: payload.userId,
+            full_name: (metadata as any)?.senderName || 'Kullanıcı',
+            avatar_url: (metadata as any)?.senderAvatar || null,
+          },
+        },
+        success: true,
+      };
+
+    case 'chat_unlocked':
+      return {
+        screen: 'Chat',
+        params: {
+          conversationId: payload.conversationId,
+          otherUser: { id: payload.userId },
+        },
+        success: true,
+      };
+
+    case 'chat_request':
+    case 'chat_request_pending':
+      return {
+        screen: 'Inbox',
+        params: { initialTab: 'requests' },
+        success: true,
+      };
+
+    // ==================== MOMENT & PROFILE ====================
+    case 'moment_liked':
+      if (!payload.momentId) {
+        return { screen: 'MyMoments', success: true, error: 'Missing momentId' };
+      }
+      return {
+        screen: 'MomentDetail',
+        params: { moment: { id: payload.momentId }, isOwner: true },
+        success: true,
+      };
+
+    case 'moment_comment':
+    case 'moment_commented':
+      if (!payload.momentId) {
+        return { screen: 'MyMoments', success: true };
+      }
+      return {
+        screen: 'MomentComments',
+        params: {
+          momentId: payload.momentId,
+          commentCount: (metadata as any)?.commentCount || 0,
+        },
+        success: true,
+      };
+
+    case 'moment_saved':
+      return {
+        screen: 'SavedMoments',
+        params: undefined,
+        success: true,
+      };
+
+    case 'moment_expired':
+      return {
+        screen: 'CreateMoment',
+        params: undefined,
+        success: true,
+      };
+
+    case 'profile_viewed':
+      if (!payload.userId) {
+        return { screen: 'Profile', success: true };
+      }
+      return {
+        screen: 'ProfileDetail',
+        params: { userId: payload.userId },
+        success: true,
+      };
+
+    case 'review_received':
+      return {
+        screen: 'Profile',
+        params: { userId: payload.userId },
+        success: true,
+      };
+
+    // ==================== TRANSACTIONS ====================
+    case 'transaction_completed':
+      if (!payload.transactionId) {
+        return { screen: 'Wallet', success: true };
+      }
+      return {
+        screen: 'TransactionDetail',
+        params: { transactionId: payload.transactionId },
+        success: true,
+      };
+
+    case 'payout_processed':
+      return {
+        screen: 'Success',
+        params: {
+          type: 'payout' as const,
+          title: 'Para Çekme Başarılı!',
+          subtitle: 'Tutarınız banka hesabınıza aktarıldı.',
+        },
+        success: true,
+      };
+
+    case 'refund_processed':
+      return { screen: 'Wallet', params: undefined, success: true };
+
+    // ==================== DISPUTES & REPORTS ====================
+    case 'dispute_opened':
+      return {
+        screen: 'DisputeFlow',
+        params: {
+          type: (metadata as any)?.disputeType || 'transaction',
+          id: payload.transactionId || payload.gestureId || '',
+        },
+        success: true,
+      };
+
+    case 'dispute_resolved':
+      return {
+        screen: 'TransactionDetail',
+        params: { transactionId: payload.transactionId || '' },
+        success: true,
+      };
+
+    case 'report_submitted':
+      return { screen: 'Profile', params: undefined, success: true };
+
+    // ==================== GAMIFICATION ====================
+    case 'milestone_reached':
+    case 'trust_level_up':
+      return { screen: 'TrustNotes', params: undefined, success: true };
+
+    case 'achievement_unlocked':
+    case 'badge_earned':
+      return { screen: 'Achievements', params: undefined, success: true };
+
+    // ==================== SYSTEM ====================
+    case 'system':
+    case 'system_update':
+      return { screen: 'Settings', params: undefined, success: true };
+
+    case 'verification_complete':
+    case 'kyc_approved':
+      return { screen: 'Profile', params: undefined, success: true };
+
+    case 'kyc_rejected':
+      return {
+        screen: 'IdentityVerification',
+        params: undefined,
+        success: true,
+      };
+
+    case 'account_warning':
+      return { screen: 'Settings', params: undefined, success: true };
+
+    // ==================== PROMOTIONAL ====================
+    case 'promotional':
+    case 'promo':
+      return { screen: 'MainTabs', params: undefined, success: true };
+
+    // ==================== DEFAULT ====================
+    default:
+      return { screen: 'Notifications', params: undefined, success: true };
+  }
+}
+
+// Pending navigation queue for app launch scenarios
+let pendingNavigation: NotificationNavigationPayload | null = null;
+
+export function queueNotificationNavigation(
+  payload: NotificationNavigationPayload,
+): void {
+  pendingNavigation = payload;
+  logger.info('[NotificationService] Queued navigation for:', payload.type);
+}
+
+export function processPendingNavigation(): void {
+  if (pendingNavigation) {
+    logger.info('[NotificationService] Processing pending navigation');
+    navigateFromNotification(pendingNavigation);
+    pendingNavigation = null;
+  }
+}
+
+export function hasPendingNavigation(): boolean {
+  return pendingNavigation !== null;
+}

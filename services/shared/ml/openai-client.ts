@@ -1,6 +1,12 @@
 /**
  * OpenAI Client Wrapper
  * Centralized OpenAI API integration for all ML services
+ * Updated: 2026-01-26 - Updated to current model versions
+ *
+ * Model Versions:
+ * - gpt-4o (2024) replaced gpt-4-turbo-preview
+ * - gpt-4o-mini for cost-efficient vision tasks
+ * - text-embedding-3-small replaced text-embedding-ada-002
  */
 
 import OpenAI from 'openai';
@@ -30,9 +36,32 @@ const getEnvVar = (key: string): string => {
   return '';
 };
 
-const openai = new OpenAI({
-  apiKey: getEnvVar('OPENAI_API_KEY'),
-});
+// AI startup check - disable gracefully if API key missing
+const openaiApiKey = getEnvVar('OPENAI_API_KEY');
+const isAiEnabled = openaiApiKey.length > 0;
+
+const openai = isAiEnabled
+  ? new OpenAI({
+      apiKey: openaiApiKey,
+    })
+  : null;
+
+/**
+ * Configuration for AI models - single source of truth
+ */
+export const AI_MODELS = {
+  vision: 'gpt-4o-mini', // Cost-efficient vision analysis
+  chat: 'gpt-4o', // Latest GPT-4 for text generation
+  embeddings: 'text-embedding-3-small', // Faster, smaller embeddings
+  moderation: 'gpt-4o', // For content moderation fallback
+} as const;
+
+// Fallback handler when AI is disabled
+function throwIfAiDisabled(): void {
+  if (!isAiEnabled) {
+    throw new Error('AI service is disabled (OPENAI_API_KEY not configured)');
+  }
+}
 
 /**
  * Analyze image using GPT-4 Vision
@@ -40,10 +69,15 @@ const openai = new OpenAI({
 export async function analyzeImage(
   imageUrl: string,
   prompt: string,
-): Promise<any> {
-  // eslint-disable-line @typescript-eslint/no-explicit-any
+): Promise<string> {
+  throwIfAiDisabled();
+
+  if (!openai) {
+    throw new Error('OpenAI client not initialized');
+  }
+
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-vision-preview',
+    model: AI_MODELS.vision,
     messages: [
       {
         role: 'user',
@@ -56,7 +90,7 @@ export async function analyzeImage(
     max_tokens: 500,
   });
 
-  return response.choices[0].message.content;
+  return response.choices[0].message.content || '';
 }
 
 /**
@@ -66,7 +100,13 @@ export async function generateText(
   prompt: string,
   systemPrompt?: string,
 ): Promise<string> {
-  const messages: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
+  throwIfAiDisabled();
+
+  if (!openai) {
+    throw new Error('OpenAI client not initialized');
+  }
+
+  const messages: any[] = [];
 
   if (systemPrompt) {
     messages.push({ role: 'system', content: systemPrompt });
@@ -75,7 +115,7 @@ export async function generateText(
   messages.push({ role: 'user', content: prompt });
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: AI_MODELS.chat,
     messages,
     max_tokens: 1000,
   });
@@ -84,12 +124,18 @@ export async function generateText(
 }
 
 /**
- * Check content moderation
+ * Check content moderation (uses OpenAI Moderations API)
  */
 export async function moderateContent(content: string): Promise<{
   flagged: boolean;
   categories: Record<string, boolean>;
 }> {
+  throwIfAiDisabled();
+
+  if (!openai) {
+    throw new Error('OpenAI client not initialized');
+  }
+
   const response = await openai.moderations.create({
     input: content,
   });
@@ -98,16 +144,23 @@ export async function moderateContent(content: string): Promise<{
 
   return {
     flagged: result.flagged,
-    categories: result.categories,
+    categories: result.categories as Record<string, boolean>,
   };
 }
 
 /**
  * Generate embeddings for semantic search
+ * Uses text-embedding-3-small (faster and cheaper than ada-002)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+  throwIfAiDisabled();
+
+  if (!openai) {
+    throw new Error('OpenAI client not initialized');
+  }
+
   const response = await openai.embeddings.create({
-    model: 'text-embedding-ada-002',
+    model: AI_MODELS.embeddings,
     input: text,
   });
 
@@ -120,8 +173,14 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function batchGenerateEmbeddings(
   texts: string[],
 ): Promise<number[][]> {
+  throwIfAiDisabled();
+
+  if (!openai) {
+    throw new Error('OpenAI client not initialized');
+  }
+
   const response = await openai.embeddings.create({
-    model: 'text-embedding-ada-002',
+    model: AI_MODELS.embeddings,
     input: texts,
   });
 
@@ -143,4 +202,24 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   }
 
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Check if AI services are enabled
+ */
+export function isAiServiceEnabled(): boolean {
+  return isAiEnabled;
+}
+
+/**
+ * Get AI service status for diagnostics
+ */
+export function getAiServiceStatus(): {
+  enabled: boolean;
+  configuredModels: string[];
+} {
+  return {
+    enabled: isAiEnabled,
+    configuredModels: isAiEnabled ? Object.values(AI_MODELS) : [],
+  };
 }

@@ -1,6 +1,8 @@
 -- Migration: Setup Storage Webhook for Rekognition
 -- Created: 2026-01-24 13:00:00
+-- Updated: 2026-01-26 - Fixed auth header issue
 -- Purpose: Trigger Edge Function on file upload to storage.objects
+-- Note: Edge Function verify_jwt=false in config/supabase.toml for this webhook
 
 -- Ensure pg_net extension is enabled for making HTTP requests
 CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
@@ -19,7 +21,7 @@ DECLARE
   -- Updated for Production Project: bjikxgtbptrvawkguypv
   edge_function_url text := 'https://bjikxgtbptrvawkguypv.supabase.co/functions/v1/handle-storage-upload';
   
-  headers jsonb := '{"Content-Type": "application/json", "Authorization": "Bearer ' || current_setting('request.jwt.claim.role', true) || '"}'::jsonb;
+  headers jsonb := '{"Content-Type": "application/json"}'::jsonb;
   payload jsonb;
   request_id integer;
 BEGIN

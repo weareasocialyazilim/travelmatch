@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
+  Alert,
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,7 +18,9 @@ import { LAYOUT } from '@/constants/layout';
 import { PLANS } from '../constants/plans';
 import { VALUES } from '@/constants/values';
 import { subscriptionsService } from '@/services/supabase';
+import { coinService } from '@/services/coinService';
 import { logger } from '@/utils/logger';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { SubscriptionPlan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -44,9 +47,11 @@ type SubscriptionScreenProps = StackScreenProps<
 export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState<string>('first_class');
   const [plans, setPlans] = useState<SubscriptionPlan[]>(PLANS);
   const [loading, setLoading] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -110,6 +115,29 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       title: plan.name,
       amount: plan.price,
     });
+  };
+
+  const handleRestorePurchases = async () => {
+    setIsRestoring(true);
+    try {
+      const success = await coinService.restorePurchases();
+      if (success) {
+        Alert.alert(
+          t('common.success'),
+          t('payment.restoredSuccess') || 'Purchases restored successfully',
+        );
+      } else {
+        Alert.alert(
+          t('common.error'),
+          t('payment.restoreFailed') || 'No purchases to restore',
+        );
+      }
+    } catch (error) {
+      logger.error('[Subscription] Restore purchases error:', error);
+      Alert.alert(t('common.error'), t('payment.restoreError') || 'Failed to restore purchases');
+    } finally {
+      setIsRestoring(false);
+    }
   };
 
   const renderPlanCard = (plan: SubscriptionPlan) => {
@@ -415,6 +443,51 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Icon name="help-circle" size={20} color={COLORS.brand.primary} />
           <Text style={styles.faqText}>View Frequently Asked Questions</Text>
         </TouchableOpacity>
+
+        {/* Subscription Terms Clarity */}
+        <View style={styles.termsCard}>
+          <Text style={styles.termsTitle}>Subscription Terms</Text>
+          <View style={styles.termsRow}>
+            <Icon name="calendar-check" size={18} color={COLORS.brand.primary} />
+            <Text style={styles.termsText}>
+              Auto-renews monthly until cancelled
+            </Text>
+          </View>
+          <View style={styles.termsRow}>
+            <Icon name="cancel" size={18} color={COLORS.brand.primary} />
+            <Text style={styles.termsText}>Cancel anytime in app settings</Text>
+          </View>
+          <View style={styles.termsRow}>
+            <Icon name="cash-refund" size={18} color={COLORS.brand.primary} />
+            <Text style={styles.termsText}>14-day money-back guarantee</Text>
+          </View>
+          <View style={styles.termsRow}>
+            <Icon name="shield-check" size={18} color={COLORS.brand.primary} />
+            <Text style={styles.termsText}>
+              Managed via {'\n'}Apple/Google Account
+            </Text>
+          </View>
+        </View>
+
+        {/* Restore Purchases - App Store Requirement */}
+        <TouchableOpacity
+          style={styles.restoreButton}
+          onPress={handleRestorePurchases}
+          disabled={isRestoring}
+        >
+          {isRestoring ? (
+            <ActivityIndicator size="small" color={COLORS.brand.primary} />
+          ) : (
+            <>
+              <Icon
+                name="restore"
+                size={20}
+                color={COLORS.text.secondary}
+              />
+              <Text style={styles.restoreText}>Restore Purchases</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -556,6 +629,44 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
+  },
+  restoreButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+  },
+  restoreText: {
+    color: COLORS.text.secondary,
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  termsCard: {
+    backgroundColor: COLORS.utility.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+  termsTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    marginBottom: LAYOUT.padding,
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: LAYOUT.padding,
+    marginBottom: LAYOUT.padding / 2,
+  },
+  termsText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.text.secondary,
+    flex: 1,
   },
   featureRow: {
     alignItems: 'center',

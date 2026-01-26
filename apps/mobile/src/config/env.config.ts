@@ -61,6 +61,9 @@ const clientEnvSchema = z.object({
     .string()
     .default('false')
     .transform((val) => val === 'true'),
+
+  // Mapbox (public token is safe to expose - designed for client SDK usage)
+  MAPBOX_PUBLIC_TOKEN: z.string().optional(),
 });
 
 /**
@@ -133,6 +136,7 @@ function parseEnv() {
     SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
     GOOGLE_ANALYTICS_ID: process.env.EXPO_PUBLIC_GOOGLE_ANALYTICS_ID,
     ENABLE_ANALYTICS: process.env.EXPO_PUBLIC_ENABLE_ANALYTICS || 'false',
+    MAPBOX_PUBLIC_TOKEN: process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN,
   };
 
   const rawEnv = {

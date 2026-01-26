@@ -1,13 +1,14 @@
 /**
  * Feature Store
  * Centralized feature management for ML models
+ * Updated: 2026-01-26 - Fixed env var name consistency
  */
 
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_KEY') ?? ''
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '' // Fixed: was SUPABASE_SERVICE_KEY
 );
 
 /**

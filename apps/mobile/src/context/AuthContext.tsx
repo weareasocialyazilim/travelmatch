@@ -59,7 +59,7 @@ const createUser = (data: {
   email: data.email || '',
   name: data.name || '',
   avatar: data.avatar,
-  role: 'Traveler' as Role,
+  role: 'Moment Host' as Role,
   kyc: 'Unverified' as KYCStatus,
   location: { lat: 0, lng: 0 },
 });
@@ -326,8 +326,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
    * 1. Load refresh token from SecureStore (small, hardware-backed)
    * 2. Use refresh token to get new access token from Supabase
    * 3. Keep access token in memory only (more secure)
+   *
+   * P1 Fix: Added 10-second timeout to prevent indefinite loading states
    */
   useEffect(() => {
+    const AUTH_LOAD_TIMEOUT_MS = 10000;
+
     const loadAuthState = async () => {
       try {
         // Load user and refresh token only (access token is not persisted)
@@ -341,72 +345,63 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           const parsedUser = JSON.parse(storedUser) as User;
           const expiresAt = expiresAtStr ? parseInt(expiresAtStr, 10) : 0;
 
-          // Always refresh access token on app start (OAuth 2.0 best practice)
-          // This ensures we have a fresh token and validates the session
-          try {
+          // P1 Fix: Create a promise that times out after 10 seconds
+          const sessionRefreshPromise = (async () => {
             logger.info('[Auth] Refreshing session on app start...');
             const { session } = await authService.getSession();
+            return session;
+          })();
 
-            if (session) {
-              const newTokens: AuthTokens = {
-                accessToken: session.access_token,
-                refreshToken: session.refresh_token,
-                expiresAt: (session.expires_at || 0) * 1000,
-              };
+          const timeoutPromise = new Promise<null>((_, reject) => {
+            setTimeout(() => reject(new Error('Auth load timeout')), AUTH_LOAD_TIMEOUT_MS);
+          });
 
-              // Save updated refresh token (if changed) and keep access token in memory
-              await saveTokens(newTokens);
-              setUser(parsedUser);
-              setAuthState('authenticated');
-              logger.info('[Auth] Session refreshed successfully');
+          // Race between session refresh and timeout
+          const session = await Promise.race([sessionRefreshPromise, timeoutPromise]);
 
-              // Sync E2E encryption public key to database
-              // This ensures other users can encrypt messages for us
-              void userService
-                .syncKeys()
-                .then(({ publicKey }) => {
-                  if (publicKey) {
-                    logger.info('[Auth] E2E encryption key synced');
-                  }
-                })
-                .catch((err) => {
-                  logger.warn(
-                    '[Auth] Failed to sync E2E keys, messaging may be unencrypted',
-                    err,
-                  );
-                });
-            } else {
-              // Session invalid, clear data
-              logger.info('[Auth] Session invalid, clearing auth data');
-              await clearAuthData();
-            }
-          } catch (error) {
-            // If refresh fails but we have a valid expiry, try to continue
-            // This handles offline scenarios
-            logger.warn('[Auth] Session refresh failed:', error);
-            if (expiresAt > Date.now()) {
-              logger.warn('[Auth] Token refresh failed, using cached session');
-              // Create minimal tokens for offline use
-              const offlineTokens: AuthTokens = {
-                accessToken: '', // Will be refreshed when online
-                refreshToken,
-                expiresAt,
-              };
-              setTokens(offlineTokens);
-              setUser(parsedUser);
-              setAuthState('authenticated');
-            } else {
-              logger.info(
-                '[Auth] Session expired and refresh failed, clearing',
-              );
-              await clearAuthData();
-            }
+          if (session) {
+            const newTokens: AuthTokens = {
+              accessToken: session.access_token,
+              refreshToken: session.refresh_token,
+              expiresAt: (session.expires_at || 0) * 1000,
+            };
+
+            // Save updated refresh token (if changed) and keep access token in memory
+            await saveTokens(newTokens);
+            setUser(parsedUser);
+            setAuthState('authenticated');
+            logger.info('[Auth] Session refreshed successfully');
+
+            // Sync E2E encryption public key to database
+            // This ensures other users can encrypt messages for us
+            void userService
+              .syncKeys()
+              .then(({ publicKey }) => {
+                if (publicKey) {
+                  logger.info('[Auth] E2E encryption key synced');
+                }
+              })
+              .catch((err) => {
+                logger.warn(
+                  '[Auth] Failed to sync E2E keys, messaging may be unencrypted',
+                  err,
+                );
+              });
+          } else {
+            // Session invalid, clear data
+            logger.info('[Auth] Session invalid, clearing auth data');
+            await clearAuthData();
           }
         } else {
           setAuthState('unauthenticated');
         }
       } catch (error) {
-        logger.error('[Auth] Failed to load auth state:', error);
+        // Handle timeout or other errors
+        if (error instanceof Error && error.message === 'Auth load timeout') {
+          logger.warn('[Auth] Auth loading timed out after 10 seconds');
+        } else {
+          logger.error('[Auth] Failed to load auth state:', error);
+        }
         setAuthState('unauthenticated');
       }
     };

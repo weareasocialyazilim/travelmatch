@@ -43,7 +43,10 @@
     "emailPlaceholder": "Enter your email",
     "passwordPlaceholder": "Enter your password",
     "namePlaceholder": "Enter your full name",
-    "phonePlaceholder": "+1234567890"
+    "phonePlaceholder": "+1234567890",
+    "signInWithApple": "Continue with Apple",
+    "signInWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with"
   },
   "validation": {
     "required": "This field is required",
@@ -880,5 +883,24 @@
     "loading": "Loading",
     "success": "Success",
     "error": "Error"
+  },
+  "invite": {
+    "title": "Invite Friends",
+    "description": "Invite people who care about real moments.",
+    "shareMessage": "Join me on Lovendo! Use my invite code: {{code}}",
+    "shareTitle": "Join Lovendo",
+    "codeLabel": "Your invite code",
+    "copy": "Copy",
+    "codeCopied": "Code copied!",
+    "copyFailed": "Failed to copy",
+    "shareLink": "Share Invite Link",
+    "shareMessages": "Share via Messages",
+    "shareInstagram": "Share on Instagram",
+    "instagramTitle": "Share on Instagram",
+    "instagramMessage": "Link copied! Open Instagram and paste it in your story or DM.",
+    "linkCopied": "Link copied!",
+    "impact": "Your impact",
+    "friendsJoined": "Friends joined",
+    "momentsGifted": "Moments gifted via invites"
   }
 }

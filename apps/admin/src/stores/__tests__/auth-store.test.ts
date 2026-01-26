@@ -29,6 +29,7 @@ describe('AuthStore', () => {
     is_active: true,
     requires_2fa: true,
     totp_enabled: true,
+    totp_secret: null, // Required by AdminUser type
     created_at: '2024-01-01T00:00:00Z',
     created_by: null,
     last_login_at: '2024-01-01T00:00:00Z',

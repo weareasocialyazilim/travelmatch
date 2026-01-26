@@ -398,7 +398,6 @@ export default function FinancePage() {
           description={`Son ${period === '7d' ? '7 gün' : period === '30d' ? '30 gün' : '90 gün'}`}
           icon={<DollarSign className="h-5 w-5" />}
           accentColor="emerald"
-          trend="up"
         />
         <CanvaStatCard
           title="Abonelik Geliri"

@@ -16,12 +16,7 @@
 
 import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
 import { logger } from '../utils/logger';
-import {
-  getCachedWallet,
-  setCachedWallet,
-  invalidateWallet,
-  invalidateAllPaymentCache,
-} from './cacheInvalidationService';
+import { paymentCache, CACHE_KEYS, CACHE_TTL } from './cacheService';
 
 export interface WalletBalance {
   available: number; // PayTR withdrawable balance
@@ -87,7 +82,7 @@ class WalletService {
       if (!user) throw new Error('Not authenticated');
 
       // Try cache first
-      const cached = await getCachedWallet(user.id);
+      const cached = await paymentCache.getWallet(user.id);
       if (cached) {
         logger.info('Wallet balance from cache');
         const cachedData = cached as unknown as {
@@ -127,7 +122,7 @@ class WalletService {
       // Check if we should use cached data (within TTL)
       const now = Date.now();
       if (now - this.lastBalanceFetch < this.BALANCE_CACHE_TTL) {
-        const cached = await getCachedWallet(user.id);
+        const cached = await paymentCache.getWallet(user.id);
         if (cached) {
           const cachedData = cached as unknown as {
             balance?: number;
@@ -183,7 +178,7 @@ class WalletService {
 
       // Update cache and database
       this.lastBalanceFetch = now;
-      await setCachedWallet(user.id, {
+      await paymentCache.setWallet(user.id, {
         balance: balance.available,
         coins: balance.coins,
         pendingBalance: balance.pending,
@@ -320,7 +315,7 @@ class WalletService {
       });
 
       // Invalidate caches
-      await invalidateAllPaymentCache(user.id);
+      await paymentCache.invalidateAll(user.id);
 
       logger.info('PayTR settlement requested:', {
         settlementId: result.settlement_id,
@@ -372,7 +367,7 @@ class WalletService {
       const result = await response.json();
 
       // Invalidate caches
-      await invalidateAllPaymentCache(user.id);
+      await paymentCache.invalidateAll(user.id);
 
       return {
         settlementId: result.settlementId,
@@ -520,7 +515,7 @@ class WalletService {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      await invalidateWallet(user.id);
+      await paymentCache.invalidateWallet(user.id);
       this.lastBalanceFetch = 0;
     }
   }

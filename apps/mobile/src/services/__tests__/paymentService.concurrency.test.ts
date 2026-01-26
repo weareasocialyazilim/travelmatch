@@ -48,11 +48,26 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-jest.mock('../cacheInvalidationService', () => ({
-  getCachedWallet: jest.fn().mockResolvedValue(null),
-  setCachedWallet: jest.fn().mockResolvedValue(undefined),
-  invalidateWallet: jest.fn().mockResolvedValue(undefined),
-  invalidateAllPaymentCache: jest.fn().mockResolvedValue(undefined),
+// Mock cacheService with paymentCache methods
+jest.mock('../cacheService', () => ({
+  paymentCache: {
+    getWallet: jest.fn().mockResolvedValue(null),
+    setWallet: jest.fn().mockResolvedValue(undefined),
+    invalidateWallet: jest.fn().mockResolvedValue(undefined),
+    invalidateAll: jest.fn().mockResolvedValue(undefined),
+    getTransactions: jest.fn().mockResolvedValue(null),
+    setTransactions: jest.fn().mockResolvedValue(undefined),
+    invalidateTransactions: jest.fn().mockResolvedValue(undefined),
+    getPaymentMethods: jest.fn().mockResolvedValue(null),
+    setPaymentMethods: jest.fn().mockResolvedValue(undefined),
+    invalidatePaymentMethods: jest.fn().mockResolvedValue(undefined),
+  },
+  cache: {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue(undefined),
+    invalidateByPattern: jest.fn().mockResolvedValue(undefined),
+    invalidateByTag: jest.fn().mockResolvedValue(undefined),
+  },
 }));
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;

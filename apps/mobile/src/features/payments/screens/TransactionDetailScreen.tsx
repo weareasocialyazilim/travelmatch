@@ -1,25 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { logger } from '@/utils/logger';
 
+/**
+ * TransactionDetailScreen - Receipt display without share functionality
+ *
+ * Sharing receipts is disabled for:
+ * - Privacy protection (no financial data exposure)
+ * - Security (prevents receipt forgery claims)
+ * - App Store compliance (no guarantee implications)
+ */
 export const TransactionDetailScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message:
-          'Lovendo Receipt: $150.00 for Dinner at Hotel Costes. Ref: #LV-8921',
-      });
-    } catch (error) {
-      logger.error('Failed to share receipt', error as Error);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -28,9 +24,7 @@ export const TransactionDetailScreen = () => {
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Receipt</Text>
-        <TouchableOpacity onPress={handleShare}>
-          <Ionicons name="share-outline" size={24} color="white" />
-        </TouchableOpacity>
+        <View style={styles.placeholder} />
       </View>
 
       <View style={styles.content}>
@@ -91,6 +85,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  placeholder: { width: 24 },
   content: { alignItems: 'center', padding: 20 },
   logoCircle: {
     width: 80,

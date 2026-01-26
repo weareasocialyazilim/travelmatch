@@ -317,7 +317,7 @@ serve(async (req) => {
     }
 
     // ==========================================================================
-    // Send Message
+    // Send Message with Transaction Safety
     // ==========================================================================
 
     // Determine the other user
@@ -340,34 +340,97 @@ serve(async (req) => {
       );
     }
 
-    // Insert message
-    const { data: message, error: insertError } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        receiver_id: receiverId,
-        content: content.trim(),
-        visibility: visibility,
-        type: messageType,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    // Use transaction-safe RPC for atomic message insert
+    const { data: txResult, error: txError } = await supabase.rpc(
+      'send_message_atomic',
+      {
+        p_conversation_id: conversationId,
+        p_sender_id: user.id,
+        p_receiver_id: receiverId,
+        p_content: content.trim(),
+        p_message_type: messageType,
+        p_visibility: visibility,
+      },
+    );
 
-    if (insertError) {
-      logger.error('Failed to insert message', insertError);
+    if (txError) {
+      logger.error('Transaction RPC failed, falling back to direct insert', txError);
+
+      // Fallback: Direct insert with separate updates (less safe but functional)
+      const { data: message, error: insertError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          receiver_id: receiverId,
+          content: content.trim(),
+          visibility: visibility,
+          type: messageType,
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('Failed to insert message', insertError);
+        return jsonResponse(
+          { success: false, error: 'Failed to send message' },
+          { status: 500, headers: corsHeaders },
+        );
+      }
+
+      // Update conversation (separate call)
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+
+      // P2 FIX: Notify user when shadowban is triggered
+      if (visibility === 'ghost') {
+        await notifyShadowbanStatus(supabase, user.id);
+      }
+
+      // Send push notification (async, don't wait)
+      // ONLY if message is public
+      if (visibility === 'public') {
+        sendPushNotification(supabase, receiverId, user.id, content).catch(
+          (err) => logger.error('Push notification failed', err),
+        );
+      }
+
       return jsonResponse(
-        { success: false, error: 'Failed to send message' },
+        {
+          success: true,
+          message: {
+            id: message.id,
+            conversationId: message.conversation_id,
+            content: message.content,
+            messageType: message.message_type,
+            createdAt: message.created_at,
+          },
+        },
+        { headers: corsHeaders },
+      );
+    }
+
+    // Check transaction result
+    if (!txResult?.success) {
+      logger.error('Message transaction failed', txResult?.error);
+      return jsonResponse(
+        {
+          success: false,
+          error: txResult?.error || 'Failed to send message',
+        },
         { status: 500, headers: corsHeaders },
       );
     }
 
-    // Update conversation last_message_at
-    await supabase
-      .from('conversations')
-      .update({ last_message_at: new Date().toISOString() })
-      .eq('id', conversationId);
+    const message = txResult.message;
+
+    // P2 FIX: Notify user when shadowban is triggered
+    if (visibility === 'ghost') {
+      await notifyShadowbanStatus(supabase, user.id);
+    }
 
     // Send push notification (async, don't wait)
     // ONLY if message is public
@@ -377,7 +440,7 @@ serve(async (req) => {
       );
     }
 
-    logger.info('Message sent successfully', {
+    logger.info('Message sent successfully (atomic)', {
       messageId: message.id,
       conversationId,
       senderId: user.id,
@@ -490,4 +553,47 @@ async function sendPushNotification(
     data: { senderId },
     created_at: new Date().toISOString(),
   });
+}
+
+/**
+ * P2 FIX: Notify user when they are shadowbanned
+ * Users should know their content is being hidden for review
+ */
+async function notifyShadowbanStatus(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<void> {
+  try {
+    // Check if notification already sent recently (avoid spam)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: recentCount } = await supabase
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('type', 'shadowban_warning')
+      .gte('created_at', oneDayAgo);
+
+    if ((recentCount || 0) > 0) {
+      // Already notified within 24 hours
+      return;
+    }
+
+    // Send shadowban notification
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      type: 'shadowban_warning',
+      title: 'Hesap Durumu Bilgisi ℹ️',
+      body: 'Güvenlik sistemlerimiz bazı aktivitelerinizi inceliyor. İçerikleriniz geçici olarak sınırlı görünürlükte olabilir. Bu normal bir süreçtir ve en kısa sürede gözden geçirilecektir.',
+      data: {
+        warning_type: 'shadowban_active',
+        appeal_url: '/settings/support',
+      },
+      created_at: new Date().toISOString(),
+    });
+
+    logger.info('Shadowban notification sent', { userId });
+  } catch (error) {
+    logger.error('Failed to send shadowban notification', error);
+    // Don't fail the main operation
+  }
 }

@@ -21,7 +21,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { NotificationCard } from '@/features/notifications/components';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
-import { navigateFromNotification } from '@/services/notificationNavigator';
+import { navigateFromNotification } from '@/services/notificationService';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NotificationType } from '@/features/notifications/components';

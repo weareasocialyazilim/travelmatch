@@ -10,6 +10,14 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 
 type ReferralScreenProps = StackScreenProps<RootStackParamList, 'Referral'>;
 
+/**
+ * ReferralScreen - Invite friends without monetary promises
+ *
+ * Removed $20 credit claims for:
+ * - App Store compliance (no unfulfilled promises)
+ * - Legal compliance (no false advertising)
+ * - Clear value prop without guaranteed rewards
+ */
 export default function ReferralScreen({ navigation }: ReferralScreenProps) {
   const insets = useSafeAreaInsets();
   const REFERRAL_CODE = 'KEMAL-2026';
@@ -21,7 +29,7 @@ export default function ReferralScreen({ navigation }: ReferralScreenProps) {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Lovendo'ya katıl! Referans kodum: ${REFERRAL_CODE} - Her ikiniz de $20 kredi kazanın!`,
+        message: `Lovendo'ya katıl! Davet kodum: ${REFERRAL_CODE}`,
       });
     } catch (_shareError) {
       // Share cancelled or failed
@@ -51,10 +59,9 @@ export default function ReferralScreen({ navigation }: ReferralScreenProps) {
           </LinearGradient>
         </View>
 
-        <Text style={styles.title}>Invite Friends,{'\n'}Get Free Vibes</Text>
+        <Text style={styles.title}>Invite Friends,{'\n'}Get Connected</Text>
         <Text style={styles.desc}>
-          Share your code with friends. When they join, you both get{' '}
-          <Text style={styles.highlight}>$20 credit</Text> for your next moment.
+          Share your code with friends. When they join, you both get connected and can share moments together.
         </Text>
 
         {/* Code Box */}
@@ -74,7 +81,7 @@ export default function ReferralScreen({ navigation }: ReferralScreenProps) {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
-          <Text style={styles.shareText}>Share Link</Text>
+          <Text style={styles.shareText}>Share Code</Text>
           <Ionicons name="share-outline" size={20} color={COLORS.black} />
         </TouchableOpacity>
       </View>
@@ -132,10 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 40,
-  },
-  highlight: {
-    color: COLORS.brand.primary,
-    fontWeight: 'bold',
   },
   codeBox: {
     width: '100%',

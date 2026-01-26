@@ -42,18 +42,45 @@ const PAYTR_IP_RANGES = [
 
 /**
  * Validate that request originates from PayTR infrastructure
+ * FIXED: Reject requests without valid IP instead of allowing bypass
  */
-function isValidPayTRSource(req: Request): boolean {
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  const clientIP = forwardedFor?.split(',')[0]?.trim();
+function isValidPayTRSource(req: Request): string | null {
+  // Try multiple headers to determine client IP
+  const headers = [
+    'cf-connecting-ip',      // Cloudflare
+    'x-forwarded-for',       // Standard proxy
+    'x-real-ip',             // Nginx/other proxies
+  ];
 
+  let clientIP: string | null = null;
+
+  for (const header of headers) {
+    const value = req.headers.get(header);
+    if (value) {
+      clientIP = value.split(',')[0]?.trim() || null;
+      break;
+    }
+  }
+
+  // FIXED: Reject if we cannot determine IP - do NOT allow bypass
   if (!clientIP) {
-    // Allow if we can't determine IP (edge function behind proxy)
-    return true;
+    logger.error('PayTR Webhook rejected - no client IP detected', {
+      headers: Object.fromEntries(req.headers.entries()),
+    });
+    return null;
   }
 
   // Check if IP is from PayTR range
-  return PAYTR_IP_RANGES.some((range) => clientIP.startsWith(range));
+  const isValid = PAYTR_IP_RANGES.some((range) => clientIP!.startsWith(range));
+
+  if (!isValid) {
+    logger.error('PayTR Webhook rejected - IP not in PayTR ranges', {
+      clientIP,
+      expectedRanges: PAYTR_IP_RANGES,
+    });
+  }
+
+  return isValid ? clientIP : null;
 }
 
 // =============================================================================
@@ -70,22 +97,9 @@ serve(async (req: Request) => {
   }
 
   // SECURITY: Validate request source - only accept from PayTR IPs
-  if (!isValidPayTRSource(req)) {
-    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-    logger.error('PayTR Webhook blocked - unauthorized IP', { clientIP });
-
-    // Log security event
-    const adminClient = createAdminClient();
-    await adminClient
-      .from('security_logs')
-      .insert({
-        event_type: 'webhook_unauthorized_ip',
-        event_status: 'failure',
-        event_details: { clientIP, expected_ranges: PAYTR_IP_RANGES },
-        ip_address: clientIP || null,
-      })
-      .catch(() => {}); // Non-blocking log
-
+  const clientIP = isValidPayTRSource(req);
+  if (!clientIP) {
+    // isValidPayTRSource already logged the error
     return new Response('Forbidden', { status: 403, headers: corsHeaders });
   }
 

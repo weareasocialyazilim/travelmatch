@@ -61,6 +61,26 @@ export const createTrustNote = async (
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // ESCROW STATUS CHECK: Thank you can only be sent after escrow is released
+    if (params.escrowId) {
+      const { data: escrowData, error: escrowError } = await supabase
+        .from('escrow_transactions')
+        .select('status')
+        .eq('id', params.escrowId)
+        .single();
+
+      if (escrowError && escrowError.code !== 'PGRST116') {
+        throw escrowError;
+      }
+
+      if (escrowData && escrowData.status !== 'released') {
+        return {
+          success: false,
+          error: 'Escrow released olmadan teşekkür gönderemezsiniz',
+        };
+      }
+    }
+
     const { data, error } = await supabase
       .from('trust_notes')
       .insert({

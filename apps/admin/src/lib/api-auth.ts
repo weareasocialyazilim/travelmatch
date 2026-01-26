@@ -20,7 +20,7 @@
 
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { createServiceClient } from './supabase';
+import { createServiceClient } from './supabase.server';
 
 export interface AdminAuthResult {
   error?: NextResponse;

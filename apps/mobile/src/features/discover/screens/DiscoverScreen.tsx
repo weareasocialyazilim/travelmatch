@@ -335,7 +335,9 @@ const DiscoverScreen = () => {
     async (story: Story) => {
       HapticManager.buttonPress();
       try {
-        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} Lovendo'da muhteşem bir an paylaştı!\n\n👉 Lovendo'da gör: https://www.lovendo.xyz/stories/${story.id}`;
+        // Note: /stories/{id} web route does not exist
+        // Sharing via deep link only for now
+        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} Lovendo'da muhteşem bir an paylaştı!\n\n👉 Lovendo'da aç: lovendo://story/${story.id}`;
 
         const result = await Share.share({
           message: shareMessage,

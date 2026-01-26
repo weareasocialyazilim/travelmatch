@@ -72,6 +72,7 @@ const canvaButtonVariants = cva(
         md: 'h-10 px-4 text-sm rounded-lg',
         lg: 'h-12 px-6 text-base rounded-xl',
         xl: 'h-14 px-8 text-lg rounded-xl',
+        icon: 'h-9 w-9', // Icon-only buttons
       },
       fullWidth: {
         true: 'w-full',
@@ -86,6 +87,7 @@ const canvaButtonVariants = cva(
       { size: 'md', iconOnly: true, className: 'w-10' },
       { size: 'lg', iconOnly: true, className: 'w-12' },
       { size: 'xl', iconOnly: true, className: 'w-14' },
+      { size: 'icon', iconOnly: true, className: 'w-9' },
     ],
     defaultVariants: {
       variant: 'primary',

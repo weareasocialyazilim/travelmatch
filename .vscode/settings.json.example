@@ -1,0 +1,130 @@
+{
+  // Deno - Enable for Supabase Edge Functions
+  "deno.enable": false,
+  "deno.enablePaths": ["./supabase/functions"],
+
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // TypeScript
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  // Ignore errors from node_modules (package internal configs)
+  "typescript.validate.enable": true,
+  "typescript.tsserver.exclude": ["**/node_modules/**"],
+
+  // ESLint
+  "eslint.workingDirectories": [
+    "./apps/mobile",
+    "./admin",
+    "./packages/design-system",
+    "./packages/shared"
+  ],
+
+  // Files - exclude from search/watch
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.turbo": true
+  },
+
+  // Search - exclude node_modules from search
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/dist": true,
+    "**/build": true
+  },
+
+  // Python
+  "python.analysis.typeCheckingMode": "strict",
+
+  // GitHub Actions
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+  },
+
+  // Snyk Configuration
+  // Exclude test files from Snyk Code scanning (false positives for mock credentials)
+  "snyk.features.codeSecurity": true,
+  "snyk.features.codeQuality": true,
+  "snyk.advanced.additionalParameters": "--policy-path=.snyk",
+  "snyk.severity": {
+    "low": false,
+    "medium": true,
+    "high": true,
+    "critical": true
+  },
+  // Exclude test directories from Snyk scanning
+  "snyk.codeScanPatterns": {
+    "exclude": [
+      "**/__tests__/**",
+      "**/tests/**",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/scripts/ux-research/**",
+      "**/packages/design-system/scripts/**"
+    ]
+  },
+
+  // Jest Configuration - run from apps/mobile for proper config
+  "jest.rootPath": "apps/mobile",
+  "jest.jestCommandLine": "pnpm jest",
+  "jest.nodePath": "/Users/kemalteksal/.nvm/versions/node/v22.22.0/bin/node",
+  "jest.autoRevealOutput": "on-exec-error",
+  "snyk.advanced.organization": "65f49e60-e063-4544-980e-9a5bc8d0ab0b",
+  "snyk.advanced.autoSelectOrganization": true,
+
+  // Claude Code - MiniMax M2.1
+  // Configuration is injected via environment variables (see scripts/launch-vscode.sh)
+  "claude-code.selectedModel": "MiniMax-M2.1",
+  "claudeCode.environmentVariables": [
+    {
+      "name": "ANTHROPIC_BASE_URL",
+      "value": "https://api.minimax.io/anthropic"
+    },
+    {
+      "name": "ANTHROPIC_AUTH_TOKEN",
+      "value": "<YOUR_MINIMAX_API_KEY>"
+    },
+    {
+      "name": "API_TIMEOUT_MS",
+      "value": "3000000"
+    },
+    {
+      "name": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "value": "1"
+    },
+    {
+      "name": "ANTHROPIC_MODEL",
+      "value": "MiniMax-M2.1"
+    },
+    {
+      "name": "ANTHROPIC_SMALL_FAST_MODEL",
+      "value": "MiniMax-M2.1"
+    },
+    {
+      "name": "ANTHROPIC_DEFAULT_SONNET_MODEL",
+      "value": "MiniMax-M2.1"
+    },
+    {
+      "name": "ANTHROPIC_DEFAULT_OPUS_MODEL",
+      "value": "MiniMax-M2.1"
+    },
+    {
+      "name": "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+      "value": "MiniMax-M2.1"
+    }
+  ]
+}

@@ -328,6 +328,11 @@ export const disputeSchema = z.object({
     .string()
     .min(1, 'forms.validation.reason.required')
     .max(1000, 'forms.validation.reason.max'),
+  // P2 FIX: Notes/description required for dispute resolution
+  notes: z
+    .string()
+    .min(20, 'Lütfen en az 20 karakter ile detaylı açıklama yapın')
+    .max(1000, 'forms.validation.reason.max'),
   evidence: z
     .array(z.string())
     .max(3, 'forms.validation.evidence.max')

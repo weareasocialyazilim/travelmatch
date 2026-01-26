@@ -282,4 +282,91 @@ EN note: Prefer separate roles table for clarity.
 
 - İstemci, moments.status gibi alanları direkt update etmemeli.
 - Claim oluşturma ve proof submit endpoint’leri idempotent olmalı.
-- “Tek aktif claim” kuralı DB constraint ile korunmalı.
+- "Tek aktif claim" kuralı DB constraint ile korunmalı.
+
+## 5. TypeScript Type Güvenliği
+
+### 5.1 Database Types Konumu
+
+**Dosya:** `apps/admin/src/types/database.ts`
+
+Tüm Supabase tabloları için TypeScript tipleri manuel olarak tanımlanmıştır:
+
+```typescript
+// Örnek: Users tablosu tipleri
+type UsersRow = {
+  id: string;
+  email: string;
+  full_name: string;
+  // ... tüm kolonlar
+};
+
+type UsersInsert = Omit<UsersRow, 'id' | 'created_at' | 'updated_at'>;
+type UsersUpdate = Partial<UsersInsert>;
+
+// Database interface'i
+interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: UsersRow;
+        Insert: UsersInsert;
+        Update: UsersUpdate;
+      };
+      // ... diğer tablolar
+    };
+  };
+}
+```
+
+### 5.2 TypeScript Kontrolü
+
+```bash
+# Admin panel
+cd apps/admin && pnpm type-check
+
+# Mobile
+cd apps/mobile && pnpm type-check
+
+# Tüm projeler
+npx tsc --noEmit
+```
+
+**Kural:** 0 TypeScript hatası zorunludur. `tsc --noEmit` temiz çıkmalı.
+
+### 5.3 Custom Query Tipleri
+
+Join içeren sorgular için `as unknown as Type` cast kullanılabilir:
+
+```typescript
+// Örnek: Admin session + user bilgisi
+const { data: session } = await supabase
+  .from('admin_sessions')
+  .select(`
+    admin_id,
+    admin_users!inner(email, role, is_active)
+  `)
+  .eq('token_hash', sessionToken)
+  .single();
+
+const adminUser = session.admin_users as unknown as {
+  email: string;
+  role: string;
+  is_active: boolean;
+};
+```
+
+## 6. Anon Role RPC İzinleri
+
+**Dosya:** `supabase/migrations/20260301000002_grant_anon_rpc_functions.sql`
+
+Anon role, public RPC fonksiyonlarını çalıştırma izni verilmeli:
+
+```sql
+GRANT EXECUTE ON FUNCTION public.discover_nomadic_moments TO anon;
+GRANT EXECUTE ON FUNCTION public.get_active_moments TO anon;
+GRANT EXECUTE ON FUNCTION public.search_moments TO anon;
+-- Diğer public RPC fonksiyonları...
+```
+
+**Not:** Hassas RPC fonksiyonları (örn: financial transactions) `service_role` gerektirir, anon'a verilmez.

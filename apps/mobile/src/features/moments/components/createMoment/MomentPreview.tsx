@@ -41,7 +41,7 @@ const MomentPreview: React.FC<MomentPreviewProps> = memo(
                 </View>
                 <View style={styles.userInfo}>
                   <Text style={styles.userName}>Your Name</Text>
-                  <Text style={styles.userRole}>Traveler</Text>
+                  <Text style={styles.userRole}>Moment Host</Text>
                 </View>
               </View>
             </View>

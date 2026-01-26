@@ -217,7 +217,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
           </View>
           <Text style={styles.escrowText}>
             For transactions over $100, funds are held in secure escrow until
-            proof of the moment is verified. This protects both travelers and
+            proof of the moment is verified. This protects both hosts and
             gift givers.
           </Text>
           <TouchableOpacity

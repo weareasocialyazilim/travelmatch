@@ -81,7 +81,7 @@ const getTrustColors = (level: TrustLevel): [string, string] => {
 const getTrustLabel = (level: TrustLevel): string => {
   switch (level) {
     case 'platinum':
-      return 'Trusted Traveler';
+      return 'Trusted Host';
     case 'gold':
       return 'Reliable';
     case 'silver':

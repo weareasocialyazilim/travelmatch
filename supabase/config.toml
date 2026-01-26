@@ -117,3 +117,9 @@ enabled = false
 [functions]
 # Edge Functions configuration
 # verify_jwt = false
+
+[functions.handle-storage-upload]
+verify_jwt = false
+# Note: This function is called via storage webhook trigger
+# The webhook trigger uses pg_net to call the function without JWT
+# JWT verification is disabled because the trigger authenticates at DB level

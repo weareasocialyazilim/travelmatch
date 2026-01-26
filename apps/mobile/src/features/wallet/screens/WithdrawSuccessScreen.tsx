@@ -13,6 +13,14 @@ type WithdrawSuccessScreenProps = StackScreenProps<
 >;
 
 /**
+ * Withdraw Success Screen
+ *
+ * DEPRECATED: PATCH-005
+ * This screen has been consolidated into the unified SuccessScreen.
+ *
+ * @deprecated Use SuccessScreen with type='payout' instead
+ * @see SuccessScreen
+ *
  * Çekim Başarılı Seremoni Ekranı.
  * Liquid animasyonlar ve "Para Yolda" görselleştirmesi.
  */

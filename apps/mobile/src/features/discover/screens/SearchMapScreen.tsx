@@ -1,16 +1,12 @@
 /**
- * SearchMapScreen - Immersive Map Experience
+ * SearchMapScreen - Location-based Moment Discovery
  *
- * Awwwards-standard map view with:
- * - Dark mode optimized theme
- * - Liquid Glass overlays
- * - Neon pulse markers with Platinum shimmer
- * - Subscription-based visibility layers
- * - Real-time price sync via Supabase Realtime
- * - Supercluster marker grouping for 50+ moments
- * - Location privacy with jitter for non-premium users
- *
- * "The map is art, the moments are destinations."
+ * Features:
+ * - Map view with moment markers
+ * - Location-based search and discovery
+ * - Supercluster for performance with many markers
+ * - Privacy protection with location jitter
+ * - Subscription tier zoom limits
  */
 import React, {
   useState,
@@ -77,13 +73,12 @@ const isMapboxConfigured = Boolean(MAPBOX_TOKEN);
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
-// Sunset Proof Palette - Neon renkleri
-const SUNSET_PALETTE = {
-  amber: '#F59E0B',
-  magenta: '#EC4899',
-  emerald: '#10B981',
-  platinum: '#E5E7EB', // Platinum Gümüş
-  platinumShimmer: '#F3F4F6',
+// Map marker colors
+const MARKER_PALETTE = {
+  primary: '#F59E0B',
+  secondary: '#EC4899',
+  success: '#10B981',
+  neutral: '#E5E7EB',
 };
 
 // Subscription tier zoom limits
@@ -91,7 +86,7 @@ const TIER_ZOOM_LIMITS = {
   free: 14,
   starter: 15,
   pro: 17,
-  vip: 19, // Platinum - en detaylı zoom
+  platinum: 19,
 };
 
 interface MapLocation {
@@ -593,13 +588,13 @@ const SearchMapScreen: React.FC = () => {
             }
 
             // Determine marker color based on status
-            const isPlatinumShimmer =
+            const isFeatured =
               marker?.hasPlatinumOffer || marker?.hostTier === 'platinum';
             const isPopular = marker?.isPopular;
-            const accentColor = isPlatinumShimmer
-              ? SUNSET_PALETTE.platinum
+            const accentColor = isFeatured
+              ? MARKER_PALETTE.platinum
               : isPopular
-                ? SUNSET_PALETTE.magenta
+                ? MARKER_PALETTE.magenta
                 : undefined;
 
             return (
@@ -614,7 +609,7 @@ const SearchMapScreen: React.FC = () => {
                   isSelected={selectedMoment?.id === marker?.id}
                   size="md"
                   accentColor={accentColor}
-                  isPlatinumShimmer={isPlatinumShimmer}
+                  isFeatured={isFeatured}
                   isPopular={isPopular}
                 />
               </MapboxGL.PointAnnotation>

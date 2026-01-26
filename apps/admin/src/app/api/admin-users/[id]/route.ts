@@ -2,6 +2,9 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import type { Database } from '@/types/database';
+
+type AdminUserUpdate = Database['public']['Tables']['admin_users']['Update'];
 
 interface AdminUser {
   id: string;
@@ -9,10 +12,6 @@ interface AdminUser {
   name: string;
   role: string;
   is_active: boolean;
-  requires_2fa: boolean;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export async function GET(
@@ -99,7 +98,7 @@ export async function PATCH(
       );
     }
 
-    // Allowed update fields
+    // Allowed update fields - use Supabase's Update type for proper typing
     const allowedFields = [
       'name',
       'role',
@@ -107,7 +106,7 @@ export async function PATCH(
       'requires_2fa',
       'avatar_url',
     ];
-    const updateData: Partial<AdminUser> = {};
+    const updateData: AdminUserUpdate = {};
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
@@ -117,7 +116,7 @@ export async function PATCH(
 
     const { data: admin, error } = await supabase
       .from('admin_users')
-      .update(updateData)
+      .update(updateData as Database['public']['Tables']['admin_users']['Update'])
       .eq('id', id)
       .select()
       .single();
@@ -185,7 +184,7 @@ export async function DELETE(
     // Soft delete by setting is_active to false
     const { error } = await supabase
       .from('admin_users')
-      .update({ is_active: false })
+      .update({ is_active: false } as Database['public']['Tables']['admin_users']['Update'])
       .eq('id', id);
 
     if (error) {

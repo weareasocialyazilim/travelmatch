@@ -40,10 +40,12 @@ import { TYPE_SCALE, FONTS } from '@/constants/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import { signInWithOAuth } from '@/features/auth/services/authService';
 
 // ============================================
 // TYPES
@@ -168,6 +170,7 @@ export const UnifiedAuthScreen: React.FC = () => {
   const { login, register } = useAuth();
   const { showToast } = useToast();
   const { props: a11y } = useAccessibility();
+  const { t } = useTranslation();
 
   // State
   const [step, setStep] = useState<AuthStep>('identifier');
@@ -177,6 +180,7 @@ export const UnifiedAuthScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingUser, setIsCheckingUser] = useState(false);
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [showPassword] = useState(false); // For secureTextEntry toggle
 
   // Refs
@@ -376,6 +380,33 @@ export const UnifiedAuthScreen: React.FC = () => {
   const switchToLogin = () => {
     HapticManager.buttonPress();
     setStep('password');
+  };
+
+  // Handle Apple Sign-In
+  const handleAppleSignIn = async () => {
+    HapticManager.buttonPress();
+    setIsOAuthLoading(true);
+
+    try {
+      const { url, error } = await signInWithOAuth('apple');
+
+      if (error) {
+        logger.error('[UnifiedAuth] Apple OAuth error:', error);
+        showToast(t('auth.loginError') || 'OAuth failed', 'error');
+        return;
+      }
+
+      if (url) {
+        // Open OAuth URL in browser/app
+        logger.info('[UnifiedAuth] Opening Apple OAuth URL');
+        // The deep link handler will process the callback
+      }
+    } catch (error) {
+      logger.error('[UnifiedAuth] Apple OAuth exception:', error);
+      showToast(t('auth.loginError') || 'An error occurred', 'error');
+    } finally {
+      setIsOAuthLoading(false);
+    }
   };
 
   // Title animation style
@@ -663,6 +694,38 @@ export const UnifiedAuthScreen: React.FC = () => {
               </Reanimated.View>
             )}
           </View>
+
+          {/* OAuth Section - Only on identifier step */}
+          {step === 'identifier' && (
+            <Reanimated.View entering={FadeIn} exiting={FadeOut}>
+              <View style={styles.oauthDivider}>
+                <View style={styles.oauthLine} />
+                <Text style={styles.oauthDividerText}>
+                  {t('auth.orContinueWith')}
+                </Text>
+                <View style={styles.oauthLine} />
+              </View>
+
+              <TouchableOpacity
+                style={styles.appleButton}
+                onPress={handleAppleSignIn}
+                disabled={isOAuthLoading}
+                testID="btn-apple-signin"
+                {...a11y.button(t('auth.signInWithApple'))}
+              >
+                <MaterialCommunityIcons
+                  name="apple"
+                  size={24}
+                  color={COLORS.text.primary}
+                />
+                <Text style={styles.appleButtonText}>
+                  {isOAuthLoading
+                    ? t('common.loading')
+                    : t('auth.signInWithApple')}
+                </Text>
+              </TouchableOpacity>
+            </Reanimated.View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -797,6 +860,38 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
+  },
+  oauthDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  oauthLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border.default,
+  },
+  oauthDividerText: {
+    ...TYPE_SCALE.body.caption,
+    color: COLORS.text.muted,
+    paddingHorizontal: 16,
+  },
+  appleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surface.card,
+    borderRadius: 16,
+    height: 56,
+    gap: 12,
+    borderWidth: 2,
+    borderColor: COLORS.border.default,
+  },
+  appleButtonText: {
+    ...TYPE_SCALE.body.base,
+    fontFamily: FONTS.body.semibold,
+    color: COLORS.text.primary,
+    fontWeight: '600',
   },
 });
 

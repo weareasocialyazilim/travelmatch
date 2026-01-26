@@ -43,7 +43,10 @@
     "emailPlaceholder": "E-posta adresinizi girin",
     "passwordPlaceholder": "Şifrenizi girin",
     "namePlaceholder": "Ad soyadınızı girin",
-    "phonePlaceholder": "+905551234567"
+    "phonePlaceholder": "+905551234567",
+    "signInWithApple": "Apple ile Giriş Yap",
+    "signInWithGoogle": "Google ile Giriş Yap",
+    "orContinueWith": "veya şununla devam et"
   },
   "validation": {
     "required": "Bu alan zorunludur",
@@ -880,5 +883,24 @@
     "loading": "Yükleniyor",
     "success": "Başarılı",
     "error": "Hata"
+  },
+  "invite": {
+    "title": "Arkadaşlarını Davet Et",
+    "description": "Gerçek anlara değer veren insanları davet edin.",
+    "shareMessage": "Lovendo'ya katıl! Davet kodum: {{code}}",
+    "shareTitle": "Lovendo'ya Katıl",
+    "codeLabel": "Davet kodun",
+    "copy": "Kopyala",
+    "codeCopied": "Kod kopyalandı!",
+    "copyFailed": "Kopyalama başarısız oldu",
+    "shareLink": "Davet Linki Paylaş",
+    "shareMessages": "Mesajlarla Paylaş",
+    "shareInstagram": "Instagram'da Paylaş",
+    "instagramTitle": "Instagram'da Paylaş",
+    "instagramMessage": "Link kopyalandı! Instagram'ı açın ve hikayenize veya DM'nize yapıştırın.",
+    "linkCopied": "Link kopyalandı!",
+    "impact": "Etkin",
+    "friendsJoined": "Katılan arkadaşlar",
+    "momentsGifted": "Davetle gönderilen hediyeler"
   }
 }

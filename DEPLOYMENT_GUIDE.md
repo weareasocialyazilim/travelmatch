@@ -97,7 +97,56 @@ eas secret:create --scope project \
 
 ---
 
-### 4. Mobile Builds (30 dk) 🟡 ÖNEM
+### 4. TypeScript Kontrolü (5 dk) 🟢 ZORUNLU
+
+```bash
+# Admin panel type check
+cd apps/admin && pnpm type-check
+
+# Beklenen: 0 errors
+# Çıktı örneği:
+# Found 0 errors
+```
+
+**Kural:** 0 TypeScript hatası olmadan deployment YAPILAMAZ.
+
+```bash
+# Manuel kontrol
+npx tsc --noEmit 2>&1 | grep -c "error"
+# Beklenen: 0
+```
+
+### 5. Admin Middleware Doğrulama (2 dk) 🔴 KRİTİK
+
+```bash
+# Middleware dosyası var mı kontrol et
+ls -la apps/admin/src/middleware.ts
+
+# Beklenen: -rw-r--r--  1 ... middleware.ts
+```
+
+**Doğrulama Testi:**
+```bash
+# 1. Admin panel'e git (browser'da)
+# 2. Giriş yap
+# 3. Cookie'yi sil veya değiştir
+# 4. Sayfayı yenile
+# Beklenen: /login?reason=session_expired'e redirect
+```
+
+### 6. Webhook Security Test (3 dk) 🔴 KRİTİK
+
+```bash
+# RevenueCat webhook auth test
+curl -X POST https://...supabase.co/functions/v1/revenuecat-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"event":{"type":"INITIAL_PURCHASE"}}'
+
+# Beklenen: {"error":"Unauthorized"} veya 401/500
+# OLMAMALI: 200 OK (bu kritik güvenlik açığıdır!)
+```
+
+### 7. Mobile Builds (30 dk) 🟡 ÖNEM
 
 ```bash
 cd apps/mobile
@@ -218,6 +267,7 @@ supabase functions list
 
 - [ ] ✅ Database migration uygulandı ve RLS testleri geçti
 - [ ] ✅ pg_cron extension aktif ve job scheduled
+- [ ] ✅ TypeScript check geçti (0 errors)
 - [ ] ✅ Firebase configs (google-services.json + plist) hazır
 - [ ] ✅ Mobile builds (Android + iOS) başarılı
 - [ ] ✅ PII leak test geçti (network inspection'da email/phone YOK)
@@ -231,6 +281,7 @@ supabase functions list
 
 Eğer bunlardan **herhangi biri** varsa DURDUR:
 
+- [ ] ❌ TypeScript hatası var (npx tsc --noEmit > 0)
 - [ ] ❌ RLS testleri FAIL
 - [ ] ❌ Mobile build error
 - [ ] ❌ PII leak detected (email görünüyor)

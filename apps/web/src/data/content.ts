@@ -17,7 +17,7 @@ export const TRANSLATIONS = {
     nav_creator: 'CLAIM THE STAGE',
     manifesto_title: 'THE TRUTH HURTS',
     manifesto_txt:
-      'We’re done with the digital foreplay and the 3-week "hey" streaks. LOVENDO is for entities who actually show up. No 20 questions. No "vibing" behind a screen. Just bread, wine, and the laws of biology.',
+      'We are done with the digital foreplay and the 3-week "hey" streaks. LOVENDO is for entities who actually show up. No 20 questions. No "vibing" behind a screen. Just bread, wine, and the laws of biology.',
     creator_cta_title: 'MAIN CHARACTER ENERGY WANTED.',
     creator_cta_sub:
       'WE NEED SOMEONE TO ACTUALLY LEAD THE SYNC. ARE YOU THE VIBE?',
@@ -27,14 +27,21 @@ export const TRANSLATIONS = {
     form_story:
       "Tell us a story that isn't mid, or 2 dream moments that justify your existence.",
     submit: 'SUBMIT_OR_WHATEVER',
-    success_title: 'WE’RE STALKING YOU NOW.',
+    success_title: 'WE'RE STALKING YOU NOW.',
     success_msg:
-      'Application received. We’ll check your profile. If you’re not mid, you’re in. Stay loud or get muted.',
+      'Application received. We will check your profile. If you are not mid, you are in. Stay loud or get muted.',
     moments_title: 'CHOOSE YOUR POISON',
     moments_sub: 'CONSUME OR BE CONSUMED.',
     unlock: 'CREATE YOUR FIRST MOMENT',
     gift: 'PAY THE TAX',
     alternative: 'HOW IT WORKS',
+    howitworks_title: 'SO WHAT THE F IS THIS?',
+    howitworks_1_title: '1. CREATE A MOMENT',
+    howitworks_1_desc: 'Share a dream, experience, or moment you want to happen. Set your goal.',
+    howitworks_2_title: '2. GET SUPPORT',
+    howitworks_2_desc: 'People who vibe with your vision send gifts. Money is locked in escrow.',
+    howitworks_3_title: '3. MAKE IT HAPPEN',
+    howitworks_3_desc: 'Once funded, you deliver. Proof goes to your supporters. They say thanks.',
     footer_tag: 'Stop the yapping. Sync the biology.',
     footer_rights: 'LOVENDO PROJECT. STOP SWIPING.',
     version: 'Engineered for Entities | v0.0.5-savage',
@@ -43,7 +50,7 @@ export const TRANSLATIONS = {
     gift_success_msg_1:
       "Congrats. Your wallet just did what your personality couldn't.",
     gift_success_msg_2:
-      'Hope that match actually happens, otherwise, that’s a very expensive "read" receipt.',
+      'Hope that match actually happens, otherwise, that is a very expensive "read" receipt.',
     gift_success_msg_3:
       'You supported an entity. Remember: they had a dream, and you had a credit card.',
     gift_success_highlight: 'CONGRATS ON THE TAX.',
@@ -56,46 +63,53 @@ export const TRANSLATIONS = {
     alt_success_btn: 'COOL, WHATEVER',
   },
   TR: {
-    hero_title: 'BOŞ YAPMA.\nSEV. YAP.',
-    hero_sub: 'Gerçek anlar yarat, güvenle paylaş.',
+    hero_title: 'BOS YAPMA.\nSEV. YAP.',
+    hero_sub: 'Gercek anlar yarat, guvenle paylas.',
     nav_creator: 'SAHNE AL',
-    manifesto_title: 'GERÇEKLER ACITIR',
+    manifesto_title: 'GERCEKLER ACITIR',
     manifesto_txt:
-      'DİJİTAL OYALAMALAR, UZAYAN SOHBETLER, YARIM PLANLAR. BUNLARI ZATEN DENEDİK. LOVENDO, GERÇEKTEN GELENLER İÇİNDİR. UZUN UZUN YAZIŞMAK YOK. EKRAN ARKASINA SAKLANMAK YOK. GELİYORSAN GEL. GERİSİ KONUŞULUR.',
-    creator_cta_title: 'ANA KARAKTER ENERJİSİ ARANIYOR.',
+      'DIJITAL OYALAMALAR,UZAYAN SOHBETLER,YARIM PLANLAR.BUNLARI ZATEN DENEDIK.LOVENDO,GERCEKTEN GELENLER ICINDIR.UZUN UZUN YAZISMAK YOK.EKRAN ARKASINA SAKLANMAK YOK.GELIYORSAN GEL.GERISI KONUSULUR.',
+    creator_cta_title: 'ANA KARAKTER ENERJISI ARANIYOR.',
     creator_cta_sub:
-      'SENKRONİZASYONU YÖNETECEK BİRİNE İHTİYACIMIZ VAR. O ENERJİ SENDE VAR MI?',
+      'SENKRONIZASYONU YONETECEK BIRINE IHTIYACIMIZ VAR.O ENERJI SENDE VAR MI?',
     creator_cta_btn: 'SAHNE_AL',
-    form_header: 'VARLIĞINI_KANITLA.',
+    form_header: 'VARLIGINI_KANITLA.',
     form_ig: '@SOSYAL_KANITIN',
     form_story:
-      'BİZE BAYIK OLMAYAN BİR HİKAYE YA DA BU MASAYA OTURMANI HAKLI ÇIKARAN 2 AN YAZ.',
-    submit: 'GÖNDER_YA_DA_NEYSE',
-    success_title: 'ŞİMDİ SENİ TAKİP EDİYORUZ.',
+      'BIZE BAYIK OLMAYAN BIR HIKAYE YA DA BU MASAYA OTURMANI HAKLI CIKARAN 2 AN YAZ.',
+    submit: 'GONDER_YA_DA_NEYSE',
+    success_title: 'SIMDI SENI TAKIP EDIYORUZ.',
     success_msg:
-      'BAŞVURU ALINDI. PROFİLİNE BAKACAĞIZ. BAYIK DEĞİLSEN İÇERDESİN. SESİ KESİLENLER DIŞARIDA KALIR.',
-    moments_title: 'SEÇİM SENİN',
-    moments_sub: 'TÜKET YA DA TÜKEN.',
-    unlock: 'İLK MOMENT’İNİ OLUŞTUR',
-    gift: 'BEDELİNİ ÖDE',
-    alternative: 'NASIL ÇALIŞIR?',
-    footer_tag: 'BOŞ MUHABBETİ KES. BİYOLOJİNİ SENKRONİZE ET.',
-    footer_rights: 'LOVENDO PROJECT. SWIPE YOK.',
-    version: 'VARLIK İÇİN TASARLANDI | v0.0.5-savage',
-    nav_void: 'BOŞLUK',
+      'BASVURU ALINDI.PROFILINE BAKACAGIZ.BAYIK DEGILSEN ICERDESIN.SESI KESILENLER DISARIDA KALIR.',
+    moments_title: 'SECIM SIN',
+    moments_sub: 'TUKET YA DA TUKEN.',
+    unlock: 'ILK MOMENTI OLUSTUR',
+    gift: 'BEDELINI ODE',
+    alternative: 'NASIL CALISIR?',
+    howitworks_title: 'PEKI BU NEDIR?',
+    howitworks_1_title: '1. AN OLUSTUR',
+    howitworks_1_desc: 'Gerçekleşmesini istediğin bir hayalı, deneyimi veya anı paylaş. Hedefini belirle.',
+    howitworks_2_title: '2. DESTEK AL',
+    howitworks_2_desc: 'Vibe ettiklerine hediye gönderiyor. Para escrowda kilitli kalıyor.',
+    howitworks_3_title: '3. GERCEKLESTIR',
+    howitworks_3_desc: 'Finansman sağlandığında, sen yap. Kanıt destekçilerine gidiyor. Onlar tesekkur diyor.',
+    footer_tag: 'BOS MUHABBETI KES.BIYOLOJINI SENKRONIZE ET.',
+    footer_rights: 'LOVENDO PROJECT.SWIPE YOK.',
+    version: 'VARLIK ICIN TASARLANDI | v0.0.5-savage',
+    nav_void: 'BOSLUK',
     gift_success_title: 'ANA KARAKTER ANI.',
-    gift_success_msg_1: 'TEBRİKLER. CÜZDANIN, KARAKTERİNİN YAPAMADIĞINI YAPTI.',
+    gift_success_msg_1: 'TEBRİKLER.CÜZDANIN,KARAKTERIN YAPAMADIGINI YAPTI.',
     gift_success_msg_2:
-      "UMARIZ BU BULUŞMA GERÇEKLEŞİR. YOKSA BU, ÇOK PAHALI BİR 'GÖRÜLDÜ' OLUR.",
+      "UMARIZ BU BULUSMA GERCEKLESIR.YOKSA BU,COK PAHALI BIR 'GORULDU' OLUR.",
     gift_success_msg_3:
-      'BİR VARLIĞI DESTEKLEDİN. UNUTMA: ONUN BİR HAYALİ VARDI, SENİN BİR KREDİ KARTIN.',
-    gift_success_highlight: 'BEDEL ÖDENDİ.',
-    gift_success_btn: 'BEKLEME_ODASINA_DÖN',
-    alt_success_title: 'VİZYONER_UYARISI.',
-    alt_success_sub: 'SEÇMEN BULUTTA.',
+      'BIR VARLIGI DESTEKLEDIN.UNUTMA:ONUN BIR HAYALI VARDI,SENIN BIR KREDI KARTIN.',
+    gift_success_highlight: 'BEDEL ODENDI.',
+    gift_success_btn: 'BEKLEME ODASINA DON',
+    alt_success_title: 'VIZYONER_UYARISI.',
+    alt_success_sub: 'SECMEN BULUTTA.',
     alt_success_msg:
-      'ÖNERİN BAYIK DEĞİLSE EKRANINA DÜŞEBİLİR. DEĞİLSE, BUNU DİJİTAL BOŞLUK SAY. ALGORİTMA KARAR VERİRKEN EGOYU DÜŞÜK TUT.',
-    alt_success_footer: 'BİR DAHAKİNE BAYIK OLMA.',
+      'ONERIN BAYIK DEGILSE EKRANINA DUSEBILEGILSE,BUNU DIGITAL BOSLUK SAY.ALGORITMA KARAR VERIRKEN EGOYU DUSUK TUT.',
+    alt_success_footer: 'BIR DAHAKINE BAYIK OLMA.',
     alt_success_btn: 'TAMAM_PEKE',
   },
 };
@@ -108,7 +122,7 @@ export const MOMENTS: Moment[] = [
     price: 45,
     location: 'PARIS',
     image:
-      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop', // Parisian Cafe / Coffee / Raw
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Le Comptoir Breakfast',
   },
   {
@@ -118,7 +132,7 @@ export const MOMENTS: Moment[] = [
     price: 110,
     location: 'NYC',
     image:
-      'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop', // Modern Art / Flash
+      'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Guggenheim VIP Tour',
   },
   {
@@ -128,37 +142,37 @@ export const MOMENTS: Moment[] = [
     price: 150,
     location: 'TOKYO',
     image:
-      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop', // Gold Casio / Direct Flash
+      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Seiko 5 Vintage',
   },
   {
     id: 'LV-04',
     creator: 'Kylie DiCaprio',
-    title: { EN: 'ARKESTRA DINNER', TR: 'ARKESTRA AKŞAM YEMEĞİ' },
+    title: { EN: 'ARKESTRA DINNER', TR: 'ARKESTRA AKSAM YEMEGI' },
     price: 180,
     location: 'ISTANBUL',
     image:
-      'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=800&auto=format&fit=crop', // Dim Dinner / Flash Party
+      'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Mikla Tasting Menu',
   },
   {
     id: 'LV-05',
     creator: 'Brad Delevingne',
-    title: { EN: 'ACE & TATE GLASSES', TR: 'ACE & TATE GÖZLÜK' },
+    title: { EN: 'ACE & TATE GLASSES', TR: 'ACE & TATE GOZLUK' },
     price: 120,
     location: 'AMSTERDAM',
     image:
-      'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=800&auto=format&fit=crop', // Stylish Glasses / Flash
+      'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Custom Frames Amsterdam',
   },
   {
     id: 'LV-06',
     creator: 'Margot Kutcher',
-    title: { EN: 'ACROPOLIS PRIVATE DINING', TR: 'AKROPOL ÖZEL YEMEK' },
+    title: { EN: 'ACROPOLIS PRIVATE DINING', TR: 'AKROPOL OZEL YEMEK' },
     price: 140,
     location: 'ATHENS',
     image:
-      'https://images.unsplash.com/photo-1563299839-a9a797db244f?q=80&w=800&auto=format&fit=crop', // Night / Grainy
+      'https://images.unsplash.com/photo-1563299839-a9a797db244f?q=80&w=800&auto=format&fit=crop',
     altSuggestion: 'Plaka Tavern Night',
   },
 ];

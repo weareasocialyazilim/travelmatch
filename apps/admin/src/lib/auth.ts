@@ -104,7 +104,7 @@ export async function createAuditLog(
 ): Promise<void> {
   try {
     const supabase = createServiceClient();
-    await supabase.from('audit_logs').insert({
+    const { error } = await supabase.from('audit_logs').insert({
       admin_id: adminId,
       action,
       resource_type: resourceType,
@@ -114,7 +114,82 @@ export async function createAuditLog(
       ip_address: ipAddress,
       user_agent: userAgent,
     });
+
+    if (error) {
+      // FIXED: Log to fallback table and trigger alert instead of silent failure
+      await logToFallbackTable(supabase, {
+        adminId,
+        action,
+        resourceType,
+        resourceId,
+        oldValue,
+        newValue,
+        ipAddress,
+        userAgent,
+        originalError: error.message,
+      });
+
+      logger.error('Audit log insert failed - logged to fallback', {
+        adminId,
+        action,
+        resourceType,
+        resourceId,
+      });
+    }
   } catch (error) {
+    // Fallback for unexpected errors
+    try {
+      const supabase = createServiceClient();
+      await logToFallbackTable(supabase, {
+        adminId,
+        action,
+        resourceType,
+        resourceId,
+        oldValue,
+        newValue,
+        ipAddress,
+        userAgent,
+        originalError: error instanceof Error ? error.message : String(error),
+      });
+    } catch (fallbackError) {
+      // Last resort - log to console
+      console.error('CRITICAL: Audit logging completely failed', {
+        adminId,
+        action,
+        resourceType,
+        resourceId,
+        fallbackError,
+      });
+    }
     logger.error('Audit log error', error);
   }
+}
+
+interface FallbackLogParams {
+  adminId: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  oldValue?: unknown;
+  newValue?: unknown;
+  ipAddress?: string;
+  userAgent?: string;
+  originalError: string;
+}
+
+async function logToFallbackTable(
+  supabase: ReturnType<typeof createServiceClient>,
+  params: FallbackLogParams,
+): Promise<void> {
+  await supabase.from('audit_log_fallback').insert({
+    admin_id: params.adminId,
+    action: params.action,
+    resource_type: params.resourceType,
+    resource_id: params.resourceId,
+    old_value: params.oldValue ? JSON.parse(JSON.stringify(params.oldValue)) : null,
+    new_value: params.newValue ? JSON.parse(JSON.stringify(params.newValue)) : null,
+    ip_address: params.ipAddress,
+    user_agent: params.userAgent,
+    original_error: params.originalError,
+  });
 }

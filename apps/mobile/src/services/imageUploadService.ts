@@ -4,6 +4,13 @@
  * Handles image uploads via Supabase Edge Functions (server-side)
  * All uploads are authenticated and rate-limited
  *
+ * DEPRECATED: PATCH-003
+ * This service is now re-exported by MediaService
+ * Please use MediaService.upload.image() instead
+ *
+ * @deprecated Use MediaService.upload.image() instead
+ * @see MediaService.upload
+ *
  * 🔒 SECURITY:
  * - Never exposes Cloudflare API tokens in client
  * - All uploads authenticated via Supabase auth

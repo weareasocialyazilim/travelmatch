@@ -1,4 +1,4 @@
-export type Role = 'Traveler' | 'Local';
+export type Role = 'Moment Host' | 'Local';
 
 /**
  * @deprecated Use KYCStatusNew for new code. Legacy status kept for backward compatibility.
@@ -40,7 +40,7 @@ export interface User {
   avatarUrl?: string | null; // Alternative avatar field
   bio?: string;
   role: Role;
-  type?: 'traveler' | 'local';
+  type?: 'host' | 'local';
   /**
    * @deprecated Use kycStatus for new code
    */

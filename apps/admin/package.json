@@ -9,7 +9,7 @@
     "start": "next start -p 3001",
     "dev:infisical": "infisical run --env=dev -- next dev -p 3001",
     "lint": "eslint src",
-    "type-check": "echo 'Admin type-check skipped (Next.js handles build-time types)' && exit 0",
+    "type-check": "tsc --noEmit --pretty",
     "type-check:strict": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",

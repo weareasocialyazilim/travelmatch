@@ -64,11 +64,30 @@ Bu repo tek referanstır.
 
 ## 6. Sık Yapılan Hatalar (Kaçınılacak)
 
-- “Bunu kodda hallettik, dokümana gerek yok”
-- “Bu zaten başka yerde yazıyor”
-- “Sonra yazarız”
+- "Bunu kodda hallettik, dokümana gerek yok"
+- "Bu zaten başka yerde yazıyor"
+- "Sonra yazarız"
+- "TypeScript hatası var ama çalışıyor" → **YASAK**: 0 TypeScript hatası zorunludur
+- "Middleware bypass edilebilir" → **YASAK**: Tüm admin route'ları middleware koruması altında olmalı
 
 Bu hatalar ürün riskidir.
+
+## 8. Kalite Standartları (2026-01)
+
+### TypeScript
+- **Zorunlu**: `npx tsc --noEmit` → 0 hata
+- Komut: `pnpm type-check` (apps/admin ve apps/mobile için)
+- Doküman: `docs/DEFINITION_OF_DONE.md`
+
+### Admin Middleware
+- Tüm `/admin/*` route'ları `middleware.ts` ile korunur
+- Session validation + IP binding zorunlu
+- Token süresi dolmuşsa → `/login?reason=session_expired` redirect
+
+### Supabase Types
+- Database types: `apps/admin/src/types/database.ts`
+- Tüm tablolar için Insert/Update/Row tipleri tanımlı
+- Custom query'ler için `as unknown as Type` cast kullanılabilir (sınırlı)
 
 ## 7. Dokümanlar Arası Referans
 

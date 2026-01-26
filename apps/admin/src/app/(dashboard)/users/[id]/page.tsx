@@ -923,13 +923,23 @@ export default function UserDetailPage() {
         </div>
       </div>
 
-      {/* Action Dialog */}
+      {/* P1 FIX: Enhanced Ban Confirmation Dialog with Preview */}
       <Dialog open={!!actionDialog} onOpenChange={() => setActionDialog(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {actionDialog === 'suspend' && 'Kullanıcıyı Askıya Al'}
-              {actionDialog === 'ban' && 'Kullanıcıyı Yasakla'}
+            <DialogTitle className="flex items-center gap-2">
+              {actionDialog === 'suspend' && (
+                <>
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  Kullanıcıyı Askıya Al
+                </>
+              )}
+              {actionDialog === 'ban' && (
+                <>
+                  <Ban className="h-5 w-5 text-red-500" />
+                  Kullanıcıyı Yasakla
+                </>
+              )}
               {actionDialog === 'verify_kyc' && 'KYC Onayla'}
               {actionDialog === 'reset_password' && 'Şifre Sıfırla'}
             </DialogTitle>
@@ -944,17 +954,92 @@ export default function UserDetailPage() {
                 'Kullanıcıya şifre sıfırlama bağlantısı gönderilecek.'}
             </DialogDescription>
           </DialogHeader>
+
+          {/* P1 FIX: Ban Impact Preview */}
           {(actionDialog === 'suspend' || actionDialog === 'ban') && (
-            <div className="space-y-2">
-              <Label htmlFor="reason">Gerekçe</Label>
-              <Textarea
-                id="reason"
-                placeholder="İşlem gerekçesini yazın..."
-                value={actionReason}
-                onChange={(e) => setActionReason(e.target.value)}
-              />
+            <div className="space-y-4">
+              {/* Impact Summary */}
+              <div className="rounded-lg bg-muted p-4">
+                <h4 className="mb-2 text-sm font-medium">Bu İşlemin Etkileri:</h4>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-red-500" />
+                    {actionDialog === 'suspend'
+                      ? 'Kullanıcı 7 gün süreyle askıya alınacak'
+                      : 'Hesap kalıcı olarak yasaklanacak'}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-red-500" />
+                    Tüm oturumları sonlandırılacak
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-red-500" />
+                    {user.stats.total_moments} moment görünmez olacak
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-red-500" />
+                    Eşleşmeler ve mesajlar arşivlenecek
+                  </li>
+                  {user.subscription.plan !== 'free' && (
+                    <li className="flex items-center gap-2">
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      Premium abonelik iptal edilecek
+                    </li>
+                  )}
+                </ul>
+              </div>
+
+              {/* User Preview Card */}
+              <div className="rounded-lg border p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.avatar_url || undefined} />
+                    <AvatarFallback>
+                      {getInitials(user.full_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{user.full_name}</p>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                  </div>
+                  <CanvaBadge
+                    variant={actionDialog === 'ban' ? 'error' : 'warning'}
+                    className="ml-auto"
+                  >
+                    {actionDialog === 'ban' ? 'Yasaklanacak' : 'Askıya Alınacak'}
+                  </CanvaBadge>
+                </div>
+              </div>
+
+              {/* Warning for permanent ban */}
+              {actionDialog === 'ban' && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <p>
+                    Bu kullanıcı artık Lovendo&apos;ya kayıt olamaz. Yasaklama,
+                    kullanıcının IP adresi, cihaz ID&apos;si ve e-posta adresi
+                    için geçerlidir.
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="reason">İşlem Gerekçesi</Label>
+                <Textarea
+                  id="reason"
+                  placeholder="İşlem gerekçesini yazın (zorunlu)..."
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Bu gerekçe kullanıcıya gösterilecek ve moderasyon kayıtlarında
+                  tutulacaktır.
+                </p>
+              </div>
             </div>
           )}
+
           <DialogFooter>
             <CanvaButton
               variant="primary"
@@ -965,8 +1050,12 @@ export default function UserDetailPage() {
             <CanvaButton
               variant={actionDialog === 'ban' ? 'danger' : 'primary'}
               onClick={() => handleAction(actionDialog!)}
+              disabled={
+                (actionDialog === 'ban' || actionDialog === 'suspend') &&
+                !actionReason.trim()
+              }
             >
-              Onayla
+              {actionDialog === 'ban' ? 'Yasakla' : 'Onayla'}
             </CanvaButton>
           </DialogFooter>
         </DialogContent>

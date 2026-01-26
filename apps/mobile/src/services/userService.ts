@@ -78,7 +78,6 @@ export interface UserPreferences {
 
   // Features
   autoAcceptRequests: boolean;
-  instantBooking: boolean;
 }
 
 export interface UpdateProfileData {

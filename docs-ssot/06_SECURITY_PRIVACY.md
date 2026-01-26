@@ -11,7 +11,32 @@
 
 - **Auth zorunlu**
 - State-changing tüm işlemler auth + policy kontrolünden geçer
-- Token’lar kısa ömürlü, yenilemeli
+- Token'lar kısa ömürlü, yenilemeli
+
+### 2.1 Admin Panel Güvenliği
+
+**Middleware Koruması:** `apps/admin/src/middleware.ts`
+
+- Tüm `/admin/*` route'ları Next.js middleware ile korunur
+- Session token validation (admin_session cookie)
+- IP binding (session.ip_hash vs client IP hash)
+- Otomatik redirect: `/login?reason=session_expired`
+
+**Session Yönetimi:**
+- Token hash'leme (SHA-256)
+- Süre kontrolü (expires_at)
+- IP adresi kaydı
+- Session invalidation: IP değişikliği tespitinde otomatik sonlandırma
+
+```typescript
+// Middleware kontrol akışı
+1. admin_session cookie var mı?
+2. Token DB'de geçerli mi? (expires_at > NOW())
+3. IP adresi eşleşiyor mu?
+4. Admin aktif mi? (is_active = true)
+5. → Tüm koşullar sağlanırsa: İzin ver
+6. → Koşullardan biri başarısız: /login redirect
+```
 
 ## 3. Veri Gizliliği (PII)
 
@@ -93,10 +118,39 @@
 
 ## 12. Üçüncü Taraf Entegrasyon Güvenliği
 
-- Secrets merkezi yönetim
+- Secrets merkezi yönetim (Infisical)
 - Rotasyon
-- Webhook doğrulama
+- **Webhook doğrulama**
 - Rate limit
+
+### 12.1 Webhook Güvenlik Kontrolleri
+
+**Zorunlu Doğrulamalar:**
+
+| Webhook | Doğrulama Yöntemi |
+|---------|-------------------|
+| RevenueCat | `REVENUECAT_WEBHOOK_SECRET` hash karşılaştırma |
+| iDenfy | `IDENTFY_API_SECRET` header kontrolü |
+| PayTR | Merchant ID + callback hash |
+| SendGrid | API Key validation (internal) |
+
+**IP Whitelist:**
+```sql
+-- İzin verilen IP aralıkları (Supabase Dashboard → Network Settings)
+-- RevenueCat: 0.0.0.0/0 (dış servis, secret ile korunuyor)
+-- iDenfy: EU-based IP'ler
+-- PayTR: TR-based IP'ler
+```
+
+**Test Komutu:**
+```bash
+# Yetkisiz erişim testi (beklenen: 401 veya 500)
+curl -X POST https://.../functions/v1/revenuecat-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"event":{"type":"INITIAL_PURCHASE"}}'
+
+# Beklenen: {"error":"Unauthorized"} veya 401 status
+```
 
 ## 13. Güvenlik Testleri
 

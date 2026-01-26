@@ -13,7 +13,7 @@ const TOGGLES = [
   {
     id: 'messages',
     label: 'Chat Messages',
-    desc: 'Direct messages from other travelers',
+    desc: 'Direct messages from other hosts',
   },
   {
     id: 'marketing',

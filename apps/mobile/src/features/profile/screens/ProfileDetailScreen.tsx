@@ -361,7 +361,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{user.name}</Text>
             <Text style={styles.role}>
-              Traveler • {user.isVerified ? 'Doğrulanmış' : 'Doğrulanmamış'}
+              Moment Host • {user.isVerified ? 'Doğrulanmış' : 'Doğrulanmamış'}
               {locationStr ? ` • ${locationStr}` : ''}
             </Text>
           </View>

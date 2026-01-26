@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "description": "Lovendo Monorepo - Social experience platform",
+  "engines": {
+    "node": "22.22.0",
+    "pnpm": "10.28.0"
+  },
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "turbo run dev",
     "dev:mobile": "pnpm --filter @lovendo/mobile dev",
@@ -56,6 +61,9 @@
     "test:visual:ci": "turbo run chromatic:ci",
     "qa:pr": "pnpm lint && pnpm type-check && pnpm format:check && pnpm test -- --ci --maxWorkers=2 && pnpm test:e2e:web && pnpm test:e2e:admin && pnpm db:smoke",
     "qa:rc": "pnpm build && pnpm test:e2e && pnpm db:test:all && pnpm test:visual:ci",
+    "check": "pnpm lint && pnpm type-check && pnpm test -- --ci --maxWorkers=2",
+    "smoke": "pnpm --filter @lovendo/web test -- --testNamePattern='auth|smoke' && pnpm --filter @lovendo/admin test -- --testNamePattern='auth|smoke'",
+    "verify:integrations": "node scripts/verify-integrations.mjs",
     "prepare": "husky",
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "android": "pnpm --filter @lovendo/mobile android",

@@ -1,3 +1,14 @@
+/**
+ * Phone Auth Screen
+ *
+ * DEPRECATED: PATCH-008
+ * This screen has been consolidated into UnifiedAuthScreen.
+ *
+ * @deprecated Use UnifiedAuthScreen with { initialMode: 'login' } instead
+ * @see UnifiedAuthScreen
+ *
+ * Standalone phone login - now part of the unified liquid auth flow.
+ */
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,

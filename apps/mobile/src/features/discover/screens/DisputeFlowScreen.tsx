@@ -21,6 +21,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
+import { disputesApi } from '../services/disputesService';
 
 type DisputeFlowRouteProp = RouteProp<RootStackParamList, 'DisputeFlow'>;
 
@@ -39,11 +40,13 @@ export const DisputeFlowScreen: React.FC = () => {
       mode: 'onChange',
       defaultValues: {
         reason: '',
+        notes: '',
         evidence: [],
       },
     });
 
   const reason = watch('reason');
+  const notes = watch('notes');
   const evidence = watch('evidence') || [];
 
   if (!type || !id) {
@@ -84,30 +87,17 @@ export const DisputeFlowScreen: React.FC = () => {
   const onSubmit = async (formData: DisputeInput) => {
     setLoading(true);
     try {
-      // Determine the foreign key based on dispute type
-      const foreignKey = type === 'transaction' ? 'transaction_id' : 'proof_id';
+      // P2 FIX: Use disputesApi for proper backend integration
+      const dispute = await disputesApi.submitDispute({
+        type,
+        id,
+        reason: formData.reason,
+        notes: formData.notes,
+        evidence: formData.evidence,
+      });
 
-      // In a real app, you would upload files to storage first and get URLs
-
-      const { error } = await supabase
-        .from('disputes') // Assuming a unified disputes table or separate ones
-        .insert({
-          [foreignKey]: id,
-          reason: formData.reason,
-          evidence: formData.evidence || [],
-          status: 'pending',
-          type: type,
-        });
-
-      if (error) {
-        // Fallback for demo/mock if table doesn't exist yet
-        logger.warn(
-          'Dispute submission failed (likely due to missing table), simulating success',
-          error,
-        );
-      }
-
-      navigation.navigate('Success', { type: 'dispute' });
+      // Navigate to dispute status screen
+      navigation.navigate('DisputeStatus', { disputeId: dispute.id });
     } catch (error) {
       logger.error('Error submitting dispute', error as Error);
       showToast('Failed to submit dispute. Please try again.', 'error');
@@ -140,7 +130,34 @@ export const DisputeFlowScreen: React.FC = () => {
           <>
             <TextInput
               style={[styles.textArea, error && styles.inputError]}
-              placeholder="Please provide a detailed explanation..."
+              placeholder="Select dispute reason..."
+              multiline
+              numberOfLines={3}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              maxLength={100}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </>
+        )}
+      />
+
+      {/* P2 FIX: Required detailed notes for dispute resolution */}
+      <Text style={[styles.label, styles.mt4]}>
+        Please provide detailed explanation (min 20 characters)
+      </Text>
+      <Controller
+        control={control}
+        name="notes"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <>
+            <TextInput
+              style={[styles.textArea, error && styles.inputError]}
+              placeholder="Please provide detailed explanation of your dispute..."
               multiline
               numberOfLines={6}
               value={value}
@@ -149,14 +166,17 @@ export const DisputeFlowScreen: React.FC = () => {
               maxLength={1000}
             />
             {error && <Text style={styles.errorText}>{error.message}</Text>}
+            <Text style={styles.charCount}>{value.length}/1000</Text>
           </>
         )}
       />
-      <Text style={styles.charCount}>{reason.length}/1000</Text>
 
       <TouchableOpacity
-        style={[styles.button, !reason.trim() && styles.buttonDisabled]}
-        disabled={!reason.trim()}
+        style={[
+          styles.button,
+          (!reason.trim() || notes.length < 20) && styles.buttonDisabled,
+        ]}
+        disabled={!reason.trim() || notes.length < 20}
         onPress={() => setStep(2)}
       >
         <Text style={styles.buttonText}>Next: Add Evidence</Text>
@@ -368,6 +388,9 @@ const styles = StyleSheet.create({
     color: COLORS.feedback.error,
     fontSize: 14,
     marginTop: 4,
+  },
+  mt4: {
+    marginTop: 16,
   },
   charCount: {
     textAlign: 'right',

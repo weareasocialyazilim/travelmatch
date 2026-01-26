@@ -13,10 +13,7 @@
 
 import { supabase, SUPABASE_EDGE_URL } from '../../config/supabase';
 import { logger } from '../../utils/logger';
-import {
-  invalidateWallet,
-  invalidateTransactions,
-} from '../cacheInvalidationService';
+import { paymentCache } from '../cacheService';
 
 // ============================================
 // TYPES
@@ -127,8 +124,8 @@ class PayTRProviderClass {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        await invalidateWallet(user.id);
-        await invalidateTransactions(user.id);
+        await paymentCache.invalidateWallet(user.id);
+        await paymentCache.invalidateTransactions(user.id);
       }
 
       logger.info('PayTR payment created:', paymentResponse.merchantOid);

@@ -9,8 +9,50 @@ export interface AuditLogEntry {
   new_value?: Record<string, unknown>;
 }
 
+// P2 FIX: Audit logging configuration
+const AUDIT_RETRY_ATTEMPTS = 3;
+const AUDIT_RETRY_DELAY_MS = 1000;
+const AUDIT_CRITICAL_ACTIONS = [
+  'admin_login',
+  'admin_logout',
+  '2fa_enabled',
+  '2fa_disabled',
+  'password_changed',
+  'user_banned',
+  'user_suspended',
+  'data_exported',
+  'settings_updated',
+  'admin_user_created',
+  'admin_user_deactivated',
+];
+
 /**
- * Log an admin action to the audit trail
+ * Retry helper with exponential backoff
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = AUDIT_RETRY_ATTEMPTS,
+  delayMs: number = AUDIT_RETRY_DELAY_MS,
+): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * P2 FIX: Enhanced audit logging with retry and fallback
+ * Critical admin actions are logged with resilience mechanisms
  */
 export async function logAuditAction(
   adminId: string,
@@ -19,24 +61,117 @@ export async function logAuditAction(
     ip_address?: string;
     user_agent?: string;
   },
-): Promise<void> {
+): Promise<{ success: boolean; method: 'primary' | 'fallback' | 'failed' }> {
   const supabase = getClient();
 
+  const auditRecord = {
+    admin_id: adminId,
+    action: entry.action,
+    resource_type: entry.resource_type,
+    resource_id: entry.resource_id,
+    old_value: entry.old_value,
+    new_value: entry.new_value,
+    ip_address: metadata?.ip_address,
+    user_agent: metadata?.user_agent,
+    created_at: new Date().toISOString(),
+  };
+
+  // Primary: Try Supabase with retry
   try {
-    await (supabase as any).from('audit_logs').insert({
-      admin_id: adminId,
-      action: entry.action,
-      resource_type: entry.resource_type,
-      resource_id: entry.resource_id,
-      old_value: entry.old_value,
-      new_value: entry.new_value,
-      ip_address: metadata?.ip_address,
-      user_agent: metadata?.user_agent,
-    });
-  } catch (error) {
-    logger.error('Failed to log audit action', error);
-    // Don't throw - audit logging should not break the main operation
+    await withRetry(() =>
+      (supabase as any).from('audit_logs').insert(auditRecord),
+    );
+    logger.info('[Audit] Action logged successfully', { action: entry.action });
+    return { success: true, method: 'primary' };
+  } catch (primaryError) {
+    logger.warn('[Audit] Primary logging failed, trying fallback', primaryError);
+
+    // Fallback: Try logging to browser console/storage for web apps
+    try {
+      // For web: store in localStorage as backup
+      if (typeof window !== 'undefined' && (window as any).localStorage) {
+        const pendingAudits = JSON.parse(
+          (window as any).localStorage.getItem('pending_audit_logs') || '[]',
+        );
+        pendingAudits.push({
+          ...auditRecord,
+          failed_at: new Date().toISOString(),
+        });
+        (window as any).localStorage.setItem(
+          'pending_audit_logs',
+          JSON.stringify(pendingAudits),
+        );
+        logger.info('[Audit] Action queued for later sync', {
+          action: entry.action,
+        });
+      }
+
+      // Alert on critical action failures
+      if (AUDIT_CRITICAL_ACTIONS.includes(entry.action)) {
+        logger.error('[Audit] CRITICAL: Failed to log sensitive admin action', {
+          action: entry.action,
+          adminId,
+          error: primaryError,
+        });
+        // In production, this should trigger an alert/notification
+      }
+
+      return { success: true, method: 'fallback' };
+    } catch (fallbackError) {
+      logger.error('[Audit] All logging mechanisms failed', {
+        action: entry.action,
+        error: fallbackError,
+      });
+
+      return { success: false, method: 'failed' };
+    }
   }
+}
+
+/**
+ * Sync pending audit logs from localStorage to Supabase
+ * Call this periodically or on page load
+ */
+export async function syncPendingAuditLogs(): Promise<{
+  synced: number;
+  failed: number;
+}> {
+  if (typeof window === 'undefined' || !(window as any).localStorage) {
+    return { synced: 0, failed: 0 };
+  }
+
+  const pendingAudits = JSON.parse(
+    (window as any).localStorage.getItem('pending_audit_logs') || '[]',
+  );
+
+  if (pendingAudits.length === 0) {
+    return { synced: 0, failed: 0 };
+  }
+
+  const supabase = getClient();
+  let synced = 0;
+  let failed = 0;
+
+  for (const audit of pendingAudits) {
+    try {
+      await (supabase as any).from('audit_logs').insert(audit);
+      synced++;
+    } catch {
+      failed++;
+    }
+  }
+
+  // Clear synced logs
+  if (synced > 0) {
+    const remaining = pendingAudits.slice(-failed);
+    (window as any).localStorage.setItem(
+      'pending_audit_logs',
+      JSON.stringify(remaining),
+    );
+    logger.info('[Audit] Synced audit logs', { synced, failed });
+  }
+
+  return { synced, failed };
 }
 
 /**
@@ -374,4 +509,78 @@ export function getAuditActionLabel(action: string): string {
   };
 
   return labels[action] || action.replace(/_/g, ' ');
+}
+
+// =====================================================
+// P2 FIX: Admin Identity Logging for Exports
+// =====================================================
+
+/**
+ * Log data export with full admin identity
+ * This ensures all data exports are traceable to the admin who initiated them
+ */
+export async function logDataExport(
+  adminId: string,
+  adminEmail: string,
+  adminName: string,
+  exportDetails: {
+    exportType: string;
+    recordCount: number;
+    filtersApplied?: Record<string, unknown>;
+    format?: string;
+  },
+): Promise<void> {
+  const supabase = getClient();
+
+  try {
+    // Log the export action with full admin identity
+    await (supabase as any).from('audit_logs').insert({
+      admin_id: adminId,
+      action: 'data_exported',
+      resource_type: exportDetails.exportType,
+      resource_id: null, // Exports don't have a single resource ID
+      old_value: null,
+      new_value: {
+        // Admin identity for audit trail
+        admin_email: adminEmail,
+        admin_name: adminName,
+        // Export details
+        export_type: exportDetails.exportType,
+        record_count: exportDetails.recordCount,
+        filters_applied: exportDetails.filtersApplied || {},
+        format: exportDetails.format || 'csv',
+        exported_at: new Date().toISOString(),
+      },
+      // Metadata
+      ip_address: null, // Can be captured from request context
+      user_agent: null, // Can be captured from request context
+    });
+
+    logger.info('[Audit] Data export logged', {
+      adminId,
+      adminEmail,
+      exportType: exportDetails.exportType,
+      recordCount: exportDetails.recordCount,
+    });
+  } catch (error) {
+    logger.error('Failed to log data export', error);
+    // Don't throw - export should complete even if audit logging fails
+  }
+}
+
+/**
+ * Get admin identity for audit logging
+ * Returns object with admin identification details
+ */
+export function getAdminIdentityForAudit(admin: {
+  id: string;
+  email?: string;
+  name?: string;
+  role?: string;
+}): { adminId: string; adminEmail: string; adminName: string } {
+  return {
+    adminId: admin.id,
+    adminEmail: admin.email || 'unknown',
+    adminName: admin.name || admin.email || admin.id,
+  };
 }

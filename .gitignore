@@ -92,8 +92,11 @@ desktop.ini
 
 # IDE
 .vscode/*
-!.vscode/settings.json
+!.vscode/settings.json.example
 !.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/mcp.json
+!.vscode/lovendo.code-workspace
 .idea/
 *.sublime-*
 

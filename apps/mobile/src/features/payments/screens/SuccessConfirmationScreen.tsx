@@ -1,3 +1,12 @@
+/**
+ * Success Confirmation Screen
+ *
+ * DEPRECATED: PATCH-005
+ * This screen has been consolidated into the unified SuccessScreen.
+ *
+ * @deprecated Use SuccessScreen with appropriate type instead
+ * @see SuccessScreen
+ */
 import React from 'react';
 import {
   View,
