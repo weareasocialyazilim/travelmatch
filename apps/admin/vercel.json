@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
+  "framework": "nextjs",
+  "buildCommand": "turbo run build --filter=@lovendo/admin...",
   "outputDirectory": ".next",
-  "framework": "nextjs"
+  "installCommand": "pnpm install",
+  "devCommand": "turbo run admin#dev"
 }
