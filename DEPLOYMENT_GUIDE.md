@@ -1,8 +1,53 @@
 # 🚀 Lovendo Beta Launch - Deployment Rehberi
 
-**Tarih:** 24 Ocak 2026
-**Branch:** `claude/lovendo-launch-readiness-UEpzZ`
-**Status:** ✅ KOD HAZIR - Manuel adımlar bekleniyor
+**Tarih:** 27 Ocak 2026
+**Branch:** `developer`
+**Status:** ✅ ALTYAPI HAZIR - Deployment bekliyor
+
+---
+
+## 🏗️ Mimari Özeti
+
+### Prod Ortam
+| Component | Service | URL |
+|-----------|---------|-----|
+| Web | Vercel | lovendo.app |
+| Admin | Vercel | admin.lovendo.app |
+| Backend | Supabase | bjikxgtbptrvawkguypv.supabase.co |
+| Mobile | EAS | TestFlight / Play Internal |
+
+### Node.js & Package Manager
+```bash
+# Versiyon sabitleme (.nvmrc)
+22.22.0
+
+# engines (package.json)
+node: 22.22.0
+pnpm: 10.28.0
+```
+
+### Verification Scripts
+```bash
+# 1. Tam kontrol (lint + type-check + test)
+pnpm check
+
+# 2. Smoke test (minimal e2e)
+pnpm smoke
+
+# 3. Integration doğrulama
+pnpm verify:integrations
+
+# 4. CI test DB başlat
+docker-compose -f docker-compose.ci.yml up -d
+```
+
+### Feature Flags (Kill-Switch)
+```bash
+# Acil durumda özellikleri kapat
+NEXT_PUBLIC_FLAG_ESCROW_CREATE=false
+NEXT_PUBLIC_FLAG_MESSAGING_MEDIA=false
+NEXT_PUBLIC_FLAG_PAYMENT_WITHDRAW=false
+```
 
 ---
 
@@ -296,28 +341,38 @@ Eğer bunlardan **herhangi biri** varsa DURDUR:
 ### Production Deployment (Önerilen Sıra)
 
 ```bash
-# 1. Database (Supabase)
+# 0. Pre-flight kontrol
+pnpm check && pnpm smoke && pnpm verify:integrations
+
+# 1. Database Migration (Supabase)
 supabase db push --linked
 # ⏱️  ~30 saniye
-# ✅ Verify: RLS testleri geçmeli
+# ✅ Verify: pnpm db:test:rls
 
 # 2. Edge Functions (Supabase)
-supabase functions deploy
+npx supabase login
+npx supabase functions deploy --project-ref bjikxgtbptrvawkguypv
 # ⏱️  ~2 dakika
-# ✅ Verify: Functions listede görünmeli
+# ✅ Verify: supabase functions list
 
-# 3. Admin Panel (Vercel)
-cd apps/admin
-vercel deploy --prod
+# 3. Web (Vercel)
+cd apps/web
+npx vercel --prod --yes
 # ⏱️  ~5 dakika
-# ✅ Verify: https://admin.lovendo.com çalışmalı
+# ✅ Verify: https://lovendo.app çalışmalı
 
-# 4. Mobile App (TestFlight/Internal Testing)
+# 4. Admin Panel (Vercel)
+cd apps/admin
+npx vercel --prod --yes
+# ⏱️  ~5 dakika
+# ✅ Verify: https://admin.lovendo.app çalışmalı
+
+# 5. Mobile App (EAS)
 cd apps/mobile
-eas submit --platform ios --profile production
-eas submit --platform android --profile production
-# ⏱️  ~10 dakika (review bekleniyor)
-# ✅ Verify: TestFlight'ta görünmeli
+eas build --platform ios --profile production --non-interactive
+eas build --platform android --profile production --non-interactive
+# ⏱️  ~30 dakika
+# ✅ Verify: TestFlight / Play Console
 ```
 
 ---
