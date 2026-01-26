@@ -17,6 +17,7 @@ interface UserStory {
   avatar?: string | null;
   avatarCloudflareId?: string | null;
   avatarBlurHash?: string | null;
+  hasStory: boolean;
   stories: {
     id: string;
     imageUrl: string;
@@ -47,13 +48,8 @@ export const StoryList = memo<StoryListProps>(function StoryList({
         {/* Avatar */}
         <StoryItem
           item={{
-            id: item.id,
-            name: item.name,
+            ...item,
             avatar: item.avatar ?? '',
-            avatarCloudflareId: item.avatarCloudflareId,
-            avatarBlurHash: item.avatarBlurHash,
-            hasStory: item.stories.length > 0,
-            isNew: item.stories.some((s) => s.isNew),
           }}
           onPress={() => onAvatarPress(item.id)}
         />

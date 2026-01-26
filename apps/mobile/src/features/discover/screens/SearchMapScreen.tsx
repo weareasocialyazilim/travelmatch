@@ -79,6 +79,8 @@ const MARKER_PALETTE = {
   secondary: '#EC4899',
   success: '#10B981',
   neutral: '#E5E7EB',
+  platinum: '#E5E7EB',
+  magenta: '#EC4899',
 };
 
 // Subscription tier zoom limits

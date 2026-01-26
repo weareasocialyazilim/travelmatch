@@ -35,6 +35,11 @@ import {
   type PaymentMetadata as _PaymentMetadata,
 } from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
+import {
+  escrowService,
+  type EscrowTransaction,
+  determineEscrowMode,
+} from './escrowService';
 
 // Re-export types for backward compatibility
 export type { WalletBalance } from './walletService';
@@ -44,6 +49,8 @@ export type {
   CreatePaymentParams,
   SavedCard,
 } from './payment/PayTRProvider';
+export type { EscrowTransaction } from './escrowService';
+export { determineEscrowMode } from './escrowService';
 
 // ============================================
 // PAYMENT TYPES (Consolidated from paymentService.ts)
@@ -177,7 +184,9 @@ class SecurePaymentService {
     return paytrProvider.getSavedCards();
   }
 
-  async createPayment(params: CreatePaymentParams): Promise<PayTRPaymentResponse> {
+  async createPayment(
+    params: CreatePaymentParams,
+  ): Promise<PayTRPaymentResponse> {
     return paytrProvider.createPayment(params);
   }
 
@@ -185,7 +194,9 @@ class SecurePaymentService {
     return paytrProvider.deleteSavedCard(cardToken);
   }
 
-  async tokenizeAndSaveCard(params: CardTokenizeParams): Promise<CardTokenizeResult> {
+  async tokenizeAndSaveCard(
+    params: CardTokenizeParams,
+  ): Promise<CardTokenizeResult> {
     return paytrProvider.tokenizeAndSaveCard(params);
   }
 

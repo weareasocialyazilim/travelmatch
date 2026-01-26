@@ -101,6 +101,8 @@ export interface DeepLinkResult {
   type?: DeepLinkType;
   screen?: string;
   params?: Record<string, string | number | boolean>;
+  queued?: boolean;
+  message?: string;
   error?: {
     code: DeepLinkError;
     message: string;
@@ -211,8 +213,12 @@ class DeepLinkHandler {
       if (storedQueue) {
         const parsed: QueuedDeepLink[] = JSON.parse(storedQueue);
         // Filter out stale entries (older than 24 hours)
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        const validEntries = parsed.filter((entry) => entry.queuedAt > oneDayAgo);
+        const oneDayAgo = new Date(
+          Date.now() - 24 * 60 * 60 * 1000,
+        ).toISOString();
+        const validEntries = parsed.filter(
+          (entry) => entry.queuedAt > oneDayAgo,
+        );
 
         if (validEntries.length > 0) {
           logger.info('[DeepLink] Restored queued links:', validEntries.length);

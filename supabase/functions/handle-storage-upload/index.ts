@@ -3,7 +3,7 @@
 // Handles storage upload webhooks and scans images for policy violations
 // Updated: 2026-01-26 - Multi-tier moderation, PII detection, graceful degradation, hash deduplication
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 import {
   RekognitionClient,
@@ -12,7 +12,8 @@ import {
   DetectFacesCommand,
   DetectTextCommand,
 } from 'npm:@aws-sdk/client-rekognition@3.454.0';
-import { createHash } from 'https://deno.land/std@0.168.0/hash/mod.ts';
+import { crypto } from 'https://deno.land/std@0.208.0/crypto/mod.ts';
+import { encodeHex } from 'https://deno.land/std@0.208.0/encoding/hex.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,9 +47,9 @@ const MODERATION_THRESHOLDS = {
   // Categories with stricter thresholds
   strictCategories: {
     'Explicit Nudity': 80,
-    'Violence': 85,
-    'Alcohol': 75,
-    'Drugs': 85,
+    Violence: 85,
+    Alcohol: 75,
+    Drugs: 85,
   },
 } as const;
 
@@ -62,8 +63,14 @@ const PII_PATTERNS = {
 
 // Forbidden concepts in AI prompts (product identity protection)
 const FORBIDDEN_CONCEPTS = [
-  'trip', 'booking', 'reservation', 'travel',
-  'flight', 'hotel', 'airbnb', 'vacation',
+  'trip',
+  'booking',
+  'reservation',
+  'travel',
+  'flight',
+  'hotel',
+  'airbnb',
+  'vacation',
 ] as const;
 
 // Rate limiting configuration
@@ -75,16 +82,15 @@ const RATE_LIMIT = {
 // Response length limits
 const RESPONSE_LIMITS = {
   maxDescriptionLength: 500, // chars for moderation descriptions
-  maxSummaryLength: 1000,    // chars for admin summaries
+  maxSummaryLength: 1000, // chars for admin summaries
 } as const;
 
 /**
  * Calculate SHA-256 hash of image for deduplication
  */
 async function calculateImageHash(imageBytes: Uint8Array): Promise<string> {
-  const hash = createHash('sha256');
-  hash.update(imageBytes);
-  return hash.toString();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', imageBytes);
+  return encodeHex(new Uint8Array(hashBuffer));
 }
 
 /**
@@ -100,15 +106,17 @@ function truncateResponse(text: string, maxLength: number): string {
  */
 function containsForbiddenConcepts(text: string): boolean {
   const lowerText = text.toLowerCase();
-  return FORBIDDEN_CONCEPTS.some(concept => lowerText.includes(concept));
+  return FORBIDDEN_CONCEPTS.some((concept) => lowerText.includes(concept));
 }
 
 /**
  * Validate AI response schema - ensures required fields exist
  */
-function validateModerationResponse(response: Record<string, unknown>): boolean {
+function validateModerationResponse(
+  response: Record<string, unknown>,
+): boolean {
   const requiredFields = ['status', 'labels', 'score'];
-  return requiredFields.every(field => field in response);
+  return requiredFields.every((field) => field in response);
 }
 
 /**
@@ -118,7 +126,9 @@ async function checkRateLimit(
   supabase: ReturnType<typeof createClient>,
   userId: string,
 ): Promise<{ allowed: boolean; remaining: number }> {
-  const windowStart = new Date(Date.now() - RATE_LIMIT.windowMinutes * 60 * 1000).toISOString();
+  const windowStart = new Date(
+    Date.now() - RATE_LIMIT.windowMinutes * 60 * 1000,
+  ).toISOString();
 
   const { count } = await supabase
     .from('moderation_logs')
@@ -193,8 +203,15 @@ serve(async (req) => {
       console.error('[Moderation] Missing Supabase credentials');
       // Silent downgrade: return success without AI decision
       return new Response(
-        JSON.stringify({ status: 'pending_review', reason: 'service_config_error', silent: true }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({
+          status: 'pending_review',
+          reason: 'service_config_error',
+          silent: true,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -204,25 +221,25 @@ serve(async (req) => {
     if (payload.type !== 'INSERT' || payload.table !== 'objects') {
       return new Response(
         JSON.stringify({ message: 'Skipping non-INSERT event' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
     const { record } = payload;
 
     if (!record || !record.name) {
-      return new Response(
-        JSON.stringify({ message: 'No record found' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ message: 'No record found' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Only scan 'moments' or 'kyc-documents' buckets
     if (!['moments', 'kyc-documents'].includes(record.bucket_id)) {
-      return new Response(
-        JSON.stringify({ message: 'Skipped bucket' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ message: 'Skipped bucket' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Rate limit check - silent fail if over limit
@@ -235,16 +252,30 @@ serve(async (req) => {
           reason: 'rate_limit_exceeded',
           silent: true,
         }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
     // --- Moderation Decision Engine ---
     const decision = {
-      status: 'pending' as 'pending' | 'approved' | 'pending_review' | 'rejected' | 'skipped_idempotent' | 'error',
+      status: 'pending' as
+        | 'pending'
+        | 'approved'
+        | 'pending_review'
+        | 'rejected'
+        | 'skipped_idempotent'
+        | 'error',
       score: 0,
       maxConfidence: 0,
-      labels: [] as Array<{ name: string; parent: string; confidence: number; category: string }>,
+      labels: [] as Array<{
+        name: string;
+        parent: string;
+        confidence: number;
+        category: string;
+      }>,
       piiDetected: [] as Array<{ type: string; value: string }>,
       evidence: {
         moderationLabels: [] as Array<Record<string, unknown>>,
@@ -299,17 +330,24 @@ serve(async (req) => {
         } else if (fileBlob) {
           const arrayBuffer = await fileBlob.arrayBuffer();
           const imageBytes = new Uint8Array(arrayBuffer);
-          decision.evidence.processingMetadata.fileSize = arrayBuffer.byteLength;
+          decision.evidence.processingMetadata.fileSize =
+            arrayBuffer.byteLength;
 
           // Calculate image hash for deduplication
           const imageHash = await calculateImageHash(imageBytes);
           decision.evidence.processingMetadata.imageHash = imageHash;
 
           // Check for previous decision by hash (avoid duplicate Rekognition calls)
-          const previousDecision = await getPreviousDecision(supabase, imageHash);
+          const previousDecision = await getPreviousDecision(
+            supabase,
+            imageHash,
+          );
           if (previousDecision) {
-            console.log('[Moderation] Found previous decision for same image hash, reusing');
-            decision.status = previousDecision.action_taken as typeof decision.status;
+            console.log(
+              '[Moderation] Found previous decision for same image hash, reusing',
+            );
+            decision.status =
+              previousDecision.action_taken as typeof decision.status;
             decision.evidence.processingMetadata.reusedFromHash = true;
             // Reuse labels from previous decision if available
             if (previousDecision.metadata?.labels) {
@@ -322,7 +360,9 @@ serve(async (req) => {
             console.warn('[Moderation] File >5MB, setting to pending_review');
             decision.status = 'pending_review';
             decision.reasons.push('File size requires manual review');
-            decision.evidence.processingMetadata.aiModels.push('SKIPPED_5MB_LIMIT');
+            decision.evidence.processingMetadata.aiModels.push(
+              'SKIPPED_5MB_LIMIT',
+            );
           } else {
             const client = new RekognitionClient({
               region: awsRegion,
@@ -340,9 +380,14 @@ serve(async (req) => {
 
             const modResponse = await client.send(modCommand);
 
-            if (modResponse.ModerationLabels && modResponse.ModerationLabels.length > 0) {
+            if (
+              modResponse.ModerationLabels &&
+              modResponse.ModerationLabels.length > 0
+            ) {
               const labels = modResponse.ModerationLabels;
-              decision.maxConfidence = Math.max(...labels.map(l => l.Confidence || 0));
+              decision.maxConfidence = Math.max(
+                ...labels.map((l) => l.Confidence || 0),
+              );
               decision.score = decision.maxConfidence;
 
               // Process labels with category-aware thresholds
@@ -355,9 +400,14 @@ serve(async (req) => {
                 const name = label.Name || '';
 
                 // Determine threshold for this category
-                const threshold = MODERATION_THRESHOLDS.strictCategories[parentName as keyof typeof MODERATION_THRESHOLDS.strictCategories]
-                  || MODERATION_THRESHOLDS.strictCategories[name as keyof typeof MODERATION_THRESHOLDS.strictCategories]
-                  || MODERATION_THRESHOLDS.reject;
+                const threshold =
+                  MODERATION_THRESHOLDS.strictCategories[
+                    parentName as keyof typeof MODERATION_THRESHOLDS.strictCategories
+                  ] ||
+                  MODERATION_THRESHOLDS.strictCategories[
+                    name as keyof typeof MODERATION_THRESHOLDS.strictCategories
+                  ] ||
+                  MODERATION_THRESHOLDS.reject;
 
                 const labelCategory = determineCategory(parentName || name);
 
@@ -378,10 +428,16 @@ serve(async (req) => {
 
                 // Multi-tier decision logic
                 if (confidence >= threshold) {
-                  if (['explicit', 'violence', 'drugs'].includes(labelCategory)) {
+                  if (
+                    ['explicit', 'violence', 'drugs'].includes(labelCategory)
+                  ) {
                     shouldReject = true;
-                    decision.reasons.push(`${labelCategory} detected (${Math.round(confidence)}% confidence)`);
-                  } else if (confidence >= MODERATION_THRESHOLDS.pendingReview) {
+                    decision.reasons.push(
+                      `${labelCategory} detected (${Math.round(confidence)}% confidence)`,
+                    );
+                  } else if (
+                    confidence >= MODERATION_THRESHOLDS.pendingReview
+                  ) {
                     shouldPending = true;
                   }
                 }
@@ -390,10 +446,15 @@ serve(async (req) => {
               // Final decision based on multi-tier logic
               if (shouldReject) {
                 decision.status = 'rejected';
-              } else if (shouldPending || decision.maxConfidence >= MODERATION_THRESHOLDS.pendingReview) {
+              } else if (
+                shouldPending ||
+                decision.maxConfidence >= MODERATION_THRESHOLDS.pendingReview
+              ) {
                 decision.status = 'pending_review';
                 if (!shouldReject) {
-                  decision.reasons.push(`Medium risk content (${Math.round(decision.maxConfidence)}% confidence)`);
+                  decision.reasons.push(
+                    `Medium risk content (${Math.round(decision.maxConfidence)}% confidence)`,
+                  );
                 }
               } else {
                 decision.status = 'approved';
@@ -419,7 +480,10 @@ serve(async (req) => {
                   const text = textItem.DetectedText;
 
                   // Check for PII patterns
-                  if (PII_PATTERNS.phone.test(text) || PII_PATTERNS.email.test(text)) {
+                  if (
+                    PII_PATTERNS.phone.test(text) ||
+                    PII_PATTERNS.email.test(text)
+                  ) {
                     piiItems.push({ type: 'contact', value: text });
                     decision.reasons.push('Contact info detected in image');
                   } else if (PII_PATTERNS.url.test(text)) {
@@ -437,7 +501,7 @@ serve(async (req) => {
                 decision.evidence.detectedText = piiItems;
 
                 // PII in images is a policy violation
-                if (!decision.labels.some(l => l.category === 'explicit')) {
+                if (!decision.labels.some((l) => l.category === 'explicit')) {
                   decision.status = 'pending_review';
                 }
               }
@@ -454,7 +518,9 @@ serve(async (req) => {
     } else if (!awsAccessKeyId || !awsSecretAccessKey) {
       console.warn('[Moderation] AWS not configured, skipping');
       decision.status = 'pending_review';
-      decision.reasons.push('AI moderation unavailable - manual review required');
+      decision.reasons.push(
+        'AI moderation unavailable - manual review required',
+      );
     }
 
     // --- Persist to Database ---
@@ -467,11 +533,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('[Moderation] Handler Error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
-      }
+      },
     );
   }
 });
@@ -485,7 +553,8 @@ function determineCategory(labelName: string): string {
   if (name.includes('nudity') || name.includes('explicit')) return 'explicit';
   if (name.includes('violence') || name.includes('weapon')) return 'violence';
   if (name.includes('drug') || name.includes('alcohol')) return 'substances';
-  if (name.includes('suggestive') || name.includes('partial')) return 'suggestive';
+  if (name.includes('suggestive') || name.includes('partial'))
+    return 'suggestive';
   if (name.includes('food') || name.includes('meal')) return 'food';
   if (name.includes('person') || name.includes('face')) return 'person';
   if (name.includes('text')) return 'text';
@@ -503,7 +572,12 @@ async function persistModerationResult(
     status: string;
     score: number;
     maxConfidence: number;
-    labels: Array<{ name: string; parent: string; confidence: number; category: string }>;
+    labels: Array<{
+      name: string;
+      parent: string;
+      confidence: number;
+      category: string;
+    }>;
     piiDetected: Array<{ type: string; value: string }>;
     evidence: Record<string, unknown>;
     reasons: string[];
@@ -552,8 +626,11 @@ async function persistModerationResult(
       user_id: record.owner,
       content_type: 'image',
       severity: severityMap[decision.status] || 'medium',
-      violations: decision.labels.map(l => l.name).concat(decision.piiDetected.map(p => `PII:${p.type}`)),
-      action_taken: decision.status === 'approved' ? 'auto_approved' : decision.status,
+      violations: decision.labels
+        .map((l) => l.name)
+        .concat(decision.piiDetected.map((p) => `PII:${p.type}`)),
+      action_taken:
+        decision.status === 'approved' ? 'auto_approved' : decision.status,
       metadata: {
         provider: 'aws_rekognition',
         decision: {

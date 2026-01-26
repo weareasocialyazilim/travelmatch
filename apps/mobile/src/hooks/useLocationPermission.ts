@@ -25,18 +25,29 @@ const LOCATION_MAX_RETRIES = 3;
 const LOCATION_INITIAL_DELAY_MS = 1000;
 const LOCATION_MAX_DELAY_MS = 5000;
 
+export interface UseLocationPermissionReturn {
+  permissionStatus: PermissionStatus;
+  hasPermission: boolean;
+  currentLocation: LocationCoords | null;
+  isLoading: boolean;
+  error: string | null;
+  lastKnownLocation: LocationCoords | null;
+  checkPermission: () => Promise<PermissionStatus>;
+  requestPermission: () => Promise<PermissionStatus>;
+  getCurrentLocation: () => Promise<LocationCoords | null>;
+  openSettings: () => Promise<void>;
+}
+
 export const useLocationPermission = (): UseLocationPermissionReturn => {
-  const [permissionStatus, setPermissionStatus] = useState<PermissionStatus>(
-    'undetermined',
-  );
+  const [permissionStatus, setPermissionStatus] =
+    useState<PermissionStatus>('undetermined');
   const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(
     null,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastKnownLocation, setLastKnownLocation] = useState<LocationCoords | null>(
-    null,
-  );
+  const [lastKnownLocation, setLastKnownLocation] =
+    useState<LocationCoords | null>(null);
 
   // Check current permission status
   const checkPermission = useCallback(async () => {
@@ -59,7 +70,7 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
   }, []);
 
   // Request permission on first use
-  const requestPermission = useCallback(async () => {
+  const requestPermission = useCallback(async (): Promise<PermissionStatus> => {
     setIsLoading(true);
     setError(null);
 
@@ -75,12 +86,12 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
         mappedStatus,
       });
 
-      return status === 'granted';
+      return mappedStatus;
     } catch (err) {
       const errorMessage = 'Failed to request location permission';
       setError(errorMessage);
       logger.error('[useLocationPermission] Request failed:', err);
-      return false;
+      return 'denied';
     } finally {
       setIsLoading(false);
     }
@@ -95,14 +106,12 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
       try {
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
-          maximumAge: 60000,
-          timeout: 10000, // 10 second timeout per attempt
-        });
+        } as any);
 
         const coords: LocationCoords = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          accuracy: location.coords.accuracy,
+          accuracy: location.coords.accuracy ?? undefined,
         };
 
         setCurrentLocation(coords);
@@ -145,9 +154,10 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
 
   // Get current location (public API with retry)
   const getCurrentLocation = useCallback(
-    async (options?: { accuracy?: number; maximumAge?: number }): Promise<
-      LocationCoords | null
-    > => {
+    async (options?: {
+      accuracy?: number;
+      maximumAge?: number;
+    }): Promise<LocationCoords | null> => {
       if (permissionStatus !== 'granted') {
         // Return last known location if permission denied
         return lastKnownLocation;
@@ -181,8 +191,10 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
   );
 
   // Open app settings (for permanent denial)
-  const openSettings = useCallback(() => {
-    Location.openSettings();
+  const openSettings = useCallback(async () => {
+    if ('openSettings' in Location) {
+      await (Location as any).openSettings();
+    }
   }, []);
 
   // Check permission on mount
@@ -203,6 +215,8 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
     currentLocation: currentLocation || lastKnownLocation,
     isLoading,
     error,
+    lastKnownLocation,
+    checkPermission,
     requestPermission,
     openSettings,
     getCurrentLocation,
@@ -210,16 +224,13 @@ export const useLocationPermission = (): UseLocationPermissionReturn => {
 };
 
 // Hook for getting location with automatic permission request
-export const useLocation = (
-  options?: { autoRequest?: boolean },
-): UseLocationPermissionReturn => {
+export const useLocation = (options?: {
+  autoRequest?: boolean;
+}): UseLocationPermissionReturn => {
   const location = useLocationPermission();
 
   useEffect(() => {
-    if (
-      options?.autoRequest &&
-      location.permissionStatus === 'undetermined'
-    ) {
+    if (options?.autoRequest && location.permissionStatus === 'undetermined') {
       location.requestPermission();
     }
   }, [location.permissionStatus, options?.autoRequest]);

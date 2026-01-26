@@ -44,6 +44,8 @@ interface NeonPulseMarkerProps {
   isPlatinumShimmer?: boolean;
   /** Show popular indicator */
   isPopular?: boolean;
+  /** Show featured indicator */
+  isFeatured?: boolean;
   /** Test ID for testing */
   testID?: string;
 }

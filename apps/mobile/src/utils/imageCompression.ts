@@ -183,7 +183,7 @@ export async function prepareImageForUpload(
       size: infoWithSize.size || 0,
       width: dimensions.width,
       height: dimensions.height,
-      needsReview: (info.size || 0) > REKOGNITION_MAX_BYTES,
+      needsReview: (infoWithSize.size || 0) > REKOGNITION_MAX_BYTES,
       quality: targetConfig.initialQuality,
       wasResized: false,
       originalSize: infoWithSize.size,

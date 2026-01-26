@@ -198,6 +198,12 @@ export const TRUST_NOTES_UI = {
   // Placeholder
   placeholder: 'Bu deneyimde neyi beğendiğini paylaş...',
 
+  // Empty state
+  emptyState: {
+    title: 'Henüz bir teşekkür yok',
+    description: 'Bu moment için henüz kimse teşekkür bırakmamış.',
+  },
+
   // Submit button
   submitButton: 'Teşekkür Et',
 

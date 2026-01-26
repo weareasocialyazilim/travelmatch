@@ -28,6 +28,8 @@ export interface UserStory {
   id: string;
   name: string;
   avatar: string;
+  avatarCloudflareId?: string | null;
+  avatarBlurHash?: string | null;
   hasStory: boolean;
   isNew?: boolean;
   subscriptionTier?: SubscriptionTierType;

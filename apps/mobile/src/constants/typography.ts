@@ -201,6 +201,14 @@ export const TYPE_SCALE = {
       letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
     } as TextStyle,
+
+    h5: {
+      fontFamily: FONTS.display.medium,
+      fontSize: FONT_SIZES.h5,
+      lineHeight: Math.round(FONT_SIZES.h5 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACING.normal,
+      fontWeight: '500',
+    } as TextStyle,
   },
 
   // ----------------------------------------
@@ -672,6 +680,7 @@ export const typography = {
   h2: TYPE_SCALE.display.h2,
   h3: TYPE_SCALE.display.h3,
   h4: TYPE_SCALE.display.h4,
+  h5: TYPE_SCALE.display.h5,
 
   // Body styles
   body: TYPE_SCALE.body.base,
