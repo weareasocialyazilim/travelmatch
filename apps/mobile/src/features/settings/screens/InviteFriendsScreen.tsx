@@ -15,7 +15,7 @@ import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
-import { createSupabaseClient } from '@/lib/supabase';
+import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
@@ -59,36 +59,41 @@ export default function InviteFriendsScreen({
       }
 
       try {
-        const supabase = createSupabaseClient();
-
         // Get invite code
-        const { data: codeData, error: codeError } = await supabase
-          .rpc('get_or_create_invite_code', { p_user_id: user.id });
+        const { data: codeData, error: codeError } = await supabase.rpc(
+          'get_or_create_invite_code' as any,
+          { p_user_id: user.id },
+        );
 
         if (codeError) {
           logger.error('Failed to fetch invite code:', codeError);
           // Fallback to demo code
           setInviteCode('LV-DEMO');
-        } else if (codeData) {
+        } else if (codeData && typeof codeData === 'string') {
           setInviteCode(codeData);
+        } else {
+          setInviteCode('LV-DEMO');
         }
 
-        // Get usage stats
-        const { data: statsData, error: statsError } = await supabase
-          .from('invite_code_usages')
+        // Get usage stats - simplified query
+        const userInviteCodeResult = await supabase
+          .from('user_invite_codes')
           .select('id')
-          .eq('invite_code_id', (
-            supabase
-              .from('user_invite_codes')
-              .select('id')
-              .eq('user_id', user.id)
-              .single()
-          ).data?.id);
+          .eq('user_id', user.id)
+          .single();
 
-        if (!statsError && statsData) {
-          setFriendsJoined(statsData.length);
-          // Estimate moments gifted (simplified - each friend could gift)
-          setMomentsGifted(Math.floor(statsData.length * 0.5));
+        if (userInviteCodeResult.data && !userInviteCodeResult.error) {
+          const userInviteData = userInviteCodeResult.data as { id: string };
+          const statsResult = await supabase
+            .from('invite_code_usages')
+            .select('id')
+            .eq('invite_code_id', userInviteData.id);
+
+          if (statsResult.data && !statsResult.error) {
+            setFriendsJoined(statsResult.data.length);
+            // Estimate moments gifted (simplified - each friend could gift)
+            setMomentsGifted(Math.floor(statsResult.data.length * 0.5));
+          }
         }
       } catch (error) {
         logger.error('Failed to fetch invite data:', error);
@@ -165,15 +170,15 @@ export default function InviteFriendsScreen({
           t('invite.instagramTitle', 'Share on Instagram'),
           t(
             'invite.instagramMessage',
-            'Link copied! Open Instagram and paste it in your story or DM.'
+            'Link copied! Open Instagram and paste it in your story or DM.',
           ),
-          [{ text: t('common.ok', 'OK') }]
+          [{ text: t('common.ok', 'OK') }],
         );
       }
     } catch (error) {
       logger.error('Instagram share failed:', error);
       // Fallback to clipboard
-      await Clipboard.setStringAsync(message);
+      await Clipboard.setStringAsync(inviteCode);
       showToast(t('invite.linkCopied', 'Link copied!'), 'info');
     }
   };
@@ -196,7 +201,7 @@ export default function InviteFriendsScreen({
           <View style={styles.backButton} />
         </View>
         <View style={styles.loadingContainer}>
-          <Ionicons name="loader" size={24} color={COLORS.brand.primary} />
+          <Ionicons name="reload" size={24} color={COLORS.brand.primary} />
           <Text style={styles.loadingText}>{t('common.loading')}</Text>
         </View>
       </SafeAreaView>
@@ -236,7 +241,10 @@ export default function InviteFriendsScreen({
         {/* Title and Description */}
         <Text style={styles.mainTitle}>Share Lovendo</Text>
         <Text style={styles.description}>
-          {t('invite.description', 'Invite people who care about real moments.')}
+          {t(
+            'invite.description',
+            'Invite people who care about real moments.',
+          )}
         </Text>
 
         {/* Invite Code Card */}
@@ -269,7 +277,9 @@ export default function InviteFriendsScreen({
               size={20}
               color={COLORS.utility.white}
             />
-            <Text style={styles.primaryButtonText}>{t('invite.shareLink')}</Text>
+            <Text style={styles.primaryButtonText}>
+              {t('invite.shareLink')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -281,7 +291,9 @@ export default function InviteFriendsScreen({
               size={20}
               color={COLORS.text.primary}
             />
-            <Text style={styles.secondaryButtonText}>{t('invite.shareMessages')}</Text>
+            <Text style={styles.secondaryButtonText}>
+              {t('invite.shareMessages')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -293,7 +305,9 @@ export default function InviteFriendsScreen({
               size={20}
               color={COLORS.text.primary}
             />
-            <Text style={styles.secondaryButtonText}>{t('invite.shareInstagram')}</Text>
+            <Text style={styles.secondaryButtonText}>
+              {t('invite.shareInstagram')}
+            </Text>
           </TouchableOpacity>
         </View>
 

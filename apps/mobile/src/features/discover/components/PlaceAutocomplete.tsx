@@ -18,18 +18,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { PlaceResult } from '@/hooks/usePlaceSearch';
 import { usePlaceSearch } from '@/hooks/usePlaceSearch';
 import { useRecentPlaces } from '@/hooks/useRecentPlaces';
-
-interface PlaceResult {
-  id: string;
-  name: string;
-  place_name: string;
-  latitude: number;
-  longitude: number;
-  type: 'city' | 'poi' | 'address';
-  context?: string;
-}
 
 interface PlaceAutocompleteProps {
   onSelect: (place: PlaceResult) => void;
@@ -53,7 +44,7 @@ export const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const { searchPlaces, loading } = usePlaceSearch();
+  const { results, searchPlaces, loading } = usePlaceSearch();
   const { recentPlaces, addRecentPlace, clearRecentPlaces } = useRecentPlaces();
 
   const performSearch = useCallback(async () => {
@@ -143,16 +134,10 @@ export const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
           >
             <Text style={styles.activeTabText}>All</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.tab}
-            onPress={() => {}}
-          >
+          <TouchableOpacity style={styles.tab} onPress={() => {}}>
             <Text style={styles.tabText}>Cities</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.tab}
-            onPress={() => {}}
-          >
+          <TouchableOpacity style={styles.tab} onPress={() => {}}>
             <Text style={styles.tabText}>Venues</Text>
           </TouchableOpacity>
         </View>
@@ -167,7 +152,7 @@ export const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
             </View>
           ) : (
             <FlatList
-              data={[]} // Results from usePlaceSearch hook
+              data={results as PlaceResult[]}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -268,7 +253,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#1a1a1a',
-    outlineStyle: 'none',
   },
   clearButton: {
     padding: 4,

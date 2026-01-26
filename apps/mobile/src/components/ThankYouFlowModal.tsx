@@ -49,7 +49,10 @@ interface ThankYouFlowModalProps {
   giftInfo: GiftInfo | null;
   allGifters?: GifterInfo[];
   onClose: () => void;
-  onSendThankYou: (message: string, recipientId?: string) => Promise<{
+  onSendThankYou: (
+    message: string,
+    recipientId?: string,
+  ) => Promise<{
     success: boolean;
     error?: string;
   }>;
@@ -65,7 +68,9 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
   onSendThankYou,
 }) => {
   const [step, setStep] = useState<FlowStep>('selection');
-  const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
+  const [selectedRecipient, setSelectedRecipient] = useState<string | null>(
+    null,
+  );
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +114,10 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
     setError(null);
 
     try {
-      const result = await onSendThankYou(message, selectedRecipient || undefined);
+      const result = await onSendThankYou(
+        message,
+        selectedRecipient || undefined,
+      );
       if (result.success) {
         setStep('success');
       } else {
@@ -128,7 +136,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
   const handleDismiss = useCallback(async () => {
     if (giftInfo?.momentId) {
       const snoozeKey = `snooze_${giftInfo.momentId}`;
-      await cacheService.set(snoozeKey, { snoozedUntil: Date.now() + 24 * 60 * 60 * 1000 }, { expiryMs: 24 * 60 * 60 * 1000 });
+      await cacheService.set(
+        snoozeKey,
+        { snoozedUntil: Date.now() + 24 * 60 * 60 * 1000 },
+        { expiryMs: 24 * 60 * 60 * 1000 },
+      );
     }
     onClose();
   }, [giftInfo, onClose]);
@@ -139,7 +151,8 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
     setError(null);
 
     // Simple client-side check for immediate feedback
-    const phonePattern = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
+    const phonePattern =
+      /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
     const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
     const urlPattern = /https?:\/\/[^\s]+/;
     const socialPattern = /@[a-zA-Z0-9_]{3,}/;
@@ -190,7 +203,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                 testID="single-thank-you"
               >
                 <View style={styles.optionIcon}>
-                  <Ionicons name="person-outline" size={24} color={COLORS.primary} />
+                  <Ionicons
+                    name="person-outline"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.optionContent}>
                   <Text style={styles.optionTitle}>Bireysel Teşekkür</Text>
@@ -198,7 +215,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                     Sadece {giftInfo.giverName}'a özel mesaj
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={COLORS.text.muted} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={COLORS.text.muted}
+                />
               </TouchableOpacity>
             )}
 
@@ -210,7 +231,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                 testID="bulk-thank-you"
               >
                 <View style={styles.optionIcon}>
-                  <Ionicons name="people-outline" size={24} color={COLORS.primary} />
+                  <Ionicons
+                    name="people-outline"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.optionContent}>
                   <Text style={styles.optionTitle}>Toplu Teşekkür</Text>
@@ -218,7 +243,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                     Tüm {allGifters.length} hediye gönderene tek mesaj
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={COLORS.text.muted} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={COLORS.text.muted}
+                />
               </TouchableOpacity>
             )}
 
@@ -256,7 +285,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                 onPress={() => setStep('selection')}
                 testID="back-button"
               >
-                <Ionicons name="arrow-back" size={24} color={COLORS.text.primary} />
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color={COLORS.text.primary}
+                />
               </TouchableOpacity>
               <Text style={styles.composeTitle}>
                 {selectedRecipient ? 'Bireysel Teşekkür' : 'Toplu Teşekkür'}
@@ -286,15 +319,17 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                 textAlignVertical="top"
                 testID="message-input"
               />
-              <Text style={styles.charCount}>
-                {message.length}/280
-              </Text>
+              <Text style={styles.charCount}>{message.length}/280</Text>
             </View>
 
             {/* Error message */}
             {error && (
               <View style={styles.errorContainer}>
-                <Ionicons name="warning-outline" size={16} color={COLORS.error} />
+                <Ionicons
+                  name="warning-outline"
+                  size={16}
+                  color={COLORS.error}
+                />
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
@@ -307,7 +342,9 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
                   styles.sendButtonDisabled,
               ]}
               onPress={handleSend}
-              disabled={message.length < 10 || message.length > 280 || isLoading}
+              disabled={
+                message.length < 10 || message.length > 280 || isLoading
+              }
               testID="send-button"
             >
               <Text style={styles.sendButtonText}>
@@ -320,7 +357,9 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
               <Text style={styles.tipsTitle}>İpuçları:</Text>
               <Text style={styles.tipText}>• Dürüst ve samimi olun</Text>
               <Text style={styles.tipText}>• Deneyiminizi kısaca paylaşın</Text>
-              <Text style={styles.tipText}>• Telefon veya email paylaşmayın</Text>
+              <Text style={styles.tipText}>
+                • Telefon veya email paylaşmayın
+              </Text>
             </View>
           </View>
         </View>
@@ -339,7 +378,11 @@ export const ThankYouFlowModal: React.FC<ThankYouFlowModalProps> = ({
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, styles.successContainer]}>
           <View style={styles.successIcon}>
-            <Ionicons name="checkmark-circle" size={80} color={COLORS.success} />
+            <Ionicons
+              name="checkmark-circle"
+              size={80}
+              color={COLORS.success}
+            />
           </View>
           <Text style={styles.successTitle}>Teşekkür Gönderildi!</Text>
           <Text style={styles.successSubtitle}>
@@ -376,7 +419,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
     alignSelf: 'center',
     marginTop: 12,
@@ -439,7 +482,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     marginBottom: 16,
   },
   composeTitle: {
@@ -503,7 +546,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   sendButtonText: {
-    color: COLORS.textOnPrimary,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -553,7 +596,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   doneButtonText: {
-    color: COLORS.textOnPrimary,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },

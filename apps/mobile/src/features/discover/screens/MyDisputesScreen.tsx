@@ -9,11 +9,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
@@ -116,9 +116,16 @@ export const MyDisputesScreen: React.FC = () => {
       <View style={styles.cardHeader}>
         <View>
           <Text style={styles.disputeType}>{dispute.displayType}</Text>
-          <Text style={styles.disputeDate}>{formatDate(dispute.created_at)}</Text>
+          <Text style={styles.disputeDate}>
+            {formatDate(dispute.created_at)}
+          </Text>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: dispute.statusColor + '20' }]}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: dispute.statusColor + '20' },
+          ]}
+        >
           <Text style={[styles.statusText, { color: dispute.statusColor }]}>
             {dispute.displayStatus}
           </Text>
@@ -157,7 +164,11 @@ export const MyDisputesScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="check-circle"
             size={16}
-            color={dispute.status === 'resolved' ? COLORS.feedback.success : COLORS.feedback.error}
+            color={
+              dispute.status === 'resolved'
+                ? COLORS.feedback.success
+                : COLORS.feedback.error
+            }
           />
           <Text style={styles.resolutionText}>{dispute.resolution}</Text>
         </View>

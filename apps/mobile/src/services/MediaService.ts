@@ -304,9 +304,33 @@ const MAX_FILE_SIZES = {
   messages: 10 * 1024 * 1024, // 10MB
 } as const;
 const BLOCKED_EXTENSIONS = [
-  '.exe', '.bat', '.cmd', '.sh', '.ps1', '.dll', '.so', '.dylib', '.app',
-  '.deb', '.rpm', '.apk', '.ipa', '.msi', '.dmg', '.js', '.ts', '.jsx',
-  '.tsx', '.py', '.rb', '.php', '.asp', '.html', '.htm', '.svg', '.xml',
+  '.exe',
+  '.bat',
+  '.cmd',
+  '.sh',
+  '.ps1',
+  '.dll',
+  '.so',
+  '.dylib',
+  '.app',
+  '.deb',
+  '.rpm',
+  '.apk',
+  '.ipa',
+  '.msi',
+  '.dmg',
+  '.js',
+  '.ts',
+  '.jsx',
+  '.tsx',
+  '.py',
+  '.rb',
+  '.php',
+  '.asp',
+  '.html',
+  '.htm',
+  '.svg',
+  '.xml',
 ] as const;
 
 export interface SecureUploadOptions {
@@ -314,7 +338,11 @@ export interface SecureUploadOptions {
   maxWidth?: number;
   maxHeight?: number;
   quality?: number;
-  onProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
+  onProgress?: (progress: {
+    loaded: number;
+    total: number;
+    percentage: number;
+  }) => void;
 }
 
 export interface SecureUploadResult {
@@ -344,15 +372,19 @@ export function validateFile(
   uri: string,
   folder: 'avatars' | 'moments' | 'proofs' | 'messages' = 'moments',
 ): Promise<FileValidationResult> {
-  return new Promise(async (resolve) => {
+  return (async () => {
     try {
       const filename = uri.split('/').pop() || 'upload.jpg';
-      const extension = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+      const extension = filename
+        .toLowerCase()
+        .substring(filename.lastIndexOf('.'));
 
       // Check blocked extensions
       if (BLOCKED_EXTENSIONS.some((e) => e === extension)) {
-        resolve({ valid: false, error: `Security: File type ${extension} is not allowed` });
-        return;
+        return {
+          valid: false,
+          error: `Security: File type ${extension} is not allowed`,
+        };
       }
 
       // Get file size
@@ -366,27 +398,25 @@ export function validateFile(
       if (fileSize > maxSize) {
         const maxSizeMB = (maxSize / 1024 / 1024).toFixed(1);
         const fileSizeMB = (fileSize / 1024 / 1024).toFixed(2);
-        resolve({
+        return {
           valid: false,
           error: `File size (${fileSizeMB}MB) exceeds maximum (${maxSizeMB}MB)`,
-        });
-        return;
+        };
       }
 
       // Check minimum size
       if (fileSize < 100) {
-        resolve({ valid: false, error: 'File is too small or corrupted' });
-        return;
+        return { valid: false, error: 'File is too small or corrupted' };
       }
 
-      resolve({
+      return {
         valid: true,
         fileInfo: { name: filename, size: fileSize, type: mimeType, extension },
-      });
+      };
     } catch (error) {
-      resolve({ valid: false, error: 'Failed to validate file' });
+      return { valid: false, error: 'Failed to validate file' };
     }
-  });
+  })();
 }
 
 /**
@@ -416,7 +446,9 @@ export async function uploadSecureImage(
   let uploadId: string | undefined;
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
     const folder = options.folder || 'moments';
@@ -469,14 +501,18 @@ export async function uploadSecureImage(
 
     if (error || !url || !path) {
       await pendingTransactionsService.updateUploadProgress(
-        uploadId, 0, TransactionStatus.FAILED,
+        uploadId,
+        0,
+        TransactionStatus.FAILED,
       );
       throw error || new Error('Upload failed');
     }
 
     // Mark complete
     await pendingTransactionsService.updateUploadProgress(
-      uploadId, 100, TransactionStatus.COMPLETED,
+      uploadId,
+      100,
+      TransactionStatus.COMPLETED,
     );
 
     logger.info('Secure upload completed:', { bucket, size: fileInfo.size });
@@ -518,14 +554,17 @@ export async function uploadSecureImages(
     } else {
       failed.push({
         uri: uris[index],
-        error: result.reason instanceof Error
-          ? result.reason
-          : new Error(String(result.reason)),
+        error:
+          result.reason instanceof Error
+            ? result.reason
+            : new Error(String(result.reason)),
       });
     }
   });
 
-  logger.info(`Secure batch upload: ${successful.length}/${uris.length} successful`);
+  logger.info(
+    `Secure batch upload: ${successful.length}/${uris.length} successful`,
+  );
   return successful;
 }
 

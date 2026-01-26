@@ -7,16 +7,16 @@
  * Users must meet specific thresholds before messaging becomes available.
  */
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase, SUPABASE_EDGE_URL } from '../services/supabase';
 import { logger } from '../utils/logger';
 
-interface MessagingEligibility {
+export interface MessagingEligibility {
   state: 'closed' | 'pending' | 'eligible' | 'active' | 'suspended';
   eligibilityType?: string;
   criteria?: Record<string, any>;
 }
 
-interface GuidedMessageState {
+export interface GuidedMessageState {
   phase: 'prompt' | 'response' | 'complete' | 'skipped';
   prompt?: {
     key: string;
@@ -41,7 +41,10 @@ interface UseMessagingEligibilityReturn {
   // Actions
   checkEligibility: (conversationId: string) => Promise<boolean>;
   getPrompt: (conversationId: string) => Promise<void>;
-  submitResponse: (conversationId: string, response: string) => Promise<boolean>;
+  submitResponse: (
+    conversationId: string,
+    response: string,
+  ) => Promise<boolean>;
   skipGuidedFlow: (conversationId: string) => Promise<boolean>;
   completeFirstMessage: (conversationId: string) => Promise<boolean>;
 
@@ -50,88 +53,99 @@ interface UseMessagingEligibilityReturn {
 }
 
 export const useMessagingEligibility = (): UseMessagingEligibilityReturn => {
-  const [eligibility, setEligibility] = useState<MessagingEligibility | null>(null);
+  const [eligibility, setEligibility] = useState<MessagingEligibility | null>(
+    null,
+  );
   const [eligibilityLoading, setEligibilityLoading] = useState(true);
-  const [guidedState, setGuidedState] = useState<GuidedMessageState | null>(null);
+  const [guidedState, setGuidedState] = useState<GuidedMessageState | null>(
+    null,
+  );
   const [guidedLoading, setGuidedLoading] = useState(false);
 
   // Check if messaging is eligible for a conversation
-  const checkEligibility = useCallback(async (conversationId: string): Promise<boolean> => {
-    try {
-      setEligibilityLoading(true);
+  const checkEligibility = useCallback(
+    async (conversationId: string): Promise<boolean> => {
+      try {
+        setEligibilityLoading(true);
 
-      const { data, error } = await supabase
-        .from('messaging_eligibility')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        const { data, error } = await supabase
+          .from('messaging_eligibility')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+          .single();
 
-      if (error) {
-        logger.warn('Failed to check eligibility:', error);
+        if (error || !data) {
+          logger.warn('Failed to check eligibility:', error);
+          setEligibility(null);
+          return false;
+        }
+
+        const dataAny = data as any;
+        const eligibilityData: MessagingEligibility = {
+          state: dataAny.state || 'closed',
+          eligibilityType: dataAny.eligibility_type,
+          criteria: dataAny.eligibility_criteria,
+        };
+
+        setEligibility(eligibilityData);
+        return dataAny.state === 'active';
+      } catch (error) {
+        logger.error('Error checking eligibility:', error);
         setEligibility(null);
         return false;
+      } finally {
+        setEligibilityLoading(false);
       }
-
-      const eligibilityData: MessagingEligibility = {
-        state: data.state,
-        eligibilityType: data.eligibility_type,
-        criteria: data.eligibility_criteria,
-      };
-
-      setEligibility(eligibilityData);
-      return data.state === 'active';
-    } catch (error) {
-      logger.error('Error checking eligibility:', error);
-      setEligibility(null);
-      return false;
-    } finally {
-      setEligibilityLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Get guided first message prompt
-  const getPrompt = useCallback(async (conversationId: string): Promise<void> => {
-    try {
-      setGuidedLoading(true);
+  const getPrompt = useCallback(
+    async (conversationId: string): Promise<void> => {
+      try {
+        setGuidedLoading(true);
 
-      const response = await fetch(
-        `${Deno.env.get('SUPABASE_URL')}/functions/v1/guided-first-message`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        const response = await fetch(
+          `${SUPABASE_EDGE_URL}/functions/v1/guided-first-message`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            },
+            body: JSON.stringify({
+              conversationId,
+              action: 'get_prompt',
+            }),
           },
-          body: JSON.stringify({
-            conversationId,
-            action: 'get_prompt',
-          }),
-        },
-      );
+        );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to get prompt');
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to get prompt');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setGuidedState({
+            phase: data.phase,
+            prompt: data.prompt,
+            canSkip: data.canSkip,
+            canSendFreeForm: data.canSendFreeForm || data.phase === 'complete',
+          });
+        }
+      } catch (error) {
+        logger.error('Error getting guided prompt:', error);
+        setGuidedState(null);
+      } finally {
+        setGuidedLoading(false);
       }
-
-      const data = await response.json();
-
-      if (data.success) {
-        setGuidedState({
-          phase: data.phase,
-          prompt: data.prompt,
-          canSkip: data.canSkip,
-          canSendFreeForm: data.canSendFreeForm || data.phase === 'complete',
-        });
-      }
-    } catch (error) {
-      logger.error('Error getting guided prompt:', error);
-      setGuidedState(null);
-    } finally {
-      setGuidedLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Submit response to guided prompt
   const submitResponse = useCallback(
@@ -140,12 +154,12 @@ export const useMessagingEligibility = (): UseMessagingEligibilityReturn => {
         setGuidedLoading(true);
 
         const apiResponse = await fetch(
-          `${Deno.env.get('SUPABASE_URL')}/functions/v1/guided-first-message`,
+          `${SUPABASE_EDGE_URL}/functions/v1/guided-first-message`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
             },
             body: JSON.stringify({
               conversationId,
@@ -189,12 +203,12 @@ export const useMessagingEligibility = (): UseMessagingEligibilityReturn => {
         setGuidedLoading(true);
 
         const response = await fetch(
-          `${Deno.env.get('SUPABASE_URL')}/functions/v1/guided-first-message`,
+          `${SUPABASE_EDGE_URL}/functions/v1/guided-first-message`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
             },
             body: JSON.stringify({
               conversationId,
@@ -235,12 +249,12 @@ export const useMessagingEligibility = (): UseMessagingEligibilityReturn => {
     async (conversationId: string): Promise<boolean> => {
       try {
         const response = await fetch(
-          `${Deno.env.get('SUPABASE_URL')}/functions/v1/guided-first-message`,
+          `${SUPABASE_EDGE_URL}/functions/v1/guided-first-message`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
             },
             body: JSON.stringify({
               conversationId,
@@ -302,7 +316,8 @@ export const useMessagingEligibility = (): UseMessagingEligibilityReturn => {
   return {
     eligibility,
     eligibilityLoading,
-    isEligible: eligibility?.state === 'eligible' || eligibility?.state === 'active',
+    isEligible:
+      eligibility?.state === 'eligible' || eligibility?.state === 'active',
     isActive: eligibility?.state === 'active',
 
     guidedState,

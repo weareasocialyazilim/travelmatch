@@ -9,7 +9,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { logger } from '@/utils/logger';
 
-interface PlaceResult {
+export interface PlaceResult {
   id: string;
   name: string;
   place_name: string;
@@ -23,12 +23,16 @@ interface UsePlaceSearchReturn {
   results: PlaceResult[];
   loading: boolean;
   error: string | null;
-  searchPlaces: (query: string, searchType?: 'city' | 'poi' | 'both') => Promise<void>;
+  searchPlaces: (
+    query: string,
+    searchType?: 'city' | 'poi' | 'both',
+  ) => Promise<void>;
   clearResults: () => void;
 }
 
 const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
-const MAPBOX_GEOCODING_URL = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
+const MAPBOX_GEOCODING_URL =
+  'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
 export const usePlaceSearch = (): UsePlaceSearchReturn => {
   const [results, setResults] = useState<PlaceResult[]>([]);
@@ -66,20 +70,24 @@ export const usePlaceSearch = (): UsePlaceSearchReturn => {
         const data = await response.json();
 
         // Parse Mapbox response
-        const places: PlaceResult[] = data.features?.map((feature: any) => {
-          const [longitude, latitude] = feature.center || [];
-          const placeType = feature.place_type?.[0] || 'address';
+        const places: PlaceResult[] =
+          data.features?.map((feature: any) => {
+            const [longitude, latitude] = feature.center || [];
+            const placeType = feature.place_type?.[0] || 'address';
 
-          return {
-            id: feature.id,
-            name: feature.text_tr || feature.text || feature.place_name?.split(',')[0],
-            place_name: feature.place_name,
-            latitude,
-            longitude,
-            type: placeType as 'city' | 'poi' | 'address',
-            context: feature.context?.map((c: any) => c.text).join(', '),
-          };
-        }) || [];
+            return {
+              id: feature.id,
+              name:
+                feature.text_tr ||
+                feature.text ||
+                feature.place_name?.split(',')[0],
+              place_name: feature.place_name,
+              latitude,
+              longitude,
+              type: placeType as 'city' | 'poi' | 'address',
+              context: feature.context?.map((c: any) => c.text).join(', '),
+            };
+          }) || [];
 
         setResults(places);
         logger.info('[usePlaceSearch] Search completed', {
@@ -87,9 +95,13 @@ export const usePlaceSearch = (): UsePlaceSearchReturn => {
           resultsCount: places.length,
         });
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Search failed';
+        const errorMessage =
+          err instanceof Error ? err.message : 'Search failed';
         setError(errorMessage);
-        logger.error('[usePlaceSearch] Search failed', { query, error: errorMessage });
+        logger.error('[usePlaceSearch] Search failed', {
+          query,
+          error: errorMessage,
+        });
 
         // Return empty results on error rather than crashing
         setResults([]);

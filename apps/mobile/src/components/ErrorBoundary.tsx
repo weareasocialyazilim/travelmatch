@@ -475,3 +475,80 @@ export const ComponentErrorBoundary: React.FC<{
     {children}
   </ErrorBoundary>
 );
+
+/**
+ * Generic Error Screen Component
+ * Used by error boundary wrappers for consistent error display
+ */
+interface GenericErrorScreenProps {
+  error: Error;
+  onRetry: () => void;
+  title: string;
+  message: string;
+}
+
+export const GenericErrorScreen: React.FC<GenericErrorScreenProps> = ({
+  error,
+  onRetry,
+  title,
+  message,
+}) => {
+  const content = {
+    icon: 'alert-circle-outline' as const,
+    title,
+    message,
+    showRetry: true,
+    showHome: false,
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={content.icon}
+              size={80}
+              color={COLORS.feedback.error}
+            />
+          </View>
+
+          <Text style={styles.title}>{content.title}</Text>
+          <Text style={styles.message}>{content.message}</Text>
+
+          {__DEV__ && error && (
+            <View style={styles.debugContainer}>
+              <Text style={styles.debugTitle}>Debug Info:</Text>
+              <Text style={styles.errorDetails}>{error.toString()}</Text>
+              {error.stack && (
+                <Text style={styles.errorStack} numberOfLines={5}>
+                  {error.stack}
+                </Text>
+              )}
+            </View>
+          )}
+
+          <View style={styles.buttonContainer}>
+            {content.showRetry && (
+              <TouchableOpacity
+                style={[styles.button, styles.buttonPrimary]}
+                onPress={onRetry}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons
+                  name="refresh"
+                  size={20}
+                  color={COLORS.bg.primary}
+                />
+                <Text style={styles.buttonTextPrimary}>Tekrar Dene</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};

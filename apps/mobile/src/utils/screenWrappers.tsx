@@ -13,18 +13,17 @@ import { GenericErrorScreen } from '../components/ErrorBoundary';
  * Wrap a component with error boundary for auth screens
  */
 export function withAuthErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ): React.ComponentType<P> {
   return withErrorBoundary(Component, {
-    fallback: (error, retry) => (
+    fallback: (error, resetError) => (
       <GenericErrorScreen
         error={error}
-        onRetry={retry}
+        onRetry={resetError}
         title="Bir hata oluştu"
         message="Giriş ekranında bir sorun oluştu. Lütfen tekrar deneyin."
       />
     ),
-    level: 'screen',
   });
 }
 
@@ -32,18 +31,17 @@ export function withAuthErrorBoundary<P extends object>(
  * Wrap a component with error boundary for payment screens
  */
 export function withPaymentErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ): React.ComponentType<P> {
   return withErrorBoundary(Component, {
-    fallback: (error, retry) => (
+    fallback: (error, resetError) => (
       <GenericErrorScreen
         error={error}
-        onRetry={retry}
+        onRetry={resetError}
         title="Ödeme Hatası"
         message="Ödeme işlemi sırasında bir sorun oluştu. Lütfen tekrar deneyin."
       />
     ),
-    level: 'screen',
   });
 }
 
@@ -51,18 +49,17 @@ export function withPaymentErrorBoundary<P extends object>(
  * Wrap a component with error boundary for messages screens
  */
 export function withMessagesErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ): React.ComponentType<P> {
   return withErrorBoundary(Component, {
-    fallback: (error, retry) => (
+    fallback: (error, resetError) => (
       <GenericErrorScreen
         error={error}
-        onRetry={retry}
+        onRetry={resetError}
         title="Mesajlaşma Hatası"
         message="Mesajlaşma sırasında bir sorun oluştu. Lütfen tekrar deneyin."
       />
     ),
-    level: 'screen',
   });
 }
 
@@ -70,18 +67,17 @@ export function withMessagesErrorBoundary<P extends object>(
  * Wrap a component with error boundary for discover screens
  */
 export function withDiscoverErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ): React.ComponentType<P> {
   return withErrorBoundary(Component, {
-    fallback: (error, retry) => (
+    fallback: (error, resetError) => (
       <GenericErrorScreen
         error={error}
-        onRetry={retry}
+        onRetry={resetError}
         title="Keşif Hatası"
         message="Keşif sayfasında bir sorun oluştu. Lütfen tekrar deneyin."
       />
     ),
-    level: 'screen',
   });
 }
 

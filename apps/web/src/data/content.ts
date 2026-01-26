@@ -27,7 +27,7 @@ export const TRANSLATIONS = {
     form_story:
       "Tell us a story that isn't mid, or 2 dream moments that justify your existence.",
     submit: 'SUBMIT_OR_WHATEVER',
-    success_title: 'WE'RE STALKING YOU NOW.',
+    success_title: "WE'RE STALKING YOU NOW.",
     success_msg:
       'Application received. We will check your profile. If you are not mid, you are in. Stay loud or get muted.',
     moments_title: 'CHOOSE YOUR POISON',
@@ -37,11 +37,14 @@ export const TRANSLATIONS = {
     alternative: 'HOW IT WORKS',
     howitworks_title: 'SO WHAT THE F IS THIS?',
     howitworks_1_title: '1. CREATE A MOMENT',
-    howitworks_1_desc: 'Share a dream, experience, or moment you want to happen. Set your goal.',
+    howitworks_1_desc:
+      'Share a dream, experience, or moment you want to happen. Set your goal.',
     howitworks_2_title: '2. GET SUPPORT',
-    howitworks_2_desc: 'People who vibe with your vision send gifts. Money is locked in escrow.',
+    howitworks_2_desc:
+      'People who vibe with your vision send gifts. Money is locked in escrow.',
     howitworks_3_title: '3. MAKE IT HAPPEN',
-    howitworks_3_desc: 'Once funded, you deliver. Proof goes to your supporters. They say thanks.',
+    howitworks_3_desc:
+      'Once funded, you deliver. Proof goes to your supporters. They say thanks.',
     footer_tag: 'Stop the yapping. Sync the biology.',
     footer_rights: 'LOVENDO PROJECT. STOP SWIPING.',
     version: 'Engineered for Entities | v0.0.5-savage',
@@ -88,11 +91,14 @@ export const TRANSLATIONS = {
     alternative: 'NASIL CALISIR?',
     howitworks_title: 'PEKI BU NEDIR?',
     howitworks_1_title: '1. AN OLUSTUR',
-    howitworks_1_desc: 'Gerçekleşmesini istediğin bir hayalı, deneyimi veya anı paylaş. Hedefini belirle.',
+    howitworks_1_desc:
+      'Gerçekleşmesini istediğin bir hayalı, deneyimi veya anı paylaş. Hedefini belirle.',
     howitworks_2_title: '2. DESTEK AL',
-    howitworks_2_desc: 'Vibe ettiklerine hediye gönderiyor. Para escrowda kilitli kalıyor.',
+    howitworks_2_desc:
+      'Vibe ettiklerine hediye gönderiyor. Para escrowda kilitli kalıyor.',
     howitworks_3_title: '3. GERCEKLESTIR',
-    howitworks_3_desc: 'Finansman sağlandığında, sen yap. Kanıt destekçilerine gidiyor. Onlar tesekkur diyor.',
+    howitworks_3_desc:
+      'Finansman sağlandığında, sen yap. Kanıt destekçilerine gidiyor. Onlar tesekkur diyor.',
     footer_tag: 'BOS MUHABBETI KES.BIYOLOJINI SENKRONIZE ET.',
     footer_rights: 'LOVENDO PROJECT.SWIPE YOK.',
     version: 'VARLIK ICIN TASARLANDI | v0.0.5-savage',

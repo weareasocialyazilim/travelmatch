@@ -24,7 +24,12 @@ interface UseConversationsRealtimeOptions {
 export const useConversationsRealtime = (
   options: UseConversationsRealtimeOptions,
 ) => {
-  const { userId, onNewMessage, onConversationUpdate, enabled = true } = options;
+  const {
+    userId,
+    onNewMessage,
+    onConversationUpdate,
+    enabled = true,
+  } = options;
   const archivedConversationsRef = useRef<Set<string>>(new Set());
 
   const isConversationArchived = useCallback((conversationId: string) => {
@@ -52,7 +57,10 @@ export const useConversationsRealtime = (
           table: 'messages',
         },
         async (payload) => {
-          const message = payload.new as { conversation_id?: string; content?: string };
+          const message = payload.new as {
+            conversation_id?: string;
+            content?: string;
+          };
           const conversationId = message?.conversation_id;
 
           if (!conversationId) return;
@@ -64,9 +72,12 @@ export const useConversationsRealtime = (
 
           // Check if conversation is archived for this user
           if (isConversationArchived(conversationId)) {
-            logger.info('[Realtime] Message in archived conversation, not unarchiving:', {
-              conversationId,
-            });
+            logger.info(
+              '[Realtime] Message in archived conversation, not unarchiving:',
+              {
+                conversationId,
+              },
+            );
             // Do NOT auto-unarchive - consistent behavior
             return;
           }
@@ -85,7 +96,9 @@ export const useConversationsRealtime = (
               .single();
 
             if (conversation) {
-              onConversationUpdate(conversation as ConversationUpdate);
+              onConversationUpdate(
+                conversation as unknown as ConversationUpdate,
+              );
             }
           }
         },
@@ -99,7 +112,9 @@ export const useConversationsRealtime = (
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const { new: newState } = payload as { new: { conversation_id?: string; archived_at?: string } };
+          const { new: newState } = payload as {
+            new: { conversation_id?: string; archived_at?: string };
+          };
           const conversationId = newState?.conversation_id;
 
           if (!conversationId) return;
@@ -107,11 +122,15 @@ export const useConversationsRealtime = (
           if (newState?.archived_at) {
             // Conversation was archived
             markConversationArchived(conversationId);
-            logger.info('[Realtime] Conversation archived:', { conversationId });
+            logger.info('[Realtime] Conversation archived:', {
+              conversationId,
+            });
           } else {
             // Conversation was unarchived
             markConversationActive(conversationId);
-            logger.info('[Realtime] Conversation unarchived:', { conversationId });
+            logger.info('[Realtime] Conversation unarchived:', {
+              conversationId,
+            });
           }
         },
       )
@@ -120,7 +139,13 @@ export const useConversationsRealtime = (
       });
 
     return channel;
-  }, [userId, enabled, onNewMessage, onConversationUpdate, isConversationArchived]);
+  }, [
+    userId,
+    enabled,
+    onNewMessage,
+    onConversationUpdate,
+    isConversationArchived,
+  ]);
 
   useEffect(() => {
     const channel = setupRealtimeSubscription();

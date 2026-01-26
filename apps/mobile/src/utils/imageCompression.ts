@@ -72,7 +72,8 @@ export async function prepareImageForUpload(
   try {
     // Get original file info
     const originalInfo = await FileSystem.getInfoAsync(uri);
-    const originalSize = originalInfo.size || 0;
+    const originalSize =
+      (originalInfo as FileSystem.FileInfo & { size?: number }).size || 0;
 
     // If already under limit, just return
     if (originalSize <= REKOGNITION_MAX_BYTES) {
@@ -91,13 +92,24 @@ export async function prepareImageForUpload(
     // Resize image to max dimensions
     const resizedResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: targetConfig.maxWidth, height: targetConfig.maxHeight } }],
-      { format: ImageManipulator.SaveFormat.JPEG, compress: targetConfig.initialQuality },
+      [
+        {
+          resize: {
+            width: targetConfig.maxWidth,
+            height: targetConfig.maxHeight,
+          },
+        },
+      ],
+      {
+        format: ImageManipulator.SaveFormat.JPEG,
+        compress: targetConfig.initialQuality,
+      },
     );
 
     // Check size after resize
     const resizedInfo = await FileSystem.getInfoAsync(resizedResult.uri);
-    const resizedSize = resizedInfo.size || 0;
+    const resizedSize =
+      (resizedInfo as FileSystem.FileInfo & { size?: number }).size || 0;
 
     if (resizedSize <= REKOGNITION_MAX_BYTES) {
       const dimensions = await getImageDimensions(resizedResult.uri);
@@ -116,12 +128,23 @@ export async function prepareImageForUpload(
     // Try with lower quality
     const lowQualityResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: targetConfig.maxWidth, height: targetConfig.maxHeight } }],
-      { format: ImageManipulator.SaveFormat.JPEG, compress: targetConfig.fallbackQuality },
+      [
+        {
+          resize: {
+            width: targetConfig.maxWidth,
+            height: targetConfig.maxHeight,
+          },
+        },
+      ],
+      {
+        format: ImageManipulator.SaveFormat.JPEG,
+        compress: targetConfig.fallbackQuality,
+      },
     );
 
     const lowQualityInfo = await FileSystem.getInfoAsync(lowQualityResult.uri);
-    const lowQualitySize = lowQualityInfo.size || 0;
+    const lowQualitySize =
+      (lowQualityInfo as FileSystem.FileInfo & { size?: number }).size || 0;
 
     if (lowQualitySize <= REKOGNITION_MAX_BYTES) {
       const dimensions = await getImageDimensions(lowQualityResult.uri);
@@ -154,15 +177,16 @@ export async function prepareImageForUpload(
     // Return original if processing fails - edge function will handle
     const dimensions = await getImageDimensions(uri);
     const info = await FileSystem.getInfoAsync(uri);
+    const infoWithSize = info as FileSystem.FileInfo & { size?: number };
     return {
       uri,
-      size: info.size || 0,
+      size: infoWithSize.size || 0,
       width: dimensions.width,
       height: dimensions.height,
       needsReview: (info.size || 0) > REKOGNITION_MAX_BYTES,
       quality: targetConfig.initialQuality,
       wasResized: false,
-      originalSize: info.size,
+      originalSize: infoWithSize.size,
     };
   }
 }
@@ -176,7 +200,8 @@ export async function checkImageRequiresReview(
 ): Promise<{ requiresReview: boolean; size: number; maxSize: number }> {
   try {
     const info = await FileSystem.getInfoAsync(uri);
-    const size = info.size || 0;
+    const infoWithSize = info as FileSystem.FileInfo & { size?: number };
+    const size = infoWithSize.size || 0;
     return {
       requiresReview: size > REKOGNITION_MAX_BYTES,
       size,
@@ -194,13 +219,13 @@ export async function checkImageRequiresReview(
 /**
  * Get image dimensions
  */
-async function getImageDimensions(uri: string): Promise<{ width: number; height: number }> {
+async function getImageDimensions(
+  uri: string,
+): Promise<{ width: number; height: number }> {
   try {
-    const result = await ImageManipulator.manipulateAsync(
-      uri,
-      [],
-      { format: ImageManipulator.SaveFormat.JPEG },
-    );
+    const result = await ImageManipulator.manipulateAsync(uri, [], {
+      format: ImageManipulator.SaveFormat.JPEG,
+    });
     return { width: result.width, height: result.height };
   } catch {
     return { width: 0, height: 0 };

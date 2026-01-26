@@ -3,15 +3,25 @@
  *
  * Usage:
  * export default withErrorBoundary(MyScreen, { fallbackType: 'network' });
+ *
+ * With custom fallback:
+ * export default withErrorBoundary(MyScreen, {
+ *   fallback: (error, retry) => <MyCustomFallback error={error} onRetry={retry} />
+ * });
  */
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import type { NavigationProp } from '@react-navigation/native';
-import { ScreenErrorBoundary, type ErrorFallbackType } from './ErrorBoundary';
+import {
+  ScreenErrorBoundary,
+  ErrorBoundary,
+  type ErrorFallbackType,
+} from './ErrorBoundary';
 
 interface WithErrorBoundaryOptions {
   fallbackType?: ErrorFallbackType;
   displayName?: string;
+  fallback?: (error: Error, resetError: () => void) => ReactNode;
 }
 
 /** Props that may include navigation */
@@ -26,11 +36,23 @@ export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   options: WithErrorBoundaryOptions = {},
 ): React.FC<P> {
-  const { fallbackType, displayName } = options;
+  const { fallbackType, displayName, fallback } = options;
 
   const WrappedComponent: React.FC<P> = (props: P) => {
     // Extract navigation from props if available
     const navigation = (props as P & MaybeNavigationProps).navigation;
+
+    if (fallback) {
+      return (
+        <ErrorBoundary
+          level="screen"
+          fallback={(error, resetError) => fallback(error, resetError)}
+          navigation={navigation}
+        >
+          <Component {...props} />
+        </ErrorBoundary>
+      );
+    }
 
     return (
       <ScreenErrorBoundary fallbackType={fallbackType} navigation={navigation}>

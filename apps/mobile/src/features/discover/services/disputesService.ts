@@ -45,7 +45,8 @@ export const disputesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const foreignKey = params.type === 'transaction' ? 'transaction_id' : 'proof_id';
+    const foreignKey =
+      params.type === 'transaction' ? 'transaction_id' : 'proof_id';
 
     const { data, error } = await supabase
       .from('disputes')
@@ -74,7 +75,8 @@ export const disputesApi = {
   getDispute: async (disputeId: string): Promise<DisputeWithDetails> => {
     const { data, error } = await supabase
       .from('disputes')
-      .select(`
+      .select(
+        `
         *,
         transaction:transactions(
           id,
@@ -87,7 +89,8 @@ export const disputesApi = {
           title,
           moments!inner(title)
         )
-      `)
+      `,
+      )
       .eq('id', disputeId)
       .single();
 
@@ -161,11 +164,16 @@ export const disputesApi = {
       .eq('id', disputeId)
       .single();
 
-    if (!existing || existing.user_id !== user.id) {
+    const existingData = existing as {
+      id: any;
+      user_id: any;
+      status: any;
+    } | null;
+    if (!existingData || existingData.user_id !== user.id) {
       throw new Error('Dispute not found');
     }
 
-    if (existing.status !== 'pending') {
+    if (existingData.status !== 'pending') {
       throw new Error('Cannot cancel dispute that is already under review');
     }
 

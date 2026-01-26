@@ -14,13 +14,14 @@
 // ============================================
 export const PII_PATTERNS = {
   // Turkish phone formats: 0555 123 4567, +90 555 123 4567, 05551234567
-  PHONE: /(?:(?:\+?90)|0)?\s*(?:5[0-9]{2})\s*(?:[0-9]{3})\s*(?:[0-9]{2})\s*(?:[0-9]{2})/g,
+  PHONE:
+    /(?:(?:\+?90)|0)?\s*(?:5[0-9]{2})\s*(?:[0-9]{3})\s*(?:[0-9]{2})\s*(?:[0-9]{2})/g,
 
   // Email pattern
   EMAIL: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
 
   // URL pattern (http, https, www)
-  URL: /(?:https?:\/\/|www\.)[^\s<>"{}|\\^`\[\]]+/gi,
+  URL: /(?:https?:\/\/|www\.)[^\s<>"{}|\\^`]+/gi,
 
   // Social media handles (@username)
   SOCIAL_HANDLE: /@[a-zA-Z0-9_]{3,30}/g,
@@ -226,7 +227,7 @@ export const TRUST_NOTES_UI = {
     subtitleSingle: '{giverName} hediye gönderdi.',
     subtitleBulk: '{count} kişi bu moment için hediye gönderdi.',
     optionSingle: 'Bireysel Teşekkür',
-    optionSingleDesc: 'Sadece {name}\'a özel mesaj',
+    optionSingleDesc: "Sadece {name}'a özel mesaj",
     optionBulk: 'Toplu Teşekkür',
     optionBulkDesc: 'Tüm {count} hediye gönderene tek mesaj',
     skipButton: 'Şimli değil',
@@ -274,7 +275,9 @@ export const containsSocialHandle = (text: string): boolean => {
 /**
  * Check if text contains any PII
  */
-export const containsPII = (text: string): {
+export const containsPII = (
+  text: string,
+): {
   hasPII: boolean;
   type?: 'phone' | 'email' | 'url' | 'social';
 } => {
@@ -296,7 +299,9 @@ export const containsPII = (text: string): {
 /**
  * Get PII error message
  */
-export const getPIIErrorMessage = (piiType?: 'phone' | 'email' | 'url' | 'social'): string => {
+export const getPIIErrorMessage = (
+  piiType?: 'phone' | 'email' | 'url' | 'social',
+): string => {
   switch (piiType) {
     case 'phone':
       return TRUST_NOTES_UI.errors.phoneBlocked;
@@ -360,7 +365,7 @@ export const hasWarningWords = (note: string): boolean => {
  * Sanitize text by removing PII (for display purposes)
  */
 export const sanitizePII = (text: string): string => {
-  let sanitized = text
+  const sanitized = text
     .replace(PII_PATTERNS.PHONE, '[TELEFON]')
     .replace(PII_PATTERNS.EMAIL, '[EMAIL]')
     .replace(PII_PATTERNS.URL, '[URL]')

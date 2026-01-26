@@ -1,6 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 interface PageProps {
@@ -16,7 +15,9 @@ interface PageProps {
  * On mobile devices with the app installed, users will be redirected
  * via the app's intent filters (lovendo://moments/{id}).
  */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   return {
     title: 'Moment | Lovendo',
@@ -46,8 +47,18 @@ export default async function MomentPage({ params }: PageProps) {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
           <div className="w-16 h-16 bg-[#F59E0B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-8 h-8 text-[#F59E0B]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
 
@@ -56,7 +67,8 @@ export default async function MomentPage({ params }: PageProps) {
           </h2>
 
           <p className="text-[#666] mb-6">
-            This moment is waiting for you. Download the Lovendo app to view and connect.
+            This moment is waiting for you. Download the Lovendo app to view and
+            connect.
           </p>
 
           {/* App Store badges */}
@@ -101,7 +113,8 @@ export default async function MomentPage({ params }: PageProps) {
 
         {/* Footer */}
         <p className="text-sm text-[#999]">
-          By using Lovendo, you agree to our Terms of Service and Privacy Policy.
+          By using Lovendo, you agree to our Terms of Service and Privacy
+          Policy.
         </p>
       </div>
     </div>

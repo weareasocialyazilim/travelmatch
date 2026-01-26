@@ -4,8 +4,16 @@
  */
 
 // Core Supabase client and types
-export { supabase, isSupabaseConfigured } from '../config/supabase';
+export {
+  supabase,
+  isSupabaseConfigured,
+  SUPABASE_EDGE_URL,
+} from '../config/supabase';
 export type { Database } from '@/types/database.types';
+
+// Mock export for tests - allows type-safe mocking with jest.mock()
+export type MockSupabaseFrom = jest.Mock;
+export declare const mockSupabaseFrom: MockSupabaseFrom;
 
 // Authentication Service (from features/auth)
 export { default as supabaseAuth } from '../features/auth/services/authService';
