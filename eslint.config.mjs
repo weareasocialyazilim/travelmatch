@@ -92,10 +92,13 @@ export default tseslint.config(
       // React Hooks Rules
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+
+      // Allow !! for TypeScript unknown type handling
+      'no-extra-boolean-cast': 'off',
     },
   },
 
-  // 4. LEGACY CONTAINMENT - ADMIN
+  // 5. LEGACY CONTAINMENT - ADMIN
   {
     files: ['apps/admin/**/*.{ts,tsx,js,jsx}'],
     rules: {
