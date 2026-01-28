@@ -53,13 +53,12 @@ export async function GET(request: NextRequest) {
         `
         *,
         user:user_id (
-          display_name,
           full_name,
           email,
           avatar_url
         ),
         granted_by_user:granted_by (
-          display_name
+          full_name
         )
       `,
         { count: 'exact' },
@@ -67,9 +66,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    // Filter by tier
+    // Filter by tier (using account_type column)
     if (tier && ['vip', 'influencer', 'partner'].includes(tier)) {
-      query = query.eq('tier', tier as UserCommissionRow['tier']);
+      query = query.eq(
+        'account_type',
+        tier as 'vip' | 'influencer' | 'partner',
+      );
     }
 
     const { data: users, count, error } = await query;
@@ -93,7 +95,6 @@ export async function GET(request: NextRequest) {
       if (safeSearch) {
         filteredUsers = filteredUsers.filter(
           (u: VIPUserWithDetails) =>
-            u.user?.display_name?.toLowerCase().includes(safeSearch) ||
             u.user?.full_name?.toLowerCase().includes(safeSearch) ||
             u.user?.email?.toLowerCase().includes(safeSearch),
         );
@@ -195,12 +196,13 @@ export async function POST(request: NextRequest) {
     // Add VIP status using the admin function
     const { data, error } = await supabase.rpc('admin_set_user_vip', {
       p_user_id: userId,
-      p_tier: tier,
-      p_commission_override: commission,
-      p_giver_pays_commission: giverPaysCommission || false,
-      p_valid_until: validUntil || null,
-      p_reason: reason || null,
-      p_granted_by: session.admin.id,
+      p_account_type: tier as 'vip' | 'influencer' | 'partner',
+      p_admin_id: session.admin.id,
+      p_expires_at: validUntil || undefined,
+      p_reason: reason || '',
+      p_social_handle: body.social_handle || undefined,
+      p_social_platform: body.social_platform || undefined,
+      p_follower_count: body.follower_count || undefined,
     });
 
     if (error) {

@@ -91,14 +91,19 @@ const mockLoginHistory: LoginHistoryEntry[] = [
 // Fetch functions - Real API calls with fallback
 async function fetchSessions(): Promise<SessionsResponse> {
   try {
-    const response = await apiClient.get<SessionsResponse>('/security/sessions');
+    const response =
+      await apiClient.get<SessionsResponse>('/security/sessions');
 
     if (response.error) {
-      logger.warn('Sessions fetch failed, using fallback:', response.error);
+      logger.warn('Sessions fetch failed, using fallback', {
+        context: response.error,
+      });
       return { sessions: mockSessions, total: mockSessions.length };
     }
 
-    return response.data || { sessions: mockSessions, total: mockSessions.length };
+    return (
+      response.data || { sessions: mockSessions, total: mockSessions.length }
+    );
   } catch (error) {
     logger.error('Sessions fetch error:', error);
     return { sessions: mockSessions, total: mockSessions.length };
@@ -110,12 +115,17 @@ async function fetchLoginHistory(
   offset = 0,
 ): Promise<LoginHistoryResponse> {
   try {
-    const response = await apiClient.get<LoginHistoryResponse>('/security/login-history', {
-      params: { limit, offset },
-    });
+    const response = await apiClient.get<LoginHistoryResponse>(
+      '/security/login-history',
+      {
+        params: { limit, offset },
+      },
+    );
 
     if (response.error) {
-      logger.warn('Login history fetch failed, using fallback:', response.error);
+      logger.warn('Login history fetch failed, using fallback', {
+        context: response.error,
+      });
       return {
         history: mockLoginHistory,
         total: mockLoginHistory.length,
@@ -124,12 +134,14 @@ async function fetchLoginHistory(
       };
     }
 
-    return response.data || {
-      history: mockLoginHistory,
-      total: mockLoginHistory.length,
-      limit,
-      offset,
-    };
+    return (
+      response.data || {
+        history: mockLoginHistory,
+        total: mockLoginHistory.length,
+        limit,
+        offset,
+      }
+    );
   } catch (error) {
     logger.error('Login history fetch error:', error);
     return {
@@ -146,7 +158,9 @@ async function fetch2FAStatus(): Promise<TwoFAStatus> {
     const response = await apiClient.get<TwoFAStatus>('/security/2fa-status');
 
     if (response.error) {
-      logger.warn('2FA status fetch failed, using fallback:', response.error);
+      logger.warn('2FA status fetch failed, using fallback', {
+        context: response.error,
+      });
       return { enabled: false };
     }
 
@@ -161,10 +175,10 @@ async function revokeSession(
   sessionId: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await apiClient.delete<{ success: boolean; message: string }>(
-      '/security/sessions',
-      { params: { sessionId } },
-    );
+    const response = await apiClient.delete<{
+      success: boolean;
+      message: string;
+    }>('/security/sessions', { params: { sessionId } });
 
     if (response.error) {
       throw new Error(response.error);
@@ -182,16 +196,18 @@ async function revokeAllSessions(): Promise<{
   message: string;
 }> {
   try {
-    const response = await apiClient.delete<{ success: boolean; message: string }>(
-      '/security/sessions',
-      { params: { all: true } },
-    );
+    const response = await apiClient.delete<{
+      success: boolean;
+      message: string;
+    }>('/security/sessions', { params: { all: true } });
 
     if (response.error) {
       throw new Error(response.error);
     }
 
-    return response.data || { success: true, message: 'Tüm oturumlar kapatıldı' };
+    return (
+      response.data || { success: true, message: 'Tüm oturumlar kapatıldı' }
+    );
   } catch (error) {
     logger.error('Revoke all sessions error:', error);
     throw new Error('Oturumlar sonlandırılamadı');

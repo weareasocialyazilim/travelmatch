@@ -1,35 +1,56 @@
 {
-	"inputs": [
-		{
-			"id": "project-ref",
-			"type": "promptString",
-			"description": "Supabase project reference ID",
-			"password": false
-		},
-		{
-			"id": "read-only",
-			"type": "promptString",
-			"description": "Enable read-only mode",
-			"password": false
-		},
-		{
-			"id": "features",
-			"type": "promptString",
-			"description": "Comma-separated list of features to enable",
-			"password": false
-		},
-		{
-			"id": "api-url",
-			"type": "promptString",
-			"description": "Custom API URL",
-			"password": false
-		},
-		{
-			"id": "SUPABASE_ACCESS_TOKEN",
-			"type": "promptString",
-			"description": "Personal access token for Supabase API",
-			"password": true
-		}
-	],
-	"servers": {}
+  "inputs": [
+    {
+      "id": "project-ref",
+      "type": "promptString",
+      "description": "Supabase project reference ID",
+      "password": false
+    },
+    {
+      "id": "read-only",
+      "type": "promptString",
+      "description": "Enable read-only mode",
+      "password": false
+    },
+    {
+      "id": "features",
+      "type": "promptString",
+      "description": "Comma-separated list of features to enable",
+      "password": false
+    },
+    {
+      "id": "api-url",
+      "type": "promptString",
+      "description": "Custom API URL",
+      "password": false
+    },
+    {
+      "id": "SUPABASE_ACCESS_TOKEN",
+      "type": "promptString",
+      "description": "Personal access token for Supabase API",
+      "password": true
+    },
+    {
+      "id": "DATABASE_URL",
+      "type": "promptString",
+      "description": "PostgreSQL connection string (e.g., postgres://user:pass@host:5432/db)",
+      "password": true
+    }
+  ],
+  "servers": {
+    "supabase-postgres": {
+      "command": "npx",
+      "args": ["-y", "@supabase/postgres-meta"],
+      "env": {
+        "POSTGRES_HOST": "${input:DATABASE_URL}"
+      }
+    },
+    "supabase-inspect": {
+      "command": "npx",
+      "args": ["-y", "@supabase/postgres-inspect"],
+      "env": {
+        "DATABASE_URL": "${input:DATABASE_URL}"
+      }
+    }
+  }
 }

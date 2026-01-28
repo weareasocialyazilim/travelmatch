@@ -62,7 +62,7 @@ async function fetchAuditLogs(
 
     if (response.error) {
       // If API fails, return empty list instead of mocks
-      logger.warn('Audit logs fetch failed:', response.error);
+      logger.warn('Audit logs fetch failed', { error: response.error });
       return {
         logs: [],
         total: 0,

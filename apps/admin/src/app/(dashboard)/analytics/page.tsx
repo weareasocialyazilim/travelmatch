@@ -59,7 +59,11 @@ import {
   useEngagementMetrics,
 } from '@/hooks/use-analytics';
 import { getClient } from '@/lib/supabase';
-import { exportToCSV, exportToExcel, generateExportFilename } from '@/lib/export';
+import {
+  exportToCSV,
+  exportToExcel,
+  generateExportFilename,
+} from '@/lib/export';
 import { toast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
 
@@ -169,16 +173,19 @@ function useAnalyticsChartData(period: DateRange) {
       const supabase = getClient();
 
       // Try to fetch from Supabase RPC
-      const { data, error } = await (supabase.rpc as any)('get_admin_analytics_charts', {
-        period_days:
-          period === '7d'
-            ? 7
-            : period === '30d'
-              ? 30
-              : period === '90d'
-                ? 90
-                : 365,
-      });
+      const { data, error } = await (supabase.rpc as any)(
+        'get_admin_analytics_charts',
+        {
+          period_days:
+            period === '7d'
+              ? 7
+              : period === '30d'
+                ? 30
+                : period === '90d'
+                  ? 90
+                  : 365,
+        },
+      );
 
       if (error) {
         // If RPC doesn't exist or fails, fall back to individual queries
@@ -201,8 +208,10 @@ function useAnalyticsChartData(period: DateRange) {
         );
 
         // Attempt to fetch real data from available tables
-        const { data: userActivityData, error: activityError } = await (supabase
-          .from('user_activity_logs') as any)
+        const { data: userActivityData, error: activityError } = await (
+          supabase as any
+        )
+          .from('user_activity_logs')
           .select('created_at, user_id')
           .gte('created_at', startDate.toISOString())
           .order('created_at', { ascending: true });
@@ -214,16 +223,18 @@ function useAnalyticsChartData(period: DateRange) {
 
         // Process user activity data into daily active users format
         const dauMap = new Map<string, Set<string>>();
-        userActivityData?.forEach((activity: { created_at: string; user_id: string }) => {
-          const date = new Date(activity.created_at).toLocaleDateString(
-            'tr-TR',
-            { day: '2-digit', month: '2-digit' },
-          );
-          if (!dauMap.has(date)) {
-            dauMap.set(date, new Set());
-          }
-          dauMap.get(date)?.add(activity.user_id);
-        });
+        userActivityData?.forEach(
+          (activity: { created_at: string; user_id: string }) => {
+            const date = new Date(activity.created_at).toLocaleDateString(
+              'tr-TR',
+              { day: '2-digit', month: '2-digit' },
+            );
+            if (!dauMap.has(date)) {
+              dauMap.set(date, new Set());
+            }
+            dauMap.get(date)?.add(activity.user_id);
+          },
+        );
 
         const processedDau: DailyActiveUsersData[] = Array.from(
           dauMap.entries(),
@@ -236,8 +247,9 @@ function useAnalyticsChartData(period: DateRange) {
           }));
 
         // Fetch revenue data
-        const { data: transactionData } = await (supabase
-          .from('transactions') as any)
+        const { data: transactionData } = await (
+          supabase.from('transactions') as any
+        )
           .select('created_at, amount')
           .gte('created_at', startDate.toISOString())
           .order('created_at', { ascending: true });
@@ -246,18 +258,20 @@ function useAnalyticsChartData(period: DateRange) {
           string,
           { revenue: number; transactions: number }
         >();
-        transactionData?.forEach((tx: { created_at: string; amount: number }) => {
-          const date = new Date(tx.created_at).toLocaleDateString('tr-TR', {
-            day: '2-digit',
-            month: '2-digit',
-          });
-          if (!revenueMap.has(date)) {
-            revenueMap.set(date, { revenue: 0, transactions: 0 });
-          }
-          const current = revenueMap.get(date)!;
-          current.revenue += tx.amount || 0;
-          current.transactions += 1;
-        });
+        transactionData?.forEach(
+          (tx: { created_at: string; amount: number }) => {
+            const date = new Date(tx.created_at).toLocaleDateString('tr-TR', {
+              day: '2-digit',
+              month: '2-digit',
+            });
+            if (!revenueMap.has(date)) {
+              revenueMap.set(date, { revenue: 0, transactions: 0 });
+            }
+            const current = revenueMap.get(date)!;
+            current.revenue += tx.amount || 0;
+            current.transactions += 1;
+          },
+        );
 
         const processedRevenue: RevenueChartData[] = Array.from(
           revenueMap.entries(),
@@ -270,8 +284,7 @@ function useAnalyticsChartData(period: DateRange) {
           }));
 
         // Fetch user acquisition sources
-        const { data: usersData } = await (supabase
-          .from('users') as any)
+        const { data: usersData } = await (supabase.from('users') as any)
           .select('acquisition_source')
           .gte('created_at', startDate.toISOString());
 
@@ -299,8 +312,7 @@ function useAnalyticsChartData(period: DateRange) {
         }));
 
         // Fetch top cities
-        const { data: cityData } = await (supabase
-          .from('users') as any)
+        const { data: cityData } = await (supabase.from('users') as any)
           .select('city')
           .not('city', 'is', null);
 
@@ -570,7 +582,8 @@ export default function AnalyticsPage() {
 
                 toast({
                   title: 'Rapor indirildi',
-                  description: 'Analitik raporu başarıyla CSV olarak indirildi.',
+                  description:
+                    'Analitik raporu başarıyla CSV olarak indirildi.',
                 });
               } catch (error) {
                 toast({

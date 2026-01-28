@@ -275,7 +275,9 @@ function formatFileSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
-function parseModerationLabels(labelsJson?: string): TriageQueueItem['evidence']['moderationLabels'] {
+function parseModerationLabels(
+  labelsJson?: string,
+): NonNullable<TriageQueueItem['evidence']>['moderationLabels'] {
   if (!labelsJson) return [];
   try {
     return JSON.parse(labelsJson);
@@ -284,7 +286,9 @@ function parseModerationLabels(labelsJson?: string): TriageQueueItem['evidence']
   }
 }
 
-function parsePiiData(piiJson?: string): Array<{ type: string; value: string }> {
+function parsePiiData(
+  piiJson?: string,
+): Array<{ type: string; value: string }> {
   if (!piiJson) return [];
   try {
     return JSON.parse(piiJson);
@@ -312,7 +316,7 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
   const pii = parsePiiData(item.ai_moderation_pii);
   const reasons = parseReasons(item.ai_moderation_reasons);
 
-  const maxConfidence = Math.max(...labels.map(l => l.confidence), 0);
+  const maxConfidence = Math.max(...labels.map((l) => l.confidence), 0);
   const threshold = labels[0]?.threshold || 90;
 
   return (
@@ -340,10 +344,14 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
             <div className="text-sm space-y-1">
               {reasons.length > 0 ? (
                 reasons.map((reason, i) => (
-                  <p key={i} className="text-muted-foreground">- {reason}</p>
+                  <p key={i} className="text-muted-foreground">
+                    - {reason}
+                  </p>
                 ))
               ) : (
-                <p className="text-muted-foreground">No specific reasons recorded</p>
+                <p className="text-muted-foreground">
+                  No specific reasons recorded
+                </p>
               )}
             </div>
           </div>
@@ -353,7 +361,13 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
             <div className="flex-1">
               <div className="flex justify-between text-xs mb-1">
                 <span>Confidence</span>
-                <span className={maxConfidence >= threshold ? 'text-red-500' : 'text-yellow-500'}>
+                <span
+                  className={
+                    maxConfidence >= threshold
+                      ? 'text-red-500'
+                      : 'text-yellow-500'
+                  }
+                >
                   {Math.round(maxConfidence)}% / {threshold}%
                 </span>
               </div>
@@ -362,7 +376,9 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
                   className={`h-full rounded-full ${
                     maxConfidence >= threshold ? 'bg-red-500' : 'bg-yellow-500'
                   }`}
-                  style={{ width: `${Math.min((maxConfidence / 100) * 100, 100)}%` }}
+                  style={{
+                    width: `${Math.min((maxConfidence / 100) * 100, 100)}%`,
+                  }}
                 />
               </div>
             </div>
@@ -392,7 +408,9 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">{Math.round(label.confidence)}%</p>
+                      <p className="text-sm font-medium">
+                        {Math.round(label.confidence)}%
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         threshold: {label.threshold}
                       </p>
@@ -416,10 +434,18 @@ function EvidencePanel({ item }: { item: TriageQueueItem }) {
                     key={i}
                     className="flex items-center gap-2 p-2 rounded bg-purple-500/10 border border-purple-500/20"
                   >
-                    {item.type === 'contact' && <Phone className="h-4 w-4 text-purple-500" />}
-                    {item.type === 'url' && <ExternalLink className="h-4 w-4 text-purple-500" />}
-                    {item.type === 'handle' && <Hash className="h-4 w-4 text-purple-500" />}
-                    {item.type === 'email' && <Mail className="h-4 w-4 text-purple-500" />}
+                    {item.type === 'contact' && (
+                      <Phone className="h-4 w-4 text-purple-500" />
+                    )}
+                    {item.type === 'url' && (
+                      <ExternalLink className="h-4 w-4 text-purple-500" />
+                    )}
+                    {item.type === 'handle' && (
+                      <Hash className="h-4 w-4 text-purple-500" />
+                    )}
+                    {item.type === 'email' && (
+                      <Mail className="h-4 w-4 text-purple-500" />
+                    )}
                     <span className="text-sm font-mono">{item.value}</span>
                     <CanvaBadge variant="primary" className="text-xs">
                       {item.type}
@@ -468,10 +494,44 @@ export default function ModerationPage() {
     category: 'profanity',
   });
 
+  // Admin session for audit logs
+  const [adminId, setAdminId] = useState<string | null>(null);
+
+  // Confirmation dialog state for irreversible actions
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    type: 'reject' | 'approve' | 'ban' | null;
+    itemId: string | null;
+    itemTitle: string;
+  }>({
+    open: false,
+    type: null,
+    itemId: null,
+    itemTitle: '',
+  });
+
   const supabase = getClient();
+
+  // Fetch admin ID on mount
+  useEffect(() => {
+    const fetchAdminId = async () => {
+      try {
+        const response = await fetch('/api/admin/me');
+        if (response.ok) {
+          const data = await response.json();
+          setAdminId(data.id);
+        }
+      } catch (error) {
+        logger.error('Failed to fetch admin ID', error);
+      }
+    };
+    fetchAdminId();
+  }, []);
 
   useEffect(() => {
     loadData();
+    // loadData is stable - uses activeTab from closure
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   async function loadData() {
@@ -547,7 +607,35 @@ export default function ModerationPage() {
       return;
     }
 
-    setLogs((data as ModerationLog[]) || []);
+    const normalizedLogs = (data ?? []).map((log) => {
+      const violations = Array.isArray(log.violations)
+        ? (log.violations as Array<{ type: string; message: string }>)
+        : [];
+      const metadata =
+        log.metadata &&
+        typeof log.metadata === 'object' &&
+        !Array.isArray(log.metadata)
+          ? (log.metadata as Record<string, unknown>)
+          : undefined;
+      const user =
+        log.user && typeof log.user === 'object' && 'username' in log.user
+          ? (log.user as {
+              full_name: string;
+              username: string;
+              email?: string;
+            })
+          : undefined;
+
+      return {
+        ...log,
+        created_at: log.created_at ?? new Date().toISOString(),
+        violations,
+        metadata,
+        user,
+      } as ModerationLog;
+    });
+
+    setLogs(normalizedLogs);
   }
 
   async function loadBlockedContent() {
@@ -562,7 +650,20 @@ export default function ModerationPage() {
       return;
     }
 
-    setBlockedContent((data as BlockedContent[]) || []);
+    const normalizedBlocked = (data ?? []).map((row) => {
+      const user =
+        row.user && typeof row.user === 'object' && 'username' in row.user
+          ? (row.user as { full_name: string; username: string })
+          : undefined;
+
+      return {
+        ...row,
+        created_at: row.created_at ?? new Date().toISOString(),
+        user,
+      } as BlockedContent;
+    });
+
+    setBlockedContent(normalizedBlocked);
   }
 
   async function loadWarnings() {
@@ -577,7 +678,20 @@ export default function ModerationPage() {
       return;
     }
 
-    setWarnings((data as UserWarning[]) || []);
+    const normalizedWarnings = (data ?? []).map((row) => {
+      const user =
+        row.user && typeof row.user === 'object' && 'username' in row.user
+          ? (row.user as { full_name: string; username: string })
+          : undefined;
+
+      return {
+        ...row,
+        created_at: row.created_at ?? new Date().toISOString(),
+        user,
+      } as UserWarning;
+    });
+
+    setWarnings(normalizedWarnings);
   }
 
   async function loadDictionary() {
@@ -598,9 +712,10 @@ export default function ModerationPage() {
   async function loadTriageQueue() {
     try {
       // Load moments pending review with moderation data
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moments')
-        .select(`
+        .select(
+          `
           id,
           title,
           user_id,
@@ -614,7 +729,8 @@ export default function ModerationPage() {
           ai_moderation_reasons,
           ai_moderation_pii,
           profiles:user_id(username)
-        `)
+        `,
+        )
         .in('moderation_status', ['pending_review', 'rejected'])
         .eq('is_hidden', false)
         .order('created_at', { ascending: false })
@@ -622,7 +738,7 @@ export default function ModerationPage() {
 
       if (error) throw error;
 
-      const queueItems: TriageQueueItem[] = (data || []).map(item => ({
+      const queueItems: TriageQueueItem[] = (data || []).map((item: any) => ({
         moment_id: item.id,
         title: item.title,
         user_id: item.user_id,
@@ -647,9 +763,10 @@ export default function ModerationPage() {
 
   async function loadThankYouEvents() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('thank_you_events')
-        .select(`
+        .select(
+          `
           id,
           moment_id,
           author_id,
@@ -662,7 +779,8 @@ export default function ModerationPage() {
           author:author_id(full_name, avatar_url, username),
           recipient:recipient_id(full_name, avatar_url, username),
           moment:moments(id, title)
-        `)
+        `,
+        )
         .in('moderation_status', ['flagged', 'pending_review'])
         .order('created_at', { ascending: false })
         .limit(50);
@@ -676,7 +794,11 @@ export default function ModerationPage() {
     }
   }
 
-  async function handleThankYouModeration(id: string, action: 'approve' | 'reject' | 'flag', reason?: string) {
+  async function handleThankYouModeration(
+    id: string,
+    action: 'approve' | 'reject' | 'flag',
+    reason?: string,
+  ) {
     try {
       const response = await fetch('/api/thank-you/moderation', {
         method: 'PATCH',
@@ -691,7 +813,7 @@ export default function ModerationPage() {
           ? 'Teşekkür onaylandı'
           : action === 'reject'
             ? 'Teşekkür reddedildi'
-            : 'Teşekkür işaretlendi'
+            : 'Teşekkür işaretlendi',
       );
 
       // Reload the list
@@ -723,9 +845,13 @@ export default function ModerationPage() {
       if (error) throw error;
 
       // Log admin override if AI previously rejected/pending_review
-      if (current?.moderation_status && ['rejected', 'pending_review'].includes(current.moderation_status)) {
+      if (
+        current?.moderation_status &&
+        ['rejected', 'pending_review'].includes(current.moderation_status) &&
+        adminId
+      ) {
         await supabase.from('admin_audit_logs').insert({
-          admin_id: 'current-admin-id', // Replace with actual admin ID from auth
+          admin_id: adminId,
           action: 'moderation_override',
           resource_type: 'moment',
           resource_id: momentId,
@@ -748,9 +874,90 @@ export default function ModerationPage() {
     }
   }
 
-  async function handleRejectContent(momentId: string, reason?: string) {
+  // Request confirmation for irreversible action
+  function requestConfirmation(
+    type: 'reject' | 'approve' | 'ban',
+    itemId: string,
+    itemTitle: string,
+  ) {
+    setConfirmDialog({ open: true, type, itemId, itemTitle });
+  }
+
+  // Execute confirmed action
+  async function confirmAction() {
+    if (!confirmDialog.type || !confirmDialog.itemId) {
+      setConfirmDialog({
+        open: false,
+        type: null,
+        itemId: null,
+        itemTitle: '',
+      });
+      return;
+    }
+
     try {
-      // Get current moderation status for audit log
+      if (confirmDialog.type === 'reject') {
+        await executeReject(confirmDialog.itemId);
+      } else if (confirmDialog.type === 'approve') {
+        await executeApprove(confirmDialog.itemId);
+      }
+    } catch (error) {
+      logger.error('Failed to execute action', error);
+    }
+
+    setConfirmDialog({ open: false, type: null, itemId: null, itemTitle: '' });
+  }
+
+  async function executeApprove(momentId: string) {
+    try {
+      const { data: current } = await supabase
+        .from('moments')
+        .select('moderation_status, user_id')
+        .eq('id', momentId)
+        .single();
+
+      const { error } = await supabase
+        .from('moments')
+        .update({
+          is_approved: true,
+          is_hidden: false,
+          moderation_status: 'approved',
+        })
+        .eq('id', momentId);
+
+      if (error) throw error;
+
+      if (
+        current?.moderation_status &&
+        ['rejected', 'pending_review'].includes(current.moderation_status) &&
+        adminId
+      ) {
+        await supabase.from('admin_audit_logs').insert({
+          admin_id: adminId,
+          action: 'moderation_override',
+          resource_type: 'moment',
+          resource_id: momentId,
+          old_value: current.moderation_status,
+          new_value: 'approved',
+          reason: 'Admin manual approval',
+          metadata: {
+            timestamp: new Date().toISOString(),
+            provider: 'manual',
+          },
+        });
+      }
+
+      toast.success('Icerik onaylandi ve yayina alindi');
+      loadTriageQueue();
+      loadStats();
+    } catch (error) {
+      logger.error('Failed to approve content', error);
+      toast.error('Islem basarisiz');
+    }
+  }
+
+  async function executeReject(momentId: string) {
+    try {
       const { data: current } = await supabase
         .from('moments')
         .select('moderation_status, user_id')
@@ -768,16 +975,19 @@ export default function ModerationPage() {
 
       if (error) throw error;
 
-      // Log admin override if AI previously approved/pending_review
-      if (current?.moderation_status && ['approved', 'pending_review'].includes(current.moderation_status)) {
+      if (
+        current?.moderation_status &&
+        ['approved', 'pending_review'].includes(current.moderation_status) &&
+        adminId
+      ) {
         await supabase.from('admin_audit_logs').insert({
-          admin_id: 'current-admin-id', // Replace with actual admin ID from auth
+          admin_id: adminId,
           action: 'moderation_override',
           resource_type: 'moment',
           resource_id: momentId,
           old_value: current.moderation_status,
           new_value: 'rejected',
-          reason: reason || 'Admin manual rejection',
+          reason: 'Admin manual rejection',
           metadata: {
             timestamp: new Date().toISOString(),
             provider: 'manual',
@@ -830,15 +1040,13 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await supabase
-      .from('moderation_dictionary')
-      .insert({
-        word: newWord.word.toLowerCase().trim(),
-        severity: newWord.severity,
-        category: newWord.category,
-        is_regex: false,
-        is_active: true,
-      });
+    const { error } = await supabase.from('moderation_dictionary').insert({
+      word: newWord.word.toLowerCase().trim(),
+      severity: newWord.severity,
+      category: newWord.category,
+      is_regex: false,
+      is_active: true,
+    });
 
     if (error) {
       logger.error('Failed to add word', error);
@@ -965,7 +1173,15 @@ export default function ModerationPage() {
       <Tabs
         value={activeTab}
         onValueChange={(value) =>
-          setActiveTab(value as 'logs' | 'blocked' | 'warnings' | 'dictionary' | 'triage' | 'thank-you')
+          setActiveTab(
+            value as
+              | 'logs'
+              | 'blocked'
+              | 'warnings'
+              | 'dictionary'
+              | 'triage'
+              | 'thank-you',
+          )
         }
       >
         <TabsList>
@@ -1031,7 +1247,9 @@ export default function ModerationPage() {
                             by @{item.username}
                           </p>
                         </div>
-                        <CanvaBadge className={getActionColor(item.moderation_status)}>
+                        <CanvaBadge
+                          className={getActionColor(item.moderation_status)}
+                        >
                           {item.moderation_status?.replace('_', ' ')}
                         </CanvaBadge>
                       </div>
@@ -1039,11 +1257,16 @@ export default function ModerationPage() {
                       {/* Quick reasons */}
                       {item.ai_moderation_reasons && (
                         <div className="mb-3">
-                          {parseReasons(item.ai_moderation_reasons).slice(0, 2).map((reason, i) => (
-                            <p key={i} className="text-xs text-muted-foreground truncate">
-                              - {reason}
-                            </p>
-                          ))}
+                          {parseReasons(item.ai_moderation_reasons)
+                            .slice(0, 2)
+                            .map((reason, i) => (
+                              <p
+                                key={i}
+                                className="text-xs text-muted-foreground truncate"
+                              >
+                                - {reason}
+                              </p>
+                            ))}
                         </div>
                       )}
 
@@ -1051,14 +1274,26 @@ export default function ModerationPage() {
                         <CanvaButton
                           variant="secondary"
                           className="w-full text-red-500 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => handleRejectContent(item.moment_id)}
+                          onClick={() =>
+                            requestConfirmation(
+                              'reject',
+                              item.moment_id,
+                              item.title,
+                            )
+                          }
                         >
                           Reject
                         </CanvaButton>
                         <CanvaButton
                           variant="primary"
                           className="w-full"
-                          onClick={() => handleApproveContent(item.moment_id)}
+                          onClick={() =>
+                            requestConfirmation(
+                              'approve',
+                              item.moment_id,
+                              item.title,
+                            )
+                          }
                         >
                           Approve
                         </CanvaButton>
@@ -1155,7 +1390,9 @@ export default function ModerationPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className={getActionColor(log.action_taken)}>
+                        <CanvaBadge
+                          className={getActionColor(log.action_taken)}
+                        >
                           {log.action_taken}
                         </CanvaBadge>
                       </TableCell>
@@ -1541,7 +1778,9 @@ export default function ModerationPage() {
                             {event.moderation_status}
                           </CanvaBadge>
                           <CanvaBadge variant="primary">
-                            {event.message_type === 'single' ? 'Bireysel' : 'Toplu'}
+                            {event.message_type === 'single'
+                              ? 'Bireysel'
+                              : 'Toplu'}
                           </CanvaBadge>
                           <span className="text-sm text-muted-foreground">
                             {formatDate(event.created_at)}
@@ -1588,7 +1827,9 @@ export default function ModerationPage() {
                         <CanvaButton
                           variant="primary"
                           size="sm"
-                          onClick={() => handleThankYouModeration(event.id, 'approve')}
+                          onClick={() =>
+                            handleThankYouModeration(event.id, 'approve')
+                          }
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
                           Onayla
@@ -1596,7 +1837,13 @@ export default function ModerationPage() {
                         <CanvaButton
                           variant="secondary"
                           size="sm"
-                          onClick={() => handleThankYouModeration(event.id, 'flag', 'Manual inceleme')}
+                          onClick={() =>
+                            handleThankYouModeration(
+                              event.id,
+                              'flag',
+                              'Manual inceleme',
+                            )
+                          }
                         >
                           <AlertTriangle className="h-4 w-4 mr-1" />
                           İşaretle
@@ -1604,7 +1851,13 @@ export default function ModerationPage() {
                         <CanvaButton
                           variant="danger"
                           size="sm"
-                          onClick={() => handleThankYouModeration(event.id, 'reject', 'Uygunsuz içerik')}
+                          onClick={() =>
+                            handleThankYouModeration(
+                              event.id,
+                              'reject',
+                              'Uygunsuz içerik',
+                            )
+                          }
                         >
                           <XCircle className="h-4 w-4 mr-1" />
                           Reddet
@@ -1618,6 +1871,71 @@ export default function ModerationPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Confirmation Dialog for Irreversible Actions */}
+      {confirmDialog.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <div className="w-full max-w-lg rounded-xl border border-white/15 bg-[#0f0f0f] p-6 text-white shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+                {confirmDialog.type === 'reject' && (
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                )}
+                {confirmDialog.type === 'approve' && (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                )}
+                {confirmDialog.type === 'ban' && (
+                  <Ban className="h-5 w-5 text-red-500" />
+                )}
+                {confirmDialog.type === 'reject'
+                  ? 'Reddetmek istiyor musunuz?'
+                  : confirmDialog.type === 'approve'
+                    ? 'Onaylamak istiyor musunuz?'
+                    : 'Bu işlemi gerçekleştirmek istiyor musunuz?'}
+              </DialogTitle>
+              <DialogDescription className="mt-2 text-sm text-gray-400">
+                Bu işlem geri alınamaz.
+                {confirmDialog.itemTitle && (
+                  <div className="mt-2 rounded-lg bg-white/5 p-3">
+                    <span className="font-medium">İçerik:</span>{' '}
+                    {confirmDialog.itemTitle}
+                  </div>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-6 flex gap-2">
+              <CanvaButton
+                variant="ghost"
+                onClick={() =>
+                  setConfirmDialog({
+                    open: false,
+                    type: null,
+                    itemId: null,
+                    itemTitle: '',
+                  })
+                }
+              >
+                İptal
+              </CanvaButton>
+              <CanvaButton
+                variant={
+                  confirmDialog.type === 'reject' ||
+                  confirmDialog.type === 'ban'
+                    ? 'danger'
+                    : 'primary'
+                }
+                onClick={confirmAction}
+              >
+                {confirmDialog.type === 'reject'
+                  ? 'Reddet'
+                  : confirmDialog.type === 'approve'
+                    ? 'Onayla'
+                    : 'Devam Et'}
+              </CanvaButton>
+            </DialogFooter>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

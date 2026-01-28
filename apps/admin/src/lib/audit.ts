@@ -84,7 +84,9 @@ export async function logAuditAction(
     logger.info('[Audit] Action logged successfully', { action: entry.action });
     return { success: true, method: 'primary' };
   } catch (primaryError) {
-    logger.warn('[Audit] Primary logging failed, trying fallback', primaryError);
+    logger.warn('[Audit] Primary logging failed, trying fallback', {
+      context: primaryError,
+    });
 
     // Fallback: Try logging to browser console/storage for web apps
     try {

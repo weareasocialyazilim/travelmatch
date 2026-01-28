@@ -11,8 +11,6 @@
   <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/>
   <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove"/>
-  <!-- P2 FIX: RECEIVE_BOOT_COMPLETED is used for push notification re-registration on boot -->
-  <!-- Required for reliable push notification delivery after device restart -->
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:node="remove"/>

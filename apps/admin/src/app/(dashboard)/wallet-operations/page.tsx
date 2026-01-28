@@ -461,15 +461,15 @@ export default function WalletOperationsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={payout.user_avatar || ''} />
+                              <AvatarImage src="" />
                               <AvatarFallback>
-                                {payout.user_name?.slice(0, 2) || 'NA'}
+                                {payout.user_id.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium">{payout.user_name}</p>
+                              <p className="font-medium">Kullanıcı</p>
                               <p className="text-xs text-muted-foreground">
-                                {payout.user_email}
+                                {payout.user_id.slice(0, 8)}...
                               </p>
                             </div>
                           </div>
@@ -482,27 +482,33 @@ export default function WalletOperationsPage() {
                         <TableCell>
                           <div>
                             <p className="font-medium">
-                              {payout.bank_details?.bank_name || '-'}
+                              {(payout.bank_details as { bank_name?: string })
+                                ?.bank_name || '-'}
                             </p>
                             <p className="text-xs text-muted-foreground font-mono">
-                              {payout.bank_details?.iban || '-'}
+                              {(payout.bank_details as { iban?: string })
+                                ?.iban || '-'}
                             </p>
                           </div>
                         </TableCell>
                         <TableCell>
                           <p className="text-sm">
-                            {new Date(payout.created_at).toLocaleDateString(
-                              'tr-TR',
-                            )}
+                            {payout.created_at
+                              ? new Date(payout.created_at).toLocaleDateString(
+                                  'tr-TR',
+                                )
+                              : '-'}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(payout.created_at).toLocaleTimeString(
-                              'tr-TR',
-                              {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              },
-                            )}
+                            {payout.created_at
+                              ? new Date(payout.created_at).toLocaleTimeString(
+                                  'tr-TR',
+                                  {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  },
+                                )
+                              : '-'}
                           </p>
                         </TableCell>
                         <TableCell>{getStatusBadge(payout.status)}</TableCell>
@@ -769,9 +775,9 @@ export default function WalletOperationsPage() {
                       <TableHead>Kullanıcı</TableHead>
                       <TableHead>Bakiye</TableHead>
                       <TableHead>Bekleyen</TableHead>
-                      <TableHead>Toplam Kazanç</TableHead>
-                      <TableHead>Toplam Çekim</TableHead>
-                      <TableHead>Son İşlem</TableHead>
+                      <TableHead>Döviz</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead>Son Güncelleme</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -783,9 +789,9 @@ export default function WalletOperationsPage() {
                               #{index + 1}
                             </span>
                             <div>
-                              <p className="font-medium">{wallet.user_name}</p>
+                              <p className="font-medium">Kullanıcı</p>
                               <p className="text-xs text-muted-foreground">
-                                {wallet.user_email}
+                                {wallet.user_id.slice(0, 8)}...
                               </p>
                             </div>
                           </div>
@@ -805,16 +811,22 @@ export default function WalletOperationsPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(wallet.total_earned)}
+                          <span className="text-muted-foreground">
+                            {wallet.currency_code || '-'}
+                          </span>
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(wallet.total_withdrawn)}
+                          <span className="text-muted-foreground">
+                            {wallet.status || '-'}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <p className="text-sm">
-                            {new Date(wallet.last_activity).toLocaleDateString(
-                              'tr-TR',
-                            )}
+                            {wallet.last_updated
+                              ? new Date(
+                                  wallet.last_updated,
+                                ).toLocaleDateString('tr-TR')
+                              : '-'}
                           </p>
                         </TableCell>
                       </TableRow>

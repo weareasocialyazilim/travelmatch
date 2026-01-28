@@ -40,16 +40,17 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-
   // Check for session expiration
   useEffect(() => {
-    if (searchParams?.get('reason') === 'session_expired') {
-      toast.error('Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
-      // Clean up URL to prevent toast on refresh
-      window.history.replaceState({}, '', '/login');
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('reason') === 'session_expired') {
+        toast.error('Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
+        // Clean up URL to prevent toast on refresh
+        window.history.replaceState({}, '', '/login');
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);

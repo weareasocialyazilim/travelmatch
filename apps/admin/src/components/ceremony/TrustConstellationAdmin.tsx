@@ -20,7 +20,7 @@ export function TrustConstellationAdmin() {
     queryFn: async (): Promise<TrustDistribution[]> => {
       const supabase = getClient();
       const { data } = await supabase.rpc('get_trust_score_distribution');
-      return data || [];
+      return (data as TrustDistribution[] | null) || [];
     },
   });
 

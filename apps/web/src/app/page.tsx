@@ -292,9 +292,7 @@ export default function App() {
                 <StoreBadge
                   platform="App Store"
                   punchline={
-                    lang === 'EN'
-                      ? 'Coming soon to iOS.'
-                      : 'Yakında iOS\'ta.'
+                    lang === 'EN' ? 'Coming soon to iOS.' : "Yakında iOS'ta."
                   }
                   type="apple"
                   color="pink"
@@ -357,21 +355,39 @@ export default function App() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                   {/* Step 1 */}
                   <div className="bg-zinc-900 p-8 border-4 border-[#FF00FF]">
-                    <div className="text-[#FF00FF] text-6xl font-black italic mb-6">01</div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">{t.howitworks_1_title}</h3>
-                    <p className="text-zinc-400 font-medium">{t.howitworks_1_desc}</p>
+                    <div className="text-[#FF00FF] text-6xl font-black italic mb-6">
+                      01
+                    </div>
+                    <h3 className="text-2xl font-black uppercase text-white mb-4">
+                      {t.howitworks_1_title}
+                    </h3>
+                    <p className="text-zinc-400 font-medium">
+                      {t.howitworks_1_desc}
+                    </p>
                   </div>
                   {/* Step 2 */}
                   <div className="bg-zinc-900 p-8 border-4 border-[#00FFFF]">
-                    <div className="text-[#00FFFF] text-6xl font-black italic mb-6">02</div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">{t.howitworks_2_title}</h3>
-                    <p className="text-zinc-400 font-medium">{t.howitworks_2_desc}</p>
+                    <div className="text-[#00FFFF] text-6xl font-black italic mb-6">
+                      02
+                    </div>
+                    <h3 className="text-2xl font-black uppercase text-white mb-4">
+                      {t.howitworks_2_title}
+                    </h3>
+                    <p className="text-zinc-400 font-medium">
+                      {t.howitworks_2_desc}
+                    </p>
                   </div>
                   {/* Step 3 */}
                   <div className="bg-zinc-900 p-8 border-4 border-[#39FF14]">
-                    <div className="text-[#39FF14] text-6xl font-black italic mb-6">03</div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">{t.howitworks_3_title}</h3>
-                    <p className="text-zinc-400 font-medium">{t.howitworks_3_desc}</p>
+                    <div className="text-[#39FF14] text-6xl font-black italic mb-6">
+                      03
+                    </div>
+                    <h3 className="text-2xl font-black uppercase text-white mb-4">
+                      {t.howitworks_3_title}
+                    </h3>
+                    <p className="text-zinc-400 font-medium">
+                      {t.howitworks_3_desc}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -755,7 +771,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {selected && (
+        {selected ? (
           <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/98 p-4 backdrop-blur-3xl overflow-y-auto">
             <motion.div
               initial={{ scale: 0.9, y: 50 }}
@@ -865,7 +881,7 @@ export default function App() {
               </div>
             </motion.div>
           </div>
-        )}
+        ) : null}
       </AnimatePresence>
     </div>
   );

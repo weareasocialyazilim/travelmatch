@@ -37,7 +37,7 @@ const ConnectedAccountsScreen: React.FC = () => {
       icon: 'instagram',
       color: COLORS.instagram,
       connected: true,
-      username: '@sophia_travels',
+      username: '@sophia_creative',
       followers: 15200,
     },
     {

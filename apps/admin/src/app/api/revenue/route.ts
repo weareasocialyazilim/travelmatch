@@ -23,42 +23,35 @@ export async function GET() {
     const supabase = createServiceClient();
 
     // Parallel data fetching
-    const [paymentsResult, subscriptionsResult, transactionsResult] =
-      await Promise.all([
-        // All completed payments
-        supabase
-          .from('payments')
-          .select('id, amount, currency, status, type, created_at, user_id')
-          .eq('status', 'completed')
-          .order('created_at', { ascending: false }),
+    const [paymentsResult, transactionsResult] = await Promise.all([
+      // All completed payments
+      supabase
+        .from('payment_transactions')
+        .select(
+          'id, amount, currency, status, payment_method, created_at, user_id',
+        )
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false }),
 
-        // Active subscriptions
-        supabase
-          .from('subscriptions')
-          .select('id, plan, amount, status, started_at, expires_at, user_id')
-          .eq('status', 'active'),
-
-        // Recent transactions for chart
-        supabase
-          .from('payments')
-          .select('amount, type, created_at')
-          .eq('status', 'completed')
-          .gte(
-            'created_at',
-            new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
-          )
-          .order('created_at', { ascending: true }),
-      ]);
+      // Recent transactions for chart (last 6 months)
+      supabase
+        .from('payment_transactions')
+        .select('amount, payment_method, created_at')
+        .eq('status', 'completed')
+        .gte(
+          'created_at',
+          new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+        )
+        .order('created_at', { ascending: true }),
+    ]);
 
     const payments: Array<{
       id: string;
       amount: number;
-      type: string;
-      created_at: string;
+      payment_method: string | null;
+      created_at: string | null;
     }> = paymentsResult.data || [];
-    const subscriptions: Array<{ id: string; amount: number; plan: string }> =
-      subscriptionsResult.data || [];
-    const transactions: Array<{ amount: number; created_at: string }> =
+    const transactions: Array<{ amount: number; created_at: string | null }> =
       transactionsResult.data || [];
 
     // Calculate overview metrics
@@ -66,50 +59,36 @@ export async function GET() {
       (sum: number, p) => sum + (p.amount || 0),
       0,
     );
-    const subscriptionRevenue = payments
-      .filter((p) => p.type === 'subscription')
+    const cardPayments = payments
+      .filter(
+        (p) =>
+          p.payment_method === 'card' || p.payment_method === 'credit_card',
+      )
       .reduce((sum: number, p) => sum + (p.amount || 0), 0);
-    const giftRevenue = payments
-      .filter((p) => p.type === 'gift')
-      .reduce((sum: number, p) => sum + (p.amount || 0), 0);
-    const otherRevenue = totalRevenue - subscriptionRevenue - giftRevenue;
+    const otherPayments = totalRevenue - cardPayments;
 
     // Calculate monthly revenue
     const monthlyRevenue = calculateMonthlyRevenue(transactions);
 
-    // Calculate revenue by product type
+    // Calculate revenue by payment method
     const revenueByProduct = [
-      { name: 'Premium', value: subscriptionRevenue, color: '#8b5cf6' },
-      { name: 'Hediyeler', value: giftRevenue, color: '#10b981' },
-      { name: 'Diğer', value: otherRevenue, color: '#f59e0b' },
+      { name: 'Kart', value: cardPayments, color: '#8b5cf6' },
+      { name: 'Diğer', value: otherPayments, color: '#10b981' },
     ];
-
-    // Active subscription stats
-    const activeSubscriptions = subscriptions.length;
-    const avgSubscriptionValue =
-      activeSubscriptions > 0
-        ? subscriptions.reduce((sum: number, s) => sum + (s.amount || 0), 0) /
-          activeSubscriptions
-        : 0;
-
-    // MRR calculation
-    const mrr = subscriptions.reduce(
-      (sum: number, s) => sum + (s.amount || 0),
-      0,
-    );
-    const arr = mrr * 12;
 
     // Growth calculation (compare last 30 days vs previous 30 days)
     const last30Days = payments
       .filter(
         (p) =>
+          p.created_at &&
           new Date(p.created_at) >
-          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       )
       .reduce((sum: number, p) => sum + (p.amount || 0), 0);
 
     const previous30Days = payments
       .filter((p) => {
+        if (!p.created_at) return false;
         const date = new Date(p.created_at);
         return (
           date > new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) &&
@@ -126,11 +105,11 @@ export async function GET() {
     return NextResponse.json({
       overview: {
         totalRevenue,
-        mrr,
-        arr,
+        mrr: 0,
+        arr: 0,
         growthRate: Math.round(growthRate * 10) / 10,
-        activeSubscriptions,
-        avgSubscriptionValue: Math.round(avgSubscriptionValue),
+        activeSubscriptions: 0,
+        avgSubscriptionValue: 0,
       },
       monthlyRevenue,
       revenueByProduct,
@@ -165,7 +144,7 @@ export async function GET() {
 }
 
 function calculateMonthlyRevenue(
-  transactions: { amount: number; created_at: string }[],
+  transactions: { amount: number; created_at: string | null }[],
 ) {
   const months = 6;
   const result = [];
@@ -180,7 +159,7 @@ function calculateMonthlyRevenue(
     });
 
     const total = transactions
-      .filter((t) => t.created_at.startsWith(monthStr))
+      .filter((t) => t.created_at?.startsWith(monthStr))
       .reduce((sum, t) => sum + (t.amount || 0), 0);
 
     result.push({

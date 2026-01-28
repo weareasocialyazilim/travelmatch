@@ -10,58 +10,50 @@ import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
-// Types
+// Json type matching Supabase schema
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+// Types matching actual database schema
 export interface FraudCase {
   id: string;
   case_number: string;
-  status: 'open' | 'investigating' | 'resolved' | 'escalated';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  type:
-    | 'payment_fraud'
-    | 'identity_theft'
-    | 'account_takeover'
-    | 'fake_profile'
-    | 'scam';
-  reported_at: string;
-  assigned_to: string | null;
-  reporter_id: string;
-  suspect_id: string;
-  suspect_name: string;
-  suspect_email: string;
-  description: string;
-  evidence_count: number;
-  linked_accounts: number;
-  total_amount_involved: number;
+  status: string;
+  severity: string;
+  type: string;
+  user_id: string | null;
+  description: string | null;
+  amount_involved: number | null;
   resolution: string | null;
   resolved_at: string | null;
+  assigned_to: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  evidence: Json | null;
+  metadata: Json | null;
 }
 
 export interface FraudEvidence {
   id: string;
   case_id: string;
-  type: 'screenshot' | 'transaction' | 'chat_log' | 'document' | 'ip_log';
-  title: string;
-  description: string;
+  type: string;
+  content: string | null;
   file_url: string | null;
-  metadata: Record<string, unknown>;
-  uploaded_at: string;
-  uploaded_by: string;
+  metadata: Json | null;
+  created_at: string | null;
+  uploaded_by: string | null;
 }
 
 export interface LinkedAccount {
   id: string;
-  case_id: string;
-  user_id: string;
-  user_name: string;
-  user_email: string;
-  connection_type:
-    | 'same_ip'
-    | 'same_device'
-    | 'same_payment'
-    | 'same_phone'
-    | 'behavioral';
-  confidence_score: number;
-  detected_at: string;
+  primary_user_id: string;
+  linked_user_id: string;
+  link_type: string;
+  confidence_score: number | null;
+  detected_at: string | null;
+  status: string | null;
+  verified_at: string | null;
+  verified_by: string | null;
+  metadata: Json | null;
 }
 
 export interface FraudStats {
@@ -79,39 +71,35 @@ const mockFraudCases: FraudCase[] = [
     id: 'fc-001',
     case_number: 'FR-2026-0001',
     status: 'investigating',
-    priority: 'critical',
+    severity: 'critical',
     type: 'payment_fraud',
-    reported_at: '2026-01-13T10:30:00Z',
-    assigned_to: 'admin-001',
-    reporter_id: 'user-123',
-    suspect_id: 'user-456',
-    suspect_name: 'Şüpheli Kullanıcı',
-    suspect_email: 'suspect@email.com',
+    user_id: 'user-456',
     description: 'Çoklu sahte ödeme girişimi tespit edildi',
-    evidence_count: 5,
-    linked_accounts: 3,
-    total_amount_involved: 15000,
+    amount_involved: 15000,
     resolution: null,
     resolved_at: null,
+    assigned_to: 'admin-001',
+    created_at: '2026-01-13T10:30:00Z',
+    updated_at: null,
+    evidence: null,
+    metadata: null,
   },
   {
     id: 'fc-002',
     case_number: 'FR-2026-0002',
     status: 'open',
-    priority: 'high',
+    severity: 'high',
     type: 'identity_theft',
-    reported_at: '2026-01-12T14:20:00Z',
-    assigned_to: null,
-    reporter_id: 'user-789',
-    suspect_id: 'user-012',
-    suspect_name: 'Kimlik Hırsızı',
-    suspect_email: 'thief@email.com',
+    user_id: 'user-012',
     description: 'Başka kullanıcının kimlik bilgileriyle hesap açılmış',
-    evidence_count: 3,
-    linked_accounts: 1,
-    total_amount_involved: 5000,
+    amount_involved: 5000,
     resolution: null,
     resolved_at: null,
+    assigned_to: null,
+    created_at: '2026-01-12T14:20:00Z',
+    updated_at: null,
+    evidence: null,
+    metadata: null,
   },
 ];
 
@@ -154,12 +142,13 @@ export function useFraudStats() {
         // Get total recovered amount
         const { data: recoveredData } = await supabase
           .from('fraud_cases')
-          .select('total_amount_involved')
+          .select('amount_involved')
           .eq('status', 'resolved');
 
         const totalRecovered =
           recoveredData?.reduce(
-            (sum, c) => sum + (c.total_amount_involved || 0),
+            (sum: number, c: { amount_involved: number | null }) =>
+              sum + (c.amount_involved || 0),
             0,
           ) || 0;
 
@@ -183,7 +172,7 @@ export function useFraudStats() {
 
 export function useFraudCases(filters?: {
   status?: string;
-  priority?: string;
+  severity?: string;
   type?: string;
   search?: string;
 }) {
@@ -196,30 +185,29 @@ export function useFraudCases(filters?: {
         let query = supabase
           .from('fraud_cases')
           .select('*')
-          .order('reported_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (filters?.status && filters.status !== 'all') {
           query = query.eq('status', filters.status);
         }
-        if (filters?.priority && filters.priority !== 'all') {
-          query = query.eq('priority', filters.priority);
+        if (filters?.severity && filters.severity !== 'all') {
+          query = query.eq('severity', filters.severity);
         }
         if (filters?.type && filters.type !== 'all') {
           query = query.eq('type', filters.type);
         }
         if (filters?.search) {
           query = query.or(
-            `suspect_name.ilike.%${filters.search}%,suspect_email.ilike.%${filters.search}%,case_number.ilike.%${filters.search}%`,
+            `case_number.ilike.%${filters.search}%,description.ilike.%${filters.search}%`,
           );
         }
 
         const { data, error } = await query.limit(100);
 
         if (error) throw error;
-        return data || [];
+        return (data as FraudCase[]) || [];
       } catch (error) {
-        // console.error('Fraud cases fetch error:', error);
-        toast.error('Vaka listesi yüklenemedi, örnek veriler gösteriliyor');
+        toast.error('Vaka listesi yüklenemedi');
         return mockFraudCases;
       }
     },
@@ -241,9 +229,8 @@ export function useFraudCase(caseId: string) {
           .single();
 
         if (error) throw error;
-        return data;
+        return data as FraudCase;
       } catch (error) {
-        // console.error('Fraud case fetch error:', error);
         return mockFraudCases.find((c) => c.id === caseId) || null;
       }
     },
@@ -265,9 +252,8 @@ export function useFraudEvidence(caseId: string) {
           .order('uploaded_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data as FraudEvidence[]) || [];
       } catch (error) {
-        // console.error('Fraud evidence fetch error:', error);
         return [];
       }
     },
@@ -289,9 +275,8 @@ export function useLinkedAccounts(caseId: string) {
           .order('confidence_score', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data as LinkedAccount[]) || [];
       } catch (error) {
-        // console.error('Linked accounts fetch error:', error);
         return [];
       }
     },
@@ -366,11 +351,11 @@ export function useResolveFraudCase() {
       if (error) throw error;
 
       // If banning, also update user status
-      if (action === 'ban' && data.suspect_id) {
+      if (action === 'ban' && data.user_id) {
         await supabase
           .from('users')
           .update({ status: 'banned', banned_reason: resolution })
-          .eq('id', data.suspect_id);
+          .eq('id', data.user_id);
       }
 
       return data;

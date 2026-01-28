@@ -5,9 +5,9 @@ import { getAdminSession, hasPermission } from '@/lib/auth';
 import { escapeSupabaseFilter } from '@/lib/security';
 
 interface Transaction {
-  amount?: number;
-  status?: string;
-  type?: string;
+  amount: number | null;
+  status: string | null;
+  type: string | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -56,8 +56,8 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        sender:users!transactions_sender_id_fkey(id, display_name, avatar_url, email),
-        receiver:users!transactions_receiver_id_fkey(id, display_name, avatar_url, email),
+        sender:users!transactions_sender_id_fkey(id, full_name, avatar_url, email),
+        recipient:users!transactions_recipient_id_fkey(id, full_name, avatar_url, email),
         moment:moments(id, title)
       `,
         { count: 'exact' },
@@ -95,7 +95,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary stats
-    type Transaction = { amount?: number; status?: string; type?: string };
+    type Transaction = {
+      amount: number | null;
+      status: string | null;
+      type: string | null;
+    };
     const summary = {
       total: count || 0,
       totalAmount:

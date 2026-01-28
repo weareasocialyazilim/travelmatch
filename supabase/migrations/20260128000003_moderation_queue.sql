@@ -1,6 +1,6 @@
 -- ============================================================================
-// Admin Moderation Queue and Audit Log
-// ============================================================================
+--  Admin Moderation Queue and Audit Log
+--  ============================================================================
 
 -- Moderation queue for human review
 CREATE TABLE IF NOT EXISTS moderation_queue (
@@ -139,8 +139,8 @@ CREATE INDEX idx_media_mod_status ON message_media_moderation(moderation_status)
 CREATE INDEX idx_media_mod_user ON message_media_moderation(user_id);
 
 -- ============================================================================
-// AUTO-QUEUE FUNCTION
-// ============================================================================
+--  AUTO-QUEUE FUNCTION
+--  ============================================================================
 
 -- Auto-queue content for review when flagged
 CREATE OR REPLACE FUNCTION auto_queue_for_moderation(
@@ -217,8 +217,8 @@ CREATE TRIGGER on_message_blocked
   EXECUTE FUNCTION queue_blocked_message();
 
 -- ============================================================================
-// MODERATION ACTIONS
-// ============================================================================
+--  MODERATION ACTIONS
+--  ============================================================================
 
 -- Record moderation action
 CREATE OR REPLACE FUNCTION record_moderation_action(
@@ -276,7 +276,7 @@ END;
 $$;
 
 -- ============================================================================
-// VIEW: Pending Moderation Queue
+--  VIEW: Pending Moderation Queue
 -- ============================================================================
 
 CREATE OR REPLACE VIEW v_moderation_queue AS
@@ -304,7 +304,7 @@ LEFT JOIN users u ON mq.reporter_id = u.id
 WHERE mq.status IN ('pending', 'in_review');
 
 -- ============================================================================
-// VIEW: Moderator Stats
+--  VIEW: Moderator Stats
 -- ============================================================================
 
 CREATE OR REPLACE VIEW v_moderator_stats AS
@@ -323,8 +323,8 @@ WHERE ma.created_at > NOW() - INTERVAL '7 days'
 GROUP BY ma.moderator_id, u.username;
 
 -- ============================================================================
-// RLS POLICIES
-// ============================================================================
+--  RLS POLICIES
+--  ============================================================================
 
 ALTER TABLE moderation_queue ENABLE ROW LEVEL SECURITY;
 ALTER TABLE moderation_actions ENABLE ROW LEVEL SECURITY;
@@ -376,7 +376,7 @@ CREATE POLICY "Admins view media moderation" ON message_media_moderation
   );
 
 -- ============================================================================
-// GRANT EXECUTE
+--  GRANT EXECUTE
 -- ============================================================================
 
 GRANT EXECUTE ON FUNCTION auto_queue_for_moderation TO authenticated;

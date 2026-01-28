@@ -116,7 +116,7 @@ drop trigger if exists "trg_log_consent_change" on "public"."user_consents";
 
 drop trigger if exists "check_warnings_trigger" on "public"."user_moderation_warnings";
 
-drop trigger if exists "trg_log_status_change" on "public"."user_safety";
+-- drop trigger if exists "trg_log_status_change" on "public"."user_safety"; -- table doesn't exist
 
 drop trigger if exists "prevent_sensitive_updates_trigger" on "public"."users";
 
@@ -180,7 +180,7 @@ drop policy "reviews_insert_verified" on "public"."reviews";
 
 drop policy "reviews_select_secure" on "public"."reviews";
 
-drop policy "Admins can view all uploads" on "public"."uploaded_images";
+-- drop policy "Admins can view all uploads" on "public"."uploaded_images"; -- policy doesn't exist;
 
 drop policy "user_warnings_admin_insert_delete" on "public"."user_moderation_warnings";
 

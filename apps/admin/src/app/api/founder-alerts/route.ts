@@ -227,7 +227,9 @@ export async function GET() {
         }
       } catch (queryError) {
         // Log error but continue with other alerts
-        logger.warn(`Alert query failed for ${definition.key}:`, queryError);
+        logger.warn(`Alert query failed for ${definition.key}:`, {
+          error: queryError,
+        });
       }
     }
 

@@ -242,6 +242,71 @@ serve(async (req) => {
 
     await supabase.from('uploaded_images').insert(imageRecord);
 
+    // 8.5 Trigger automatic content moderation (P0-E compliance)
+    // Moderation is required for all user-uploaded content before it becomes visible
+    const mediaUrl = uploadData.result.variants[0];
+    let moderationStatus = 'pending';
+    let moderationLabels: string[] = [];
+    let moderationConfidence = 0;
+
+    try {
+      logger.info('[Moderation] Starting auto-moderation for upload:', {
+        imageId: uploadData.result.id,
+        userId: user.id,
+        type: metadata.type || 'general',
+      });
+
+      const moderationResponse = await fetch(
+        `${Deno.env.get('SUPABASE_URL')}/functions/v1/moderate-media`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({
+            mediaUrl,
+            mediaType: 'image',
+            conversationId: metadata.conversationId || `upload-${uploadData.result.id}`,
+            messageId: metadata.messageId,
+          }),
+        },
+      );
+
+      if (moderationResponse.ok) {
+        const moderationResult = await moderationResponse.json();
+        moderationStatus = moderationResult.status || 'pending';
+        moderationLabels = moderationResult.moderationLabels?.map((l: any) => l.name) || [];
+        moderationConfidence = moderationResult.confidence || 0;
+
+        logger.info('[Moderation] Complete:', {
+          imageId: uploadData.result.id,
+          status: moderationStatus,
+          labels: moderationLabels,
+        });
+      } else {
+        logger.warn('[Moderation] Failed, will retry later:', {
+          imageId: uploadData.result.id,
+          status: moderationResponse.status,
+        });
+        // Moderation will be retried by admin or client
+      }
+    } catch (moderationError) {
+      logger.warn('[Moderation] Error, will retry later:', {
+        imageId: uploadData.result.id,
+        error: moderationError,
+      });
+      // Continue - moderation can be retried later
+    }
+
+    // Update record with moderation results
+    await supabase.from('uploaded_images').update({
+      moderation_status: moderationStatus,
+      moderation_labels: moderationLabels,
+      moderation_confidence: moderationConfidence,
+      moderation_at: new Date().toISOString(),
+    }).eq('id', uploadData.result.id);
+
     // 9. Return successful response
     const response = createSuccessResponse<UploadImageResponse>({
       id: uploadData.result.id,

@@ -26,14 +26,16 @@
     <array>
       <dict>
         <key>CFBundleURLName</key>
-        <string>com.lovendo.mobile</string>
+        <string>com.lovendo.app</string>
         <key>CFBundleURLSchemes</key>
         <array>
           <string>lovendo</string>
-<<<<<<< Updated upstream
-=======
-          <string>com.lovendo.app</string>
->>>>>>> Stashed changes
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+lovendo</string>
         </array>
       </dict>
     </array>

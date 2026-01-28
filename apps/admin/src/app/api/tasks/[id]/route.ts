@@ -70,7 +70,10 @@ export async function PATCH(
     if (body.assigned_roles) updateData.assigned_roles = body.assigned_roles;
     if (body.due_date !== undefined) updateData.due_date = body.due_date;
     if (body.metadata)
-      updateData.metadata = { ...currentTask.metadata, ...body.metadata };
+      updateData.metadata = {
+        ...((currentTask.metadata || {}) as Record<string, unknown>),
+        ...(body.metadata as Record<string, unknown>),
+      };
 
     // Handle completion
     if (body.status === 'completed') {

@@ -75,26 +75,20 @@ export async function GET(request: NextRequest) {
       systemHealthResult,
     ] = await Promise.all([
       // Total users count
-      supabase.from('profiles').select('*', {
-        count: 'exact',
-        head: true,
-      }),
+      supabase.from('users').select('id', { count: 'exact', head: true }),
 
       // Total moments count
-      supabase.from('moments').select('*', {
-        count: 'exact',
-        head: true,
-      }),
+      supabase.from('moments').select('id', { count: 'exact', head: true }),
 
       // Pending tasks count
       supabase
         .from('tasks')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('status', 'pending'),
 
       // Revenue calculation from payments (last 6 months only for performance)
       supabase
-        .from('payments')
+        .from('payment_transactions')
         .select('amount, status, created_at')
         .eq('status', 'completed')
         .gte(
@@ -104,7 +98,7 @@ export async function GET(request: NextRequest) {
 
       // Recent users for activity chart (last 30 days)
       supabase
-        .from('profiles')
+        .from('users')
         .select('created_at')
         .gte(
           'created_at',
@@ -122,9 +116,9 @@ export async function GET(request: NextRequest) {
         )
         .order('created_at', { ascending: true }),
 
-      // Active users in last 24h (from activity_logs)
+      // Active users in last 24h (from audit_logs)
       supabase
-        .from('activity_logs')
+        .from('audit_logs')
         .select('user_id', { count: 'exact', head: false })
         .gte(
           'created_at',
@@ -138,15 +132,22 @@ export async function GET(request: NextRequest) {
 
     // Calculate monthly revenue for chart
     const monthlyRevenue = calculateMonthlyData(
-      paymentsResult.data || [],
+      (paymentsResult.data || []) as {
+        created_at: string | null;
+        amount: number;
+      }[],
       'amount',
     );
 
     // Calculate daily user registrations for chart
-    const dailyUsers = calculateDailyData(recentUsersResult.data || []);
+    const dailyUsers = calculateDailyData(
+      (recentUsersResult.data || []) as { created_at: string | null }[],
+    );
 
     // Calculate daily moments for chart
-    const dailyMoments = calculateDailyData(recentMomentsResult.data || []);
+    const dailyMoments = calculateDailyData(
+      (recentMomentsResult.data || []) as { created_at: string | null }[],
+    );
 
     // Get pending tasks list
     const { data: pendingTasks } = await supabase
@@ -158,16 +159,18 @@ export async function GET(request: NextRequest) {
 
     // Get recent activities
     const { data: recentActivities } = await supabase
-      .from('activity_logs')
+      .from('audit_logs')
       .select(
         'id, action, entity_type, entity_id, user_id, created_at, metadata',
       )
       .order('created_at', { ascending: false })
       .limit(20);
 
-    // System health metrics - count distinct active users from activity_logs
+    // System health metrics - count distinct active users from audit_logs
     const activeUserIds = new Set(
-      (systemHealthResult.data || []).map((r: { user_id: string }) => r.user_id)
+      (systemHealthResult.data || [])
+        .filter((r): r is { user_id: string } => r.user_id != null)
+        .map((r) => r.user_id),
     );
     const activeUsers24h = activeUserIds.size;
     const totalUsers = usersResult.count || 0;
@@ -176,8 +179,8 @@ export async function GET(request: NextRequest) {
 
     // Calculate week-over-week growth
     const { count: lastWeekCount } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
+      .from('users')
+      .select('id', { count: 'exact', head: true })
       .lt(
         'created_at',
         new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -301,7 +304,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper: Calculate daily data from records with created_at
-function calculateDailyData(records: { created_at: string }[]) {
+function calculateDailyData(records: { created_at: string | null }[]) {
   const days = 14; // Last 14 days
   const labels: string[] = [];
   const data: number[] = [];
@@ -316,7 +319,7 @@ function calculateDailyData(records: { created_at: string }[]) {
     );
 
     const count = records.filter((r) =>
-      r.created_at.startsWith(dateStr),
+      r.created_at?.startsWith(dateStr),
     ).length;
 
     data.push(count);
@@ -327,7 +330,7 @@ function calculateDailyData(records: { created_at: string }[]) {
 
 // Helper: Calculate monthly data from payment records
 function calculateMonthlyData(
-  records: { created_at: string; amount: number }[],
+  records: { created_at: string | null; amount: number }[],
   field: 'amount',
 ) {
   const months = 6; // Last 6 months
@@ -342,7 +345,7 @@ function calculateMonthlyData(
     labels.push(date.toLocaleDateString('tr-TR', { month: 'short' }));
 
     const total = records
-      .filter((r) => r.created_at.startsWith(monthStr))
+      .filter((r) => r.created_at?.startsWith(monthStr))
       .reduce((sum, r) => sum + (r[field] || 0), 0);
 
     data.push(total);

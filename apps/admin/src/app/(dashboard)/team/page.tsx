@@ -197,7 +197,7 @@ async function fetchTeamStats(): Promise<TeamStats> {
     const supabase = getClient();
 
     // Try to fetch from team_stats view or aggregate from profiles
-    const { data: profiles, error } = await supabase
+    const { data: profiles, error } = await (supabase as any)
       .from('profiles')
       .select('id, status')
       .eq('role', 'team_member');
@@ -211,7 +211,7 @@ async function fetchTeamStats(): Promise<TeamStats> {
 
       // Fetch tasks completed today
       const today = new Date().toISOString().split('T')[0];
-      const { data: tasks } = await supabase
+      const { data: tasks } = await (supabase as any)
         .from('tasks')
         .select('id')
         .gte('completed_at', today)
@@ -236,7 +236,7 @@ async function fetchTeamMembers(): Promise<TeamMember[]> {
   try {
     const supabase = getClient();
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('admin_users')
       .select(
         `
@@ -293,7 +293,7 @@ async function fetchShifts(): Promise<Shift[]> {
   try {
     const supabase = getClient();
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('shifts')
       .select('*')
       .order('start_time', { ascending: true });
@@ -342,7 +342,7 @@ async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
     const supabase = getClient();
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('admin_users')
       .select('full_name, tasks_completed, rating')
       .order('tasks_completed', { ascending: false })
@@ -351,21 +351,12 @@ async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
     if (error) throw error;
 
     if (data && data.length > 0) {
-      return data.map(
-        (
-          entry: {
-            full_name: string;
-            tasks_completed?: number;
-            rating?: number;
-          },
-          index: number,
-        ) => ({
-          rank: index + 1,
-          name: entry.full_name,
-          tasks: entry.tasks_completed || 0,
-          rating: entry.rating || 4.5,
-        }),
-      );
+      return data.map((entry: any, index: number) => ({
+        rank: index + 1,
+        name: entry.full_name,
+        tasks: entry.tasks_completed || 0,
+        rating: entry.rating || 4.5,
+      }));
     }
 
     return mockLeaderboard;

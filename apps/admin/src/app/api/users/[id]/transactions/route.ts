@@ -15,17 +15,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     // Check permission for viewing transactions
     if (!hasPermission(session, 'transactions', 'view')) {
       return NextResponse.json(
         { error: 'Bu işlem için yetkiniz yok' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -55,28 +52,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       logger.error('Failed to fetch user transactions:', error);
       return NextResponse.json(
         { error: 'İşlemler alınamadı' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Get wallet balance
     const { data: wallet } = await supabase
       .from('wallets')
-      .select('balance, pending_balance, total_earned, total_spent, currency')
+      .select('balance, pending_balance, currency')
       .eq('user_id', userId)
       .single();
 
     // Calculate totals
     const totals = {
-      total_spent: wallet?.total_spent || 0,
-      total_earned: wallet?.total_earned || 0,
       current_balance: wallet?.balance || 0,
       pending_balance: wallet?.pending_balance || 0,
       currency: wallet?.currency || 'TRY',
     };
 
     // Transform transactions for response
-    const transformedTransactions = (transactions || []).map(txn => ({
+    const transformedTransactions = (transactions || []).map((txn) => ({
       id: txn.id,
       type: txn.type,
       amount: txn.amount,
@@ -85,7 +80,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       description: txn.description || getTransactionDescription(txn.type),
       metadata: txn.metadata,
       created_at: txn.created_at,
-      completed_at: txn.completed_at,
     }));
 
     return NextResponse.json({
@@ -97,10 +91,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logger.error('User transactions API error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }
 

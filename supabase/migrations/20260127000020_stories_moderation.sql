@@ -1,7 +1,7 @@
 -- ============================================================================
-// Stories Moderation Pipeline
-// Integrates with existing AWS Rekognition pattern
-// ============================================================================
+--  Stories Moderation Pipeline
+--  Integrates with existing AWS Rekognition pattern
+--  ============================================================================
 
 -- Add moderation columns
 ALTER TABLE stories ADD COLUMN IF NOT EXISTS moderation_status VARCHAR(20) DEFAULT 'pending' CHECK (

@@ -4,15 +4,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface User {
   id: string;
-  display_name: string;
+  full_name: string;
   email?: string;
   avatar_url?: string;
   bio?: string;
-  is_verified: boolean;
-  is_active: boolean;
+  verified: boolean;
   is_suspended: boolean;
   is_banned: boolean;
-  verification_level: number;
   created_at: string;
   last_active_at?: string;
   // Status and moderation fields
@@ -50,7 +48,6 @@ interface UserFilters {
 interface UserDetails extends User {
   stats: {
     moments: number;
-    matches: number;
     reports: number;
   };
   recent_transactions: Array<{
@@ -179,9 +176,8 @@ export function useVerifyUser() {
 
   return {
     ...updateUser,
-    mutate: (id: string) =>
-      updateUser.mutate({ id, data: { is_verified: true } }),
+    mutate: (id: string) => updateUser.mutate({ id, data: { verified: true } }),
     mutateAsync: (id: string) =>
-      updateUser.mutateAsync({ id, data: { is_verified: true } }),
+      updateUser.mutateAsync({ id, data: { verified: true } }),
   };
 }

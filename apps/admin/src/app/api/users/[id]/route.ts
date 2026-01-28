@@ -2,10 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
-import {
-  sanitizeUUID,
-  buildSafeMultiColumnUUIDFilter,
-} from '@/lib/query-utils';
+import { sanitizeUUID } from '@/lib/query-utils';
 
 export async function GET(
   request: NextRequest,
@@ -47,36 +44,23 @@ export async function GET(
       );
     }
 
-    // SECURITY: Build safe filter for multi-column OR query (VULN-001)
-    const matchFilter = buildSafeMultiColumnUUIDFilter(
-      ['user1_id', 'user2_id'],
-      id,
-    );
-
     // Get user stats
     const [
       { count: momentCount },
-      { count: matchCount },
       { count: reportCount },
       { data: recentTransactions },
     ] = await Promise.all([
       supabase
         .from('moments')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('user_id', id),
-      matchFilter
-        ? supabase
-            .from('matches')
-            .select('*', { count: 'exact', head: true })
-            .or(matchFilter)
-        : Promise.resolve({ count: 0 }),
       supabase
         .from('reports')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('reported_user_id', id),
       supabase
         .from('transactions')
-        .select('*')
+        .select('id, amount, status, created_at')
         .eq('user_id', id)
         .order('created_at', { ascending: false })
         .limit(10),
@@ -86,7 +70,6 @@ export async function GET(
       user,
       stats: {
         moments: momentCount || 0,
-        matches: matchCount || 0,
         reports: reportCount || 0,
       },
       recent_transactions: recentTransactions || [],

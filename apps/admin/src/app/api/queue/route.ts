@@ -1,7 +1,7 @@
 import { createServiceClient } from '@/lib/supabase.server';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
-import type { Database } from '@/types/database';
+import type { Database, Json } from '@/types/database';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 
 type TaskRow = Database['public']['Tables']['tasks']['Row'];
@@ -179,7 +179,9 @@ export async function POST(request: Request) {
         priority: (body.priority || 'medium') as TaskRow['priority'],
         assigned_to: body.assigned_to,
         due_date: body.due_date,
-        metadata: body.metadata || {},
+        resource_id: body.resource_id || '',
+        resource_type: body.resource_type || '',
+        metadata: (body.metadata || {}) as Json,
       })
       .select()
       .single();

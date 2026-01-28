@@ -4,7 +4,8 @@ import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 import type { Database } from '@/types/database';
 
-type KycSubmissionRow = Database['public']['Tables']['kyc_submissions']['Row'];
+type KycVerificationRow =
+  Database['public']['Tables']['kyc_verifications']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,9 +26,9 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // First try kyc_submissions table
+    // Query kyc_verifications table
     let query = supabase
-      .from('kyc_submissions')
+      .from('kyc_verifications')
       .select(
         `
         *,
@@ -47,21 +48,18 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (status) {
-      query = query.eq('status', status as KycSubmissionRow['status']);
-    } else {
-      // Default to showing pending submissions
-      query = query.eq('status', 'pending');
+      query = query.eq('status', status);
     }
 
     if (userId) {
       query = query.eq('user_id', userId);
     }
 
-    const { data: submissions, count, error } = await query;
+    const { data: verifications, count, error } = await query;
 
     if (error) {
       logger.error('KYC query error:', error);
-      // If table doesn't exist, query users for KYC status
+      // Fallback to users table
       const usersQuery = supabase
         .from('users')
         .select(
@@ -92,12 +90,12 @@ export async function GET(request: NextRequest) {
 
       type UserKyc = {
         id: string;
-        kyc_status?: string;
-        created_at: string;
+        kyc_status?: string | null;
+        created_at: string | null;
         full_name?: string;
-        avatar_url?: string;
+        avatar_url?: string | null;
         email?: string;
-        phone?: string;
+        phone?: string | null;
       };
       return NextResponse.json({
         submissions: users?.map((p: UserKyc) => ({
@@ -123,16 +121,17 @@ export async function GET(request: NextRequest) {
     // Calculate summary
     const summary = {
       total: count || 0,
-      pending: submissions?.filter((s) => s.status === 'pending').length || 0,
+      pending: verifications?.filter((s) => s.status === 'pending').length || 0,
       approved:
-        submissions?.filter(
+        verifications?.filter(
           (s) => s.status === 'approved' || s.status === 'verified',
         ).length || 0,
-      rejected: submissions?.filter((s) => s.status === 'rejected').length || 0,
+      rejected:
+        verifications?.filter((s) => s.status === 'rejected').length || 0,
     };
 
     return NextResponse.json({
-      submissions,
+      submissions: verifications,
       summary,
       total: count || 0,
       limit,
@@ -226,17 +225,15 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Try to update kyc_submissions table if it exists
+    // Update kyc_verifications table
     await supabase
-      .from('kyc_submissions')
+      .from('kyc_verifications')
       .update({
-        status: (action === 'approve'
-          ? 'approved'
-          : 'rejected') as KycSubmissionRow['status'],
+        status: action === 'approve' ? 'approved' : 'rejected',
         reviewed_by: session.admin.id,
         reviewed_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejection_reason : null,
-        notes,
+        verification_notes: notes,
       })
       .eq('user_id', user_id)
       .eq('status', 'pending');

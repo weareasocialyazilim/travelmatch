@@ -37,21 +37,21 @@ const STEPS: Step[] = [
     icon: 'arrow-up-circle',
     title: 'You send a gift',
     description:
-      'Your money goes into a secure escrow balance, not directly to the host.',
+      'Your payment is held securely in escrow. The host cannot access it until you approve the proof.',
   },
   {
     id: '2',
     icon: 'cloud-upload',
     title: 'Host uploads proof',
     description:
-      'They provide a receipt, photo, or location check-in to verify the moment.',
+      'They provide a receipt, photo, or location check-in. You have 24-48 hours to review.',
   },
   {
     id: '3',
     icon: 'check-decagram',
     title: 'You approve & release',
     description:
-      'Once you&apos;re happy with the proof, the money moves from escrow to their wallet.',
+      'Satisfied with proof? Release funds instantly. Issues? Request revisions or open a dispute.',
   },
 ];
 
@@ -129,8 +129,26 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
             <Text style={styles.faqTitle}>What if proof looks wrong?</Text>
             <Text style={styles.faqDescription}>
               You&apos;re in control. You can ask the host for more proof or
-              clarification. If you&apos;re still not satisfied, you can open a
-              dispute and our support team will help mediate.
+              clarification. If you&apos;re still not satisfied, open a dispute
+              and our support team will help mediate within 48 hours. If
+              unresolved, you&apos;ll receive a refund.
+            </Text>
+          </View>
+
+          {/* Refund Guarantee Card */}
+          <View
+            style={[
+              styles.faqCard,
+              { marginTop: 12, backgroundColor: `${COLORS.brand.primary}10` },
+            ]}
+          >
+            <Text style={[styles.faqTitle, { color: COLORS.brand.primary }]}>
+              Money-Back Guarantee
+            </Text>
+            <Text style={styles.faqDescription}>
+              If the moment doesn&apos;t happen as described and we can&apos;t
+              resolve the dispute, your payment is fully refunded from escrow.
+              No questions asked within 7 days.
             </Text>
           </View>
         </View>

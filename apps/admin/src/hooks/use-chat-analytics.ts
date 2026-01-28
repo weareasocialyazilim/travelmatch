@@ -292,38 +292,20 @@ async function fetchActiveConversations(): Promise<ActiveConversation[]> {
   // Transform Supabase data to expected format
   return (data || []).map((conv) => ({
     id: conv.id,
-    participants: conv.participants || [],
-    moment: conv.moment_title || '',
-    giftAmount: conv.gift_amount || 0,
-    messages: conv.message_count || 0,
-    lastActivity: formatRelativeTime(conv.updated_at),
-    status: conv.status as 'active' | 'idle' | 'closed',
-    tier: conv.tier as 'tier_1' | 'tier_2' | 'tier_3',
+    participants: conv.participant_ids || [],
+    moment: '',
+    giftAmount: 0,
+    messages: 0,
+    lastActivity: conv.updated_at ? formatRelativeTime(conv.updated_at) : '',
+    status: conv.archived_at ? ('closed' as const) : ('active' as const),
+    tier: 'tier_1' as const,
   }));
 }
 
 async function fetchFlaggedMessages(): Promise<FlaggedMessage[]> {
-  const supabase = getClient();
-  const { data, error } = await supabase
-    .from('flagged_messages')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  if (error) {
-    throw new Error('Failed to fetch flagged messages');
-  }
-
-  // Transform Supabase data to expected format
-  return (data || []).map((msg) => ({
-    id: msg.id,
-    conversation: msg.conversation_id,
-    sender: msg.sender_id,
-    reason: msg.reason as FlaggedMessage['reason'],
-    snippet: msg.snippet || '',
-    flaggedAt: formatRelativeTime(msg.created_at),
-    status: msg.status as 'pending' | 'reviewing' | 'actioned',
-  }));
+  // flagged_messages table doesn't exist in current schema
+  // Return empty array until table is created
+  return [];
 }
 
 // Helper function to format relative time

@@ -3,15 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 
-interface WalletWithUser {
-  available_balance?: number;
-  pending_balance?: number;
-  user?: {
-    display_name?: string;
-    email?: string;
-  };
-}
-
 export async function GET(request: NextRequest) {
   try {
     const session = await getAdminSession();
@@ -25,8 +16,6 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('user_id');
-    const minBalance = searchParams.get('min_balance');
-    const search = searchParams.get('search');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
 
@@ -36,12 +25,7 @@ export async function GET(request: NextRequest) {
     if (userId) {
       const { data: wallet, error } = await supabase
         .from('wallets')
-        .select(
-          `
-          *,
-          user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
-        `,
-        )
+        .select('*')
         .eq('user_id', userId)
         .single();
 
@@ -49,7 +33,7 @@ export async function GET(request: NextRequest) {
         // If no wallet exists, get user info and return zero balance
         const { data: user } = await supabase
           .from('users')
-          .select('id, display_name, avatar_url, email, kyc_status')
+          .select('id, full_name, avatar_url, email')
           .eq('id', userId)
           .single();
 
@@ -57,7 +41,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({
             wallet: {
               user_id: userId,
-              available_balance: 0,
+              balance: 0,
               pending_balance: 0,
               currency: 'TRY',
               user,
@@ -70,36 +54,33 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      // Get user info for the wallet
+      const { data: user } = await supabase
+        .from('users')
+        .select('id, full_name, avatar_url, email')
+        .eq('id', userId)
+        .single();
+
       // Get recent transactions for this user
       const { data: transactions } = await supabase
         .from('transactions')
-        .select('*')
-        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .select('id, amount, type, status, created_at')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10);
 
       return NextResponse.json({
-        wallet,
+        wallet: { ...wallet, user },
         recentTransactions: transactions || [],
       });
     }
 
     // List all wallets with balances
-    let query = supabase
+    const query = supabase
       .from('wallets')
-      .select(
-        `
-        *,
-        user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
-      `,
-        { count: 'exact' },
-      )
-      .order('available_balance', { ascending: false })
+      .select('*', { count: 'exact' })
+      .order('balance', { ascending: false })
       .range(offset, offset + limit - 1);
-
-    if (minBalance) {
-      query = query.gte('available_balance', parseFloat(minBalance));
-    }
 
     const { data: wallets, count, error } = await query;
 
@@ -111,42 +92,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Filter by search if provided
-    let filteredWallets = wallets;
-    if (search && wallets) {
-      const safeSearch = search.toLowerCase();
-      filteredWallets = wallets.filter(
-        (w: WalletWithUser) =>
-          w.user?.display_name?.toLowerCase().includes(safeSearch) ||
-          w.user?.email?.toLowerCase().includes(safeSearch),
-      );
-    }
-
     // Calculate summary
     const summary = {
       totalWallets: count || 0,
-      totalAvailableBalance:
+      totalBalance:
         wallets?.reduce(
-          (sum: number, w: WalletWithUser) => sum + (w.available_balance || 0),
+          (sum: number, w: { balance: number | null }) =>
+            sum + (w.balance || 0),
           0,
         ) || 0,
       totalPendingBalance:
         wallets?.reduce(
-          (sum: number, w: WalletWithUser) => sum + (w.pending_balance || 0),
+          (sum: number, w: { pending_balance: number | null }) =>
+            sum + (w.pending_balance || 0),
           0,
         ) || 0,
-      averageBalance:
-        wallets && wallets.length > 0
-          ? wallets.reduce(
-              (sum: number, w: WalletWithUser) =>
-                sum + (w.available_balance || 0),
-              0,
-            ) / wallets.length
-          : 0,
     };
 
     return NextResponse.json({
-      wallets: filteredWallets,
+      wallets,
       summary,
       total: count || 0,
       limit,

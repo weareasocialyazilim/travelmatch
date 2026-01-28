@@ -110,7 +110,7 @@ export default function FraudInvestigationPage() {
     refetch: refetchCases,
   } = useFraudCases({
     status: statusFilter,
-    priority: priorityFilter,
+    severity: priorityFilter,
     search: searchQuery,
   });
   const { data: selectedCase, isLoading: caseLoading } = useFraudCase(
@@ -152,7 +152,7 @@ export default function FraudInvestigationPage() {
     );
   };
 
-  const getPriorityBadge = (priority: string) => {
+  const getSeverityBadge = (severity: string) => {
     const styles: Record<string, string> = {
       critical: 'bg-red-500 text-white',
       high: 'bg-orange-500 text-white',
@@ -160,8 +160,8 @@ export default function FraudInvestigationPage() {
       low: 'bg-blue-500 text-white',
     };
     return (
-      <CanvaBadge className={styles[priority] || styles.low}>
-        {priority.toUpperCase()}
+      <CanvaBadge className={styles[severity] || styles.low}>
+        {severity.toUpperCase()}
       </CanvaBadge>
     );
   };
@@ -313,7 +313,7 @@ export default function FraudInvestigationPage() {
                     >
                       {indicator.count}
                     </p>
-                    {getPriorityBadge(indicator.severity)}
+                    {getSeverityBadge(indicator.severity)}
                   </div>
                 </CanvaCardBody>
               </CanvaCard>
@@ -394,10 +394,12 @@ export default function FraudInvestigationPage() {
                     <span className="font-mono text-xs text-muted-foreground">
                       {fraudCase.case_number}
                     </span>
-                    {getPriorityBadge(fraudCase.priority)}
+                    {getSeverityBadge(fraudCase.severity)}
                   </div>
                   <p className="font-medium text-sm mb-1">
-                    {fraudCase.suspect_name}
+                    {fraudCase.user_id
+                      ? `Kullanıcı: ${fraudCase.user_id.slice(0, 8)}...`
+                      : 'Bilinmiyor'}
                   </p>
                   <p className="text-xs text-muted-foreground line-clamp-2">
                     {fraudCase.description}
@@ -405,7 +407,7 @@ export default function FraudInvestigationPage() {
                   <div className="flex items-center justify-between mt-2">
                     {getStatusBadge(fraudCase.status)}
                     <span className="text-xs text-muted-foreground">
-                      {formatCurrency(fraudCase.total_amount_involved)}
+                      {formatCurrency(fraudCase.amount_involved || 0)}
                     </span>
                   </div>
                 </div>
@@ -436,7 +438,7 @@ export default function FraudInvestigationPage() {
                       <CanvaCardTitle>
                         {selectedCase.case_number}
                       </CanvaCardTitle>
-                      {getPriorityBadge(selectedCase.priority)}
+                      {getSeverityBadge(selectedCase.severity)}
                       {getStatusBadge(selectedCase.status)}
                     </div>
                     <CanvaCardSubtitle>
@@ -535,7 +537,9 @@ export default function FraudInvestigationPage() {
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">İsim:</span>
                             <span className="font-medium">
-                              {selectedCase.suspect_name}
+                              {selectedCase.user_id
+                                ? `ID: ${selectedCase.user_id.slice(0, 8)}...`
+                                : 'Bilinmiyor'}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -543,7 +547,7 @@ export default function FraudInvestigationPage() {
                               Email:
                             </span>
                             <span className="font-medium">
-                              {selectedCase.suspect_email}
+                              {selectedCase.user_id?.slice(0, 8)}...
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -565,7 +569,7 @@ export default function FraudInvestigationPage() {
                             </span>
                             <span className="font-medium text-red-500">
                               {formatCurrency(
-                                selectedCase.total_amount_involved,
+                                selectedCase.amount_involved || 0,
                               )}
                             </span>
                           </div>
@@ -573,17 +577,13 @@ export default function FraudInvestigationPage() {
                             <span className="text-muted-foreground">
                               Bağlı Hesap:
                             </span>
-                            <span className="font-medium">
-                              {selectedCase.linked_accounts}
-                            </span>
+                            <span className="font-medium">-</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">
                               Kanıt Sayısı:
                             </span>
-                            <span className="font-medium">
-                              {selectedCase.evidence_count}
-                            </span>
+                            <span className="font-medium">-</span>
                           </div>
                         </div>
                       </div>
@@ -601,7 +601,7 @@ export default function FraudInvestigationPage() {
                     <div className="grid grid-cols-4 gap-3">
                       <div className="p-3 rounded-lg bg-red-500/10 dark:bg-red-500/20 text-center">
                         <p className="text-2xl font-bold text-red-500 dark:text-red-400">
-                          {selectedCase.linked_accounts}
+                          -
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Bağlı Hesap
@@ -609,7 +609,7 @@ export default function FraudInvestigationPage() {
                       </div>
                       <div className="p-3 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 text-center">
                         <p className="text-lg font-bold text-orange-500 dark:text-orange-400">
-                          {formatCurrency(selectedCase.total_amount_involved)}
+                          {formatCurrency(selectedCase.amount_involved || 0)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Toplam Hacim
@@ -617,15 +617,17 @@ export default function FraudInvestigationPage() {
                       </div>
                       <div className="p-3 rounded-lg bg-yellow-500/10 dark:bg-yellow-500/20 text-center">
                         <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">
-                          {selectedCase.evidence_count}
+                          -
                         </p>
                         <p className="text-xs text-muted-foreground">Kanıt</p>
                       </div>
                       <div className="p-3 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-center">
                         <p className="text-lg font-bold text-purple-500 dark:text-purple-400">
-                          {new Date(
-                            selectedCase.reported_at,
-                          ).toLocaleDateString('tr-TR')}
+                          {selectedCase.created_at
+                            ? new Date(
+                                selectedCase.created_at,
+                              ).toLocaleDateString('tr-TR')
+                            : '-'}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Rapor Tarihi
@@ -681,45 +683,53 @@ export default function FraudInvestigationPage() {
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-8 w-8">
                                     <AvatarFallback>
-                                      {account.user_name?.slice(0, 2) || 'NA'}
+                                      {account.linked_user_id
+                                        ? account.linked_user_id.slice(0, 2)
+                                        : 'NA'}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div>
                                     <p className="font-medium">
-                                      {account.user_name}
+                                      {account.linked_user_id}
                                     </p>
                                     <p className="text-xs text-muted-foreground">
-                                      {account.user_email}
+                                      {account.link_type}
                                     </p>
                                   </div>
                                 </div>
                               </TableCell>
                               <TableCell>
                                 <CanvaBadge variant="outline">
-                                  {account.connection_type.replace('_', ' ')}
+                                  {account.link_type?.replace('_', ' ')}
                                 </CanvaBadge>
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <Progress
-                                    value={account.confidence_score * 100}
+                                    value={
+                                      (account.confidence_score || 0) * 100
+                                    }
                                     className={cn(
                                       'w-16 h-2',
-                                      account.confidence_score > 0.8
+                                      (account.confidence_score || 0) > 0.8
                                         ? '[&>div]:bg-red-500'
                                         : '[&>div]:bg-yellow-500',
                                     )}
                                   />
                                   <span className="font-medium">
-                                    {Math.round(account.confidence_score * 100)}
+                                    {Math.round(
+                                      (account.confidence_score || 0) * 100,
+                                    )}
                                     %
                                   </span>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                {new Date(
-                                  account.detected_at,
-                                ).toLocaleDateString('tr-TR')}
+                                {account.detected_at
+                                  ? new Date(
+                                      account.detected_at,
+                                    ).toLocaleDateString('tr-TR')
+                                  : '-'}
                               </TableCell>
                               <TableCell className="text-right">
                                 <CanvaButton variant="ghost" size="sm">
@@ -746,21 +756,21 @@ export default function FraudInvestigationPage() {
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <FileText className="h-5 w-5 text-muted-foreground" />
-                                <span className="font-medium">
-                                  {item.title}
-                                </span>
+                                <span className="font-medium">{item.type}</span>
                               </div>
                               <CanvaBadge variant="outline">
                                 {item.type}
                               </CanvaBadge>
                             </div>
                             <p className="text-sm text-muted-foreground mb-2">
-                              {item.description}
+                              {item.content || '-'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(item.uploaded_at).toLocaleString(
-                                'tr-TR',
-                              )}
+                              {item.created_at
+                                ? new Date(item.created_at).toLocaleString(
+                                    'tr-TR',
+                                  )
+                                : '-'}
                             </p>
                           </div>
                         ))}

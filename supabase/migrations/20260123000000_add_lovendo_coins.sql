@@ -1,116 +1,98 @@
 -- ============================================
--- LOVENDO COINS MIGRATION
+-- LOVENDO COINS MIGRATION (FIXED)
 -- Description: Adds support for virtual currency ("Coins") to comply with Apple IAP.
+-- Note: Fixed to match existing schema
 -- ============================================
 
--- 1. Add Coins Balance to Users
--- We use INTEGER for coins (atomic units). 
-ALTER TABLE users ADD COLUMN IF NOT EXISTS coins_balance INTEGER DEFAULT 0;
-
--- 2. Coin Packages (IAP Products)
--- These map to RevenueCat/store products.
+-- 1. Coin Packages (IAP Products) - Only create if not exists
 CREATE TABLE IF NOT EXISTS coin_packages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_product_id TEXT NOT NULL UNIQUE, -- e.g. 'lovendo_100_coins'
+  store_product_id TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   description TEXT,
   coin_amount INTEGER NOT NULL CHECK (coin_amount > 0),
-  price DECIMAL(10,2) NOT NULL, -- Display price (e.g. 9.99)
-  currency TEXT DEFAULT 'USD', -- Display currency
+  price DECIMAL(10,2) NOT NULL,
+  currency TEXT DEFAULT 'USD',
   is_active BOOLEAN DEFAULT TRUE,
   platform TEXT DEFAULT 'all' CHECK (platform IN ('all', 'ios', 'android')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Coin Transactions (Audit Trail)
-CREATE TABLE IF NOT EXISTS coin_transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  amount INTEGER NOT NULL, -- Positive = Credit, Negative = Debit
-  type TEXT NOT NULL CHECK (
-    type IN (
-      'purchase',          -- Bought via IAP
-      'gift_sent',         -- Sent to escrow/user
-      'gift_received',     -- Released from escrow
-      'bonus',             -- Admin bonus
-      'refund',            -- Refunded from espresso
-      'withdrawal_burn'    -- Burned for real money withdrawal
-    )
-  ),
-  reference_id UUID, -- External ID (Escrow ID, IAP Transaction ID, etc.)
-  description TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 4. Indexes
-CREATE INDEX IF NOT EXISTS idx_coin_transactions_user ON coin_transactions(user_id);
-CREATE INDEX IF NOT EXISTS idx_coin_transactions_type ON coin_transactions(type);
+-- 2. Add indexes for coin_packages
 CREATE INDEX IF NOT EXISTS idx_coin_packages_active ON coin_packages(is_active);
+CREATE INDEX IF NOT EXISTS idx_coin_packages_store_id ON coin_packages(store_product_id);
 
--- 5. RLS Policies
+-- 3. Add missing columns to coin_transactions if they don't exist
+-- (coin_transactions already exists with sender_id/recipient_id schema)
+ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS idempotency_key VARCHAR(100);
+ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'purchase';
+ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'completed';
 
--- Coin Packages: Public read, Admin write (implicit via dashboard)
-ALTER TABLE coin_packages ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can view active coin packages" 
-  ON coin_packages FOR SELECT 
-  USING (is_active = true);
-
--- Coin Transactions: Users see their own
+-- 4. Update RLS policies for coin_transactions
 ALTER TABLE coin_transactions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own coin transactions" 
-  ON coin_transactions FOR SELECT 
-  USING (auth.uid() = user_id);
+-- Drop and recreate policy to match current schema
+DROP POLICY IF EXISTS "Users can view own coin transactions" ON coin_transactions;
+CREATE POLICY "Users can view own coin transactions"
+  ON coin_transactions FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
 
--- Users: Allow users to view own coin balance (covered by existing users select policy, but ensuring update protection)
--- Note: Updates to coins_balance should only happen via secure Database Functions (Security Definer), NOT direct client update.
+-- 5. Add RLS policies for coin_packages
+ALTER TABLE coin_packages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can view active coin packages" ON coin_packages;
+CREATE POLICY "Anyone can view active coin packages"
+  ON coin_packages FOR SELECT
+  USING (is_active = true);
 
--- 6. Helper Function: Safe Add/Subtract Coins
+-- 6. Helper function to handle coin transactions (matches existing schema)
 CREATE OR REPLACE FUNCTION handle_coin_transaction(
   p_user_id UUID,
-  p_amount INTEGER,
+  p_amount NUMERIC,
   p_type TEXT,
-  p_description TEXT,
-  p_reference_id UUID DEFAULT NULL,
-  p_metadata JSONB DEFAULT '{}'::jsonb
+  p_reference_id TEXT DEFAULT NULL,
+  p_metadata JSONB DEFAULT '{}'::jsonb,
+  p_idempotency_key TEXT DEFAULT NULL
 )
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, pg_temp
+SET search_path = 'pg_catalog', 'public'
 AS $$
 DECLARE
-  v_new_balance INTEGER;
   v_txn_id UUID;
 BEGIN
-  -- Lock user for update to prevent race conditions
-  SELECT coins_balance INTO v_new_balance
-  FROM users
-  WHERE id = p_user_id
-  FOR UPDATE;
-
-  -- Check sufficient funds for debit
-  IF p_amount < 0 AND (v_new_balance + p_amount) < 0 THEN
-    RAISE EXCEPTION 'Insufficient coin balance';
+  -- Check idempotency
+  IF p_idempotency_key IS NOT NULL THEN
+    SELECT id INTO v_txn_id FROM coin_transactions WHERE idempotency_key = p_idempotency_key;
+    IF FOUND THEN RETURN v_txn_id; END IF;
   END IF;
 
-  -- Update Balance
-  UPDATE users 
-  SET coins_balance = coins_balance + p_amount,
-      updated_at = NOW()
-  WHERE id = p_user_id;
-
-  -- Record Transaction
+  -- Insert transaction (matches existing schema: sender_id/recipient_id)
   INSERT INTO coin_transactions (
-    user_id, amount, type, reference_id, description, metadata
-  ) VALUES (
-    p_user_id, p_amount, p_type, p_reference_id, p_description, p_metadata
+    reference_id, sender_id, recipient_id, amount, currency, type, status, metadata, idempotency_key
+  )
+  VALUES (
+    p_reference_id, NULL, p_user_id, ABS(p_amount), 'LVND', COALESCE(p_type, 'purchase'), 'completed', p_metadata, p_idempotency_key
   )
   RETURNING id INTO v_txn_id;
 
   RETURN v_txn_id;
 END;
 $$;
+
+-- 7. Grant permissions
+GRANT EXECUTE ON FUNCTION handle_coin_transaction TO authenticated;
+GRANT EXECUTE ON FUNCTION handle_coin_transaction TO service_role;
+GRANT SELECT ON coin_packages TO authenticated;
+GRANT SELECT ON coin_transactions TO authenticated;
+
+DO $$
+BEGIN
+  RAISE NOTICE '============================================';
+  RAISE NOTICE 'Coin system migration applied successfully';
+  RAISE NOTICE '- coin_packages table created/updated';
+  RAISE NOTICE '- coin_transactions columns added';
+  RAISE NOTICE '- handle_coin_transaction function created';
+  RAISE NOTICE '============================================';
+END $$;

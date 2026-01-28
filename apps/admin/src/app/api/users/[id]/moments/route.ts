@@ -15,10 +15,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     const { id: userId } = await params;
@@ -32,21 +29,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Build query
     let query = supabase
       .from('moments')
-      .select(`
+      .select(
+        `
         id,
         title,
         description,
         status,
-        thumbnail_url,
+        image_id,
         location,
-        start_date,
-        end_date,
+        date,
         created_at,
-        updated_at,
-        view_count,
-        like_count
-      `, { count: 'exact' })
-      .eq('creator_id', userId)
+        updated_at
+      `,
+        { count: 'exact' },
+      )
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -60,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       logger.error('Failed to fetch user moments:', error);
       return NextResponse.json(
         { error: 'Momentler alınamadı' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -77,31 +74,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { data: statusCounts } = await supabase
       .from('moments')
       .select('status')
-      .eq('creator_id', userId);
+      .eq('user_id', userId);
 
     if (statusCounts) {
-      statusCounts.forEach(m => {
-        const status = m.status as keyof typeof stats;
-        if (status in stats) {
-          stats[status]++;
+      statusCounts.forEach((m) => {
+        const s = m.status as string;
+        if (s && s in stats) {
+          stats[s as keyof typeof stats]++;
         }
       });
     }
 
     // Transform moments for response
-    const transformedMoments = (moments || []).map(moment => ({
+    const transformedMoments = (moments || []).map((moment) => ({
       id: moment.id,
       title: moment.title,
       description: moment.description,
       status: moment.status,
-      thumbnail: moment.thumbnail_url,
+      thumbnail: moment.image_id,
       location: moment.location,
-      dates: {
-        start: moment.start_date,
-        end: moment.end_date,
-      },
-      views: moment.view_count || 0,
-      likes: moment.like_count || 0,
+      date: moment.date,
       created_at: moment.created_at,
       updated_at: moment.updated_at,
     }));
@@ -115,9 +107,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logger.error('User moments API error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }

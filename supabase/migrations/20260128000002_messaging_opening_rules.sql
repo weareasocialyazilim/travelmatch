@@ -1,12 +1,12 @@
 -- ============================================================================
-// Message Opening Rules and Thresholds
-//
-// Defines exact conditions under which messaging becomes available.
-// Messaging is an EARNED REWARD, never automatic.
-// ============================================================================
+--  Message Opening Rules and Thresholds
+-- 
+--  Defines exact conditions under which messaging becomes available.
+--  Messaging is an EARNED REWARD, never automatic.
+--  ============================================================================
 
 -- ============================================================================
-// THRESHOLD CONFIGURATION TABLE
+--  THRESHOLD CONFIGURATION TABLE
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS messaging_thresholds (
@@ -38,7 +38,7 @@ INSERT INTO messaging_thresholds (threshold_key, threshold_type, threshold_value
 ON CONFLICT (threshold_key) DO NOTHING;
 
 -- ============================================================================
-// OFFERING ELIGIBILITY RULES
+--  OFFERING ELIGIBILITY RULES
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS offering_rules (
@@ -63,7 +63,7 @@ INSERT INTO offering_rules (rule_name, offer_type, min_lvnd_cents, grants_messag
 ON CONFLICT (rule_name) DO NOTHING;
 
 -- ============================================================================
-// MUTUAL APPROVAL RULES
+--  MUTUAL APPROVAL RULES
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS mutual_approval_config (
@@ -84,8 +84,8 @@ INSERT INTO mutual_approval_config (config_key, approval_type, required_approval
 ON CONFLICT (config_key) DO NOTHING;
 
 -- ============================================================================
-// STATE TRANSITION LOG
-// ============================================================================
+--  STATE TRANSITION LOG
+--  ============================================================================
 
 CREATE TABLE IF NOT EXISTS messaging_state_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -105,7 +105,7 @@ CREATE INDEX idx_state_log_user ON messaging_state_log(user_id);
 CREATE INDEX idx_state_log_created ON messaging_state_log(created_at DESC);
 
 -- ============================================================================
-// THRESHOLD CHECK FUNCTIONS
+--  THRESHOLD CHECK FUNCTIONS
 -- ============================================================================
 
 -- Check LVND spending threshold
@@ -168,8 +168,8 @@ END;
 $$;
 
 -- ============================================================================
-// MAIN ELIGIBILITY EVALUATION FUNCTION
-// ============================================================================
+--  MAIN ELIGIBILITY EVALUATION FUNCTION
+--  ============================================================================
 
 -- Evaluate all eligibility criteria for a conversation
 CREATE OR REPLACE FUNCTION evaluate_messaging_eligibility(
@@ -282,7 +282,7 @@ END;
 $$;
 
 -- ============================================================================
-// TRIGGER: Auto-evaluate eligibility on relevant events
+--  TRIGGER: Auto-evaluate eligibility on relevant events
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION auto_evaluate_messaging_eligibility()
@@ -358,7 +358,7 @@ CREATE TRIGGER on_moment_approval_messaging
   EXECUTE FUNCTION auto_evaluate_messaging_eligibility();
 
 -- ============================================================================
-// RLS POLICIES
+--  RLS POLICIES
 -- ============================================================================
 
 ALTER TABLE messaging_thresholds ENABLE ROW LEVEL SECURITY;
@@ -379,7 +379,7 @@ CREATE POLICY "Users view own state log" ON messaging_state_log
   FOR SELECT USING (auth.uid() = user_id);
 
 -- ============================================================================
-// GRANT EXECUTE
+--  GRANT EXECUTE
 -- ============================================================================
 
 GRANT EXECUTE ON FUNCTION check_lvnd_threshold TO authenticated;

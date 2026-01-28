@@ -1,7 +1,7 @@
 -- ============================================================================
-// Escrow Idempotency
-// Prevents duplicate escrow operations
-// ============================================================================
+-- Escrow Idempotency
+-- Prevents duplicate escrow operations
+-- ============================================================================
 
 -- Add idempotency_key column
 ALTER TABLE escrow_transactions ADD COLUMN IF NOT EXISTS idempotency_key VARCHAR(200) UNIQUE;
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS escrow_idempotency_keys (
   expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '24 hours')
 );
 
-CREATE INDEX idx_escrow_idempotency_key ON escrow_idempotency_keys(idempotency_key);
-CREATE INDEX idx_escrow_idempotency_expires ON escrow_idempotency_keys(expires_at);
+CREATE INDEX IF NOT EXISTS idx_escrow_idempotency_key ON escrow_idempotency_keys(idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_escrow_idempotency_expires ON escrow_idempotency_keys(expires_at);
 
 -- Idempotent escrow creation function
 CREATE OR REPLACE FUNCTION create_escrow_idempotent(

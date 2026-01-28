@@ -1,6 +1,6 @@
 -- ============================================================================
-// Story Reports and Block Integration
-// ============================================================================
+--  Story Reports and Block Integration
+--  ============================================================================
 
 -- Story reports table
 CREATE TABLE IF NOT EXISTS story_reports (

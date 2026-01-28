@@ -46,14 +46,14 @@ export interface AlertHistoryItem {
 
 // Helper to parse dates from API response
 function parseActiveAlerts(alerts: unknown[]): ActiveAlert[] {
-  return alerts.map((alert: Record<string, unknown>) => ({
+  return (alerts as Array<Record<string, unknown>>).map((alert) => ({
     ...alert,
     triggeredAt: new Date(alert.triggeredAt as string),
   })) as ActiveAlert[];
 }
 
 function parseAlertHistory(history: unknown[]): AlertHistoryItem[] {
-  return history.map((item: Record<string, unknown>) => ({
+  return (history as Array<Record<string, unknown>>).map((item) => ({
     ...item,
     resolvedAt: new Date(item.resolvedAt as string),
   })) as AlertHistoryItem[];

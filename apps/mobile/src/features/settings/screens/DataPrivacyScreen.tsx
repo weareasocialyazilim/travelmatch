@@ -209,7 +209,7 @@ const DataPrivacyScreen = () => {
       'Are you sure you want to delete your account? This action will:\n\n' +
         '• Schedule your account for deletion in 30 days\n' +
         '• Anonymize your personal data\n' +
-        '• Remove your trips and messages\n' +
+        '• Remove your moments and messages\n' +
         '• You can cancel within 30 days\n\n' +
         'This action cannot be undone after the grace period.',
       [

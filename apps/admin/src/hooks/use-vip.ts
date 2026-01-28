@@ -243,13 +243,17 @@ async function fetchVIPUsers(filters: VIPFilters): Promise<VIPUsersResponse> {
     // Try Supabase first
     return await fetchVIPUsersFromSupabase(filters);
   } catch (supabaseError) {
-    logger.warn('Supabase VIP fetch failed, trying API', supabaseError);
+    logger.warn('Supabase VIP fetch failed, trying API', {
+      context: supabaseError,
+    });
 
     try {
       // Fall back to API
       return await fetchVIPUsersFromAPI(filters);
     } catch (apiError) {
-      logger.warn('API VIP fetch failed, using mock data', apiError);
+      logger.warn('API VIP fetch failed, using mock data', {
+        context: apiError,
+      });
 
       // Fall back to mock data with filtering
       let filtered = [...mockVIPUsers];
@@ -332,15 +336,16 @@ async function fetchVIPStats(): Promise<VIPStats> {
     // Try API first (likely has better aggregation)
     return await fetchVIPStatsFromAPI();
   } catch (apiError) {
-    logger.warn('API stats fetch failed, trying Supabase', apiError);
+    logger.warn('API stats fetch failed, trying Supabase', {
+      context: apiError,
+    });
 
     try {
       return await fetchVIPStatsFromSupabase();
     } catch (supabaseError) {
-      logger.warn(
-        'Supabase stats fetch failed, using mock data',
-        supabaseError,
-      );
+      logger.warn('Supabase stats fetch failed, using mock data', {
+        context: supabaseError,
+      });
       return mockStats;
     }
   }
@@ -417,7 +422,7 @@ async function searchUsers(
       email: user.email,
     }));
   } catch (err) {
-    logger.warn('User search failed, trying API', err);
+    logger.warn('User search failed, trying API', { context: err });
 
     // Try API fallback
     try {

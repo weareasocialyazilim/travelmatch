@@ -7,7 +7,8 @@ import { logger } from './logger';
 import type { Database } from '@/types/database';
 
 type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
-type RolePermissionRow = Database['public']['Tables']['role_permissions']['Row'];
+type RolePermissionRow =
+  Database['public']['Tables']['role_permissions']['Row'];
 
 interface SessionWithAdmin {
   id: string;
@@ -69,7 +70,8 @@ export async function getAdminSession(): Promise<AdminSession | null> {
         avatar_url: session.admin.avatar_url,
         role: session.admin.role,
       },
-      permissions: (permissions as Pick<RolePermissionRow, 'resource' | 'action'>[]) || [],
+      permissions:
+        (permissions as Pick<RolePermissionRow, 'resource' | 'action'>[]) || [],
     };
   } catch (error) {
     logger.error('Session check error', error);
@@ -116,80 +118,23 @@ export async function createAuditLog(
     });
 
     if (error) {
-      // FIXED: Log to fallback table and trigger alert instead of silent failure
-      await logToFallbackTable(supabase, {
+      // CRITICAL: Audit log insert failed - log with logger only
+      logger.error('CRITICAL: Audit log insert failed', {
         adminId,
         action,
         resourceType,
         resourceId,
-        oldValue,
-        newValue,
-        ipAddress,
-        userAgent,
         originalError: error.message,
-      });
-
-      logger.error('Audit log insert failed - logged to fallback', {
-        adminId,
-        action,
-        resourceType,
-        resourceId,
       });
     }
   } catch (error) {
-    // Fallback for unexpected errors
-    try {
-      const supabase = createServiceClient();
-      await logToFallbackTable(supabase, {
-        adminId,
-        action,
-        resourceType,
-        resourceId,
-        oldValue,
-        newValue,
-        ipAddress,
-        userAgent,
-        originalError: error instanceof Error ? error.message : String(error),
-      });
-    } catch (fallbackError) {
-      // Last resort - log to console
-      console.error('CRITICAL: Audit logging completely failed', {
-        adminId,
-        action,
-        resourceType,
-        resourceId,
-        fallbackError,
-      });
-    }
-    logger.error('Audit log error', error);
+    // Fallback for unexpected errors - log with logger only
+    logger.error('CRITICAL: Audit logging completely failed', {
+      adminId,
+      action,
+      resourceType,
+      resourceId,
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
-}
-
-interface FallbackLogParams {
-  adminId: string;
-  action: string;
-  resourceType: string;
-  resourceId: string;
-  oldValue?: unknown;
-  newValue?: unknown;
-  ipAddress?: string;
-  userAgent?: string;
-  originalError: string;
-}
-
-async function logToFallbackTable(
-  supabase: ReturnType<typeof createServiceClient>,
-  params: FallbackLogParams,
-): Promise<void> {
-  await supabase.from('audit_log_fallback').insert({
-    admin_id: params.adminId,
-    action: params.action,
-    resource_type: params.resourceType,
-    resource_id: params.resourceId,
-    old_value: params.oldValue ? JSON.parse(JSON.stringify(params.oldValue)) : null,
-    new_value: params.newValue ? JSON.parse(JSON.stringify(params.newValue)) : null,
-    ip_address: params.ipAddress,
-    user_agent: params.userAgent,
-    original_error: params.originalError,
-  });
 }

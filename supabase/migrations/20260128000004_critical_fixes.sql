@@ -1,7 +1,7 @@
 -- ============================================================================
-// Critical Production Fixes v1
-// Fixes from production readiness audit
-// ============================================================================
+--  Critical Production Fixes v1
+--  Fixes from production readiness audit
+--  ============================================================================
 
 -- Fix A.3: Add content column to message_moderation_logs for admin visibility
 ALTER TABLE message_moderation_logs ADD COLUMN IF NOT EXISTS content TEXT;

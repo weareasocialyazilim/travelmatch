@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession } from '@/lib/auth';
+import type { Json } from '@/types/database';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -15,10 +16,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     const { id: userId } = await params;
@@ -41,30 +39,36 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         .select('id, type, title, body, created_at, read')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(10)
+        .limit(10),
     ]);
 
     // Transform audit logs to activity format
-    const auditActivities = (auditResult.data || []).map(log => ({
+    const auditActivities = (auditResult.data || []).map((log) => ({
       id: log.id,
       type: mapAuditActionToType(log.action),
       description: formatAuditDescription(log),
       timestamp: log.created_at,
-      metadata: log.new_value || log.old_value,
+      metadata: log.metadata,
     }));
 
     // Transform notifications to activity format
-    const notificationActivities = (notificationsResult.data || []).map(notif => ({
-      id: notif.id,
-      type: 'notification',
-      description: notif.title || notif.body,
-      timestamp: notif.created_at,
-      metadata: { read: notif.read, type: notif.type },
-    }));
+    const notificationActivities = (notificationsResult.data || []).map(
+      (notif) => ({
+        id: notif.id,
+        type: 'notification',
+        description: notif.title || notif.body,
+        timestamp: notif.created_at,
+        metadata: { read: notif.read, type: notif.type },
+      }),
+    );
 
     // Merge and sort by timestamp
     const allActivities = [...auditActivities, ...notificationActivities]
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .sort((a, b) => {
+        const dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return dateB - dateA;
+      })
       .slice(0, limit);
 
     return NextResponse.json({
@@ -73,51 +77,52 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logger.error('User activity API error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }
 
 function mapAuditActionToType(action: string): string {
   const typeMap: Record<string, string> = {
-    'user_login': 'login',
-    'user_logout': 'logout',
-    'moment_created': 'moment_created',
-    'moment_updated': 'moment_updated',
-    'match_created': 'match',
-    'payment_completed': 'payment',
-    'report_submitted': 'report_submitted',
-    'report_received': 'report_received',
-    'kyc_submitted': 'kyc',
-    'kyc_verified': 'kyc',
-    'profile_updated': 'profile',
+    user_login: 'login',
+    user_logout: 'logout',
+    moment_created: 'moment_created',
+    moment_updated: 'moment_updated',
+    match_created: 'match',
+    payment_completed: 'payment',
+    report_submitted: 'report_submitted',
+    report_received: 'report_received',
+    kyc_submitted: 'kyc',
+    kyc_verified: 'kyc',
+    profile_updated: 'profile',
   };
   return typeMap[action] || action;
 }
 
-function formatAuditDescription(log: { action: string; new_value?: Record<string, unknown> }): string {
+function formatAuditDescription(log: {
+  action: string;
+  metadata?: Json | null;
+}): string {
   const descriptionMap: Record<string, string> = {
-    'user_login': 'Giriş yaptı',
-    'user_logout': 'Çıkış yaptı',
-    'moment_created': 'Yeni moment paylaştı',
-    'match_created': 'Yeni eşleşme',
-    'payment_completed': 'Ödeme tamamlandı',
-    'report_submitted': 'Rapor gönderildi',
-    'kyc_verified': 'KYC doğrulandı',
-    'profile_updated': 'Profil güncellendi',
+    user_login: 'Giriş yaptı',
+    user_logout: 'Çıkış yaptı',
+    moment_created: 'Yeni moment paylaştı',
+    match_created: 'Yeni eşleşme',
+    payment_completed: 'Ödeme tamamlandı',
+    report_submitted: 'Rapor gönderildi',
+    kyc_verified: 'KYC doğrulandı',
+    profile_updated: 'Profil güncellendi',
   };
 
   let desc = descriptionMap[log.action] || log.action;
 
-  // Add context from new_value if available
-  if (log.new_value) {
-    if (log.new_value.amount) {
-      desc += ` - ₺${log.new_value.amount}`;
+  // Add context from metadata if available
+  const meta = log.metadata as Record<string, unknown> | null | undefined;
+  if (meta) {
+    if (meta.amount) {
+      desc += ` - ₺${meta.amount}`;
     }
-    if (log.new_value.title) {
-      desc += `: "${log.new_value.title}"`;
+    if (meta.title) {
+      desc += `: "${meta.title}"`;
     }
   }
 

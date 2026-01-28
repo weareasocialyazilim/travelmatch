@@ -121,8 +121,8 @@ export default function CeremonyManagementPage() {
   const approveMutation = useMutation({
     mutationFn: async (proofId: string) => {
       const supabase = getClient();
-      const { data, error } = await (supabase
-        .from('proof_ceremonies') as any)
+      const { data, error } = await (supabase as any)
+        .from('proof_ceremonies')
         .update({
           status: 'verified',
           verified_at: new Date().toISOString(),
@@ -163,8 +163,8 @@ export default function CeremonyManagementPage() {
       reason: string;
     }) => {
       const supabase = getClient();
-      const { data, error } = await (supabase
-        .from('proof_ceremonies') as any)
+      const { data, error } = await (supabase as any)
+        .from('proof_ceremonies')
         .update({
           status: 'rejected',
           rejection_reason: reason,
@@ -206,8 +206,8 @@ export default function CeremonyManagementPage() {
       message: string;
     }) => {
       const supabase = getClient();
-      const { data, error } = await (supabase
-        .from('proof_ceremonies') as any)
+      const { data, error } = await (supabase as any)
+        .from('proof_ceremonies')
         .update({
           status: 'info_requested',
           info_request_message: message,

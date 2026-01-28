@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
     // Search users
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, display_name, email, avatar_url')
-      .or(`display_name.ilike.%${safeQuery}%,email.ilike.%${safeQuery}%`)
+      .select('id, full_name, email, avatar_url')
+      .or(`full_name.ilike.%${safeQuery}%,email.ilike.%${safeQuery}%`)
       .limit(Math.ceil(limit / 3));
 
     if (usersError) {
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         results.push({
           type: 'user',
           id: user.id,
-          title: user.display_name || 'İsimsiz Kullanıcı',
+          title: user.full_name || 'İsimsiz Kullanıcı',
           subtitle: user.email || undefined,
           avatar: user.avatar_url || undefined,
           href: `/users/${user.id}`,
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
         results.push({
           type: 'transaction',
           id: tx.id,
-          title: `${typeLabels[tx.type] || tx.type} - ₺${tx.amount?.toFixed(2) || '0.00'}`,
-          subtitle: `${tx.status} • ${new Date(tx.created_at).toLocaleDateString('tr-TR')}`,
+          title: `${typeLabels[tx.type || ''] || tx.type || 'İşlem'} - ₺${tx.amount?.toFixed(2) || '0.00'}`,
+          subtitle: `${tx.status || 'unknown'} • ${tx.created_at ? new Date(tx.created_at).toLocaleDateString('tr-TR') : ''}`,
           href: `/transactions?id=${tx.id}`,
         });
       });
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     // Search moments by title
     const { data: moments, error: momentsError } = await supabase
       .from('moments')
-      .select('id, title, status, user:users!moments_user_id_fkey(display_name)')
+      .select('id, title, status, user:users!moments_user_id_fkey(full_name)')
       .ilike('title', `%${safeQuery}%`)
       .limit(Math.ceil(limit / 3));
 
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       logger.error('Search moments error:', momentsError);
     } else if (moments) {
       moments.forEach((moment) => {
-        const userName = (moment.user as { display_name?: string })?.display_name;
+        const userName = (moment.user as { full_name?: string })?.full_name;
         results.push({
           type: 'moment',
           id: moment.id,

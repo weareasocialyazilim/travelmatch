@@ -11,16 +11,13 @@ export async function GET() {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     if (!hasPermission(session, 'transactions', 'view')) {
       return NextResponse.json(
         { error: 'Bu işlem için yetkiniz yok' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -39,31 +36,31 @@ export async function GET() {
     ] = await Promise.all([
       // Total escrow amount (funds currently held)
       supabase
-        .from('escrows')
+        .from('escrow_transactions')
         .select('amount')
-        .in('status', ['awaiting_proof', 'proof_submitted', 'ready_to_release']),
-      // Pending release (ready to release)
+        .in('status', ['pending', 'processing']),
+      // Pending release (proof submitted, ready to release)
       supabase
-        .from('escrows')
+        .from('escrow_transactions')
         .select('amount')
-        .eq('status', 'ready_to_release'),
+        .eq('status', 'processing'),
       // Released today
       supabase
-        .from('escrows')
+        .from('escrow_transactions')
         .select('amount')
         .eq('status', 'released')
         .gte('released_at', todayISO),
       // Refunded today
       supabase
-        .from('escrows')
+        .from('escrow_transactions')
         .select('amount')
         .eq('status', 'refunded')
         .gte('refunded_at', todayISO),
       // Active transaction count
       supabase
-        .from('escrows')
+        .from('escrow_transactions')
         .select('id', { count: 'exact', head: true })
-        .in('status', ['awaiting_proof', 'proof_submitted', 'ready_to_release', 'disputed']),
+        .in('status', ['pending', 'processing']),
     ]);
 
     const sumAmounts = (data: { amount: number }[] | null) =>
@@ -113,9 +110,13 @@ export async function GET() {
     const todayVolume = sumAmounts(todayVolumeResult.data);
     const todayTransactions = todayTransactionsResult.count || 0;
     const failedTransactions = failedTodayResult.count || 0;
-    const successRate = todayTransactions > 0
-      ? ((todayTransactions - failedTransactions) / todayTransactions * 100).toFixed(1)
-      : '100.0';
+    const successRate =
+      todayTransactions > 0
+        ? (
+            ((todayTransactions - failedTransactions) / todayTransactions) *
+            100
+          ).toFixed(1)
+        : '100.0';
 
     return NextResponse.json({
       escrow: {
@@ -131,7 +132,10 @@ export async function GET() {
       payment: {
         todayVolume,
         todayTransactions,
-        avgTransactionValue: todayTransactions > 0 ? Math.round(todayVolume / todayTransactions) : 0,
+        avgTransactionValue:
+          todayTransactions > 0
+            ? Math.round(todayVolume / todayTransactions)
+            : 0,
         successRate: parseFloat(successRate),
         failedTransactions,
         pendingKYC: 0, // TODO: Add KYC pending count
@@ -141,9 +145,6 @@ export async function GET() {
     });
   } catch (error) {
     logger.error('Escrow stats API error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }

@@ -169,62 +169,9 @@ function generateMockData(): FeatureFlagsData {
 }
 
 async function fetchFeatureFlagsFromSupabase(): Promise<FeatureFlagsData> {
-  try {
-    const supabase = getClient();
-
-    const { data: flags, error } = await supabase
-      .from('feature_flags')
-      .select('*')
-      .order('name');
-
-    if (error) {
-      throw error;
-    }
-
-    if (!flags || flags.length === 0) {
-      // No data in database, return mock data
-      return generateMockData();
-    }
-
-    // Group flags by category
-    const groupedFlags = flags.reduce(
-      (acc: Record<string, FeatureFlag[]>, flag: FeatureFlag) => {
-        const category = flag.category || 'general';
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(flag);
-        return acc;
-      },
-      {} as Record<string, FeatureFlag[]>,
-    );
-
-    // Calculate stats
-    const totalFlags = flags.length;
-    const enabledFlags = flags.filter((f: FeatureFlag) => f.enabled).length;
-    const betaFlags = flags.filter(
-      (f: FeatureFlag) =>
-        f.rollout_percentage < 100 && f.rollout_percentage > 0,
-    ).length;
-
-    return {
-      flags,
-      groupedFlags,
-      stats: {
-        total: totalFlags,
-        enabled: enabledFlags,
-        disabled: totalFlags - enabledFlags,
-        beta: betaFlags,
-      },
-      meta: {
-        generatedAt: new Date().toISOString(),
-        isMockData: false,
-      },
-    };
-  } catch {
-    // If Supabase fails, try API route
-    return fetchFeatureFlagsFromAPI();
-  }
+  // feature_flags table doesn't exist in current schema
+  // Return mock data until table is created
+  return generateMockData();
 }
 
 async function fetchFeatureFlagsFromAPI(): Promise<FeatureFlagsData> {
@@ -291,35 +238,8 @@ export function useCreateFeatureFlag() {
 
   return useMutation({
     mutationFn: async (flag: Partial<FeatureFlag>) => {
-      // Try direct Supabase first
-      try {
-        const supabase = getClient();
-        const { data, error } = await supabase
-          .from('feature_flags')
-          .insert({
-            name: flag.name || '',
-            description: flag.description,
-            enabled: flag.enabled ?? false,
-            category: flag.category || 'general',
-            rollout_percentage: flag.rollout_percentage ?? 100,
-            environments: flag.environments || ['production'],
-            metadata: flag.metadata || {},
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      } catch {
-        // Fallback to API route
-        const response = await fetch('/api/feature-flags', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(flag),
-        });
-        if (!response.ok) throw new Error('Failed to create flag');
-        return response.json();
-      }
+      // feature_flags table doesn't exist - throw error
+      throw new Error('Feature flags table does not exist in database');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
@@ -336,33 +256,8 @@ export function useUpdateFeatureFlag() {
 
   return useMutation({
     mutationFn: async (updates: { id: string } & Partial<FeatureFlag>) => {
-      const { id, ...data } = updates;
-
-      // Try direct Supabase first
-      try {
-        const supabase = getClient();
-        const { data: result, error } = await supabase
-          .from('feature_flags')
-          .update({
-            ...data,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return result;
-      } catch {
-        // Fallback to API route
-        const response = await fetch('/api/feature-flags', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates),
-        });
-        if (!response.ok) throw new Error('Failed to update flag');
-        return response.json();
-      }
+      // feature_flags table doesn't exist - throw error
+      throw new Error('Feature flags table does not exist in database');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
@@ -378,24 +273,8 @@ export function useDeleteFeatureFlag() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      // Try direct Supabase first
-      try {
-        const supabase = getClient();
-        const { error } = await supabase
-          .from('feature_flags')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-        return { success: true };
-      } catch {
-        // Fallback to API route
-        const response = await fetch(`/api/feature-flags?id=${id}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) throw new Error('Failed to delete flag');
-        return response.json();
-      }
+      // feature_flags table doesn't exist - throw error
+      throw new Error('Feature flags table does not exist in database');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });

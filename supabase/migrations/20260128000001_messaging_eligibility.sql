@@ -1,11 +1,11 @@
 -- ============================================================================
-// Messaging Eligibility State Machine
-//
-// States: closed → pending → eligible → active → guided_first → free_form
-//
-// Messaging never opens automatically - it requires meeting specific intent
-// thresholds defined by the business logic of Lovendo's dating platform.
-// ============================================================================
+--  Messaging Eligibility State Machine
+-- 
+--  States: closed → pending → eligible → active → guided_first → free_form
+-- 
+--  Messaging never opens automatically - it requires meeting specific intent
+--  thresholds defined by the business logic of Lovendo's dating platform.
+--  ============================================================================
 
 -- Messaging eligibility per conversation (tracks when messaging opens)
 CREATE TABLE IF NOT EXISTS messaging_eligibility (
@@ -96,8 +96,8 @@ INSERT INTO guided_message_templates (template_key, category, prompt_text, conte
 ON CONFLICT (template_key) DO NOTHING;
 
 -- ============================================================================
-// STATE MACHINE FUNCTIONS
-// ============================================================================
+--  STATE MACHINE FUNCTIONS
+--  ============================================================================
 
 -- Check if messaging is eligible for a user in a conversation
 CREATE OR REPLACE FUNCTION is_messaging_eligible(
@@ -204,8 +204,8 @@ END;
 $$;
 
 -- ============================================================================
-// ELIGIBILITY TRIGGER FUNCTIONS
-// ============================================================================
+--  ELIGIBILITY TRIGGER FUNCTIONS
+--  ============================================================================
 
 -- Function to auto-create eligibility record when conversation is created
 CREATE OR REPLACE FUNCTION handle_conversation_created()
@@ -234,8 +234,8 @@ CREATE TRIGGER on_conversation_created
   EXECUTE FUNCTION handle_conversation_created();
 
 -- ============================================================================
-// OFF-PLATFORM PREVENTION: Message type enforcement
-// ============================================================================
+--  OFF-PLATFORM PREVENTION: Message type enforcement
+--  ============================================================================
 
 -- Allowed message types enum
 CREATE TYPE allowed_message_type AS ENUM (
@@ -266,8 +266,8 @@ END;
 $$;
 
 -- ============================================================================
-// OFF-PLATFORM CONTACT DETECTION
-// ============================================================================
+--  OFF-PLATFORM CONTACT DETECTION
+--  ============================================================================
 
 -- Off-platform detection patterns
 CREATE TABLE IF NOT EXISTS off_platform_patterns (
@@ -302,7 +302,7 @@ INSERT INTO off_platform_patterns (pattern_type, pattern_regex, severity) VALUES
   ('url', 'telegram\.me/[a-zA-Z0-9_]+', 'block'),
 
   -- Generic URLs (last resort)
-  ('url', 'https?://[^\s]+', 'block'),
+  ('url', 'https?:-- [^\s]+', 'block'),
   ('url', 'www\.[^\s]+', 'block')
 ON CONFLICT DO NOTHING;
 
@@ -338,8 +338,8 @@ END;
 $$;
 
 -- ============================================================================
-// MESSAGE CONTENT AUDIT LOG
-// ============================================================================
+--  MESSAGE CONTENT AUDIT LOG
+--  ============================================================================
 
 CREATE TABLE IF NOT EXISTS message_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -389,8 +389,8 @@ END;
 $$;
 
 -- ============================================================================
-// RLS POLICIES
-// ============================================================================
+--  RLS POLICIES
+--  ============================================================================
 
 ALTER TABLE messaging_eligibility ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guided_first_message_state ENABLE ROW LEVEL SECURITY;
@@ -427,8 +427,8 @@ CREATE POLICY "Admins view audit logs" ON message_audit_log
   );
 
 -- ============================================================================
-// GRANT EXECUTE
-// ============================================================================
+--  GRANT EXECUTE
+--  ============================================================================
 
 GRANT EXECUTE ON FUNCTION is_messaging_eligible TO authenticated;
 GRANT EXECUTE ON FUNCTION can_send_first_message TO authenticated;

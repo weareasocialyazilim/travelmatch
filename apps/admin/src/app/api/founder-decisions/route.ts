@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import type { Json } from '@/types/database';
 import {
   isFounderDecisionLoopEnabled,
   type FounderDecision,
@@ -202,7 +203,7 @@ export async function POST(request: Request) {
         item_key,
         action,
         note: note || null,
-        metadata: metadata || {},
+        metadata: (metadata || {}) as Json,
       })
       .select('id, created_at')
       .single();

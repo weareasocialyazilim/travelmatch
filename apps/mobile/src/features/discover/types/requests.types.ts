@@ -5,7 +5,7 @@ export interface Person {
   avatar: string;
   rating: number;
   isVerified: boolean;
-  tripCount: number;
+  momentCount: number;
   city: string;
 }
 

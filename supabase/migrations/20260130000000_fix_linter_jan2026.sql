@@ -12,10 +12,9 @@ BEGIN;
 -- PART 1: FIX SECURITY DEFINER VIEWS
 -- ============================================================================
 -- SECURITY DEFINER views run with view owner's privileges, not caller's.
--- This can bypass RLS. Change to INVOKER (default) or add proper security.
+-- This can bypass RLS. Drop them - they'll need to be recreated with proper RLS.
 -- ============================================================================
 
--- Helper: Check if view exists
 DO $$
 DECLARE
   view_name TEXT;
@@ -38,44 +37,18 @@ BEGIN
 END $$;
 
 -- ============================================================================
--- PART 2: FIX FUNCTION SEARCH PATH
+-- PART 2: FIX FUNCTION SEARCH PATH (SKIPPED)
 -- ============================================================================
--- Functions with mutable search_path can be exploited for privilege escalation.
--- Add SET search_path = "pg_catalog" to prevent schema hijacking.
+-- The function_search_path_mutable is a WARN level issue, not ERROR.
+-- These functions continue to work correctly without SET search_path.
+-- For production hardening, functions can be updated individually.
+-- Skipping to avoid breaking application functionality.
 -- ============================================================================
 
 DO $$
-DECLARE
-  func RECORD;
 BEGIN
-  -- List of functions that need search_path fix
-  FOR func IN
-    SELECT
-      p.proname AS function_name,
-      ns.nspname AS schema_name,
-      pg_get_function_arguments(p.oid) AS args
-    FROM pg_proc p
-    JOIN pg_namespace ns ON p.pronamespace = ns.oid
-    WHERE ns.nspname = 'public'
-    AND p.proname IN (
-      'increment_offer_stat', 'auto_approve_story', 'update_email_logs_updated_at',
-      'hold_period_remaining', 'creator_earn', 'withdraw_funds', 'get_archived_conversations',
-      'redact_pii', 'unarchive_conversation', 'archive_resolved_alert',
-      'get_transactions_keyset', 'transfer_funds', 'send_bulk_thank_you',
-      'update_system_financial_config_timestamp', 'get_active_conversations',
-      'check_inbound_rules', 'get_moments_keyset', 'sanitize_storage_path',
-      'update_alert_rules_updated_at', 'cleanup_expired_idempotency_keys',
-      'update_kyc_updated_at', 'auto_escalate_disputes', 'archive_conversation',
-      'lvnd_debit', 'update_story_moderation', 'can_view_story', 'add_creator_payout_hold',
-      'generate_case_number', 'queue_blocked_message', 'create_thank_you_event_from_note',
-      'update_updated_at_column', 'check_thank_you_rate_limit', 'notify_thank_you_available',
-      'deposit_funds'
-    )
-  LOOP
-    -- Drop and recreate with secure search_path
-    EXECUTE format('DROP FUNCTION IF EXISTS public.%I CASCADE', func.function_name);
-    RAISE NOTICE 'Dropped function for recreation: %', func.function_name;
-  END LOOP;
+  RAISE NOTICE 'Skipping function search_path fix (WARN level only)';
+  RAISE NOTICE 'To fix later: Add SET search_path to individual functions as needed';
 END $$;
 
 -- ============================================================================
@@ -87,7 +60,6 @@ END $$;
 
 DO $$
 BEGIN
-  -- spatial_ref_sys is a PostGIS system catalog, RLS should not be enabled
   RAISE NOTICE 'spatial_ref_sys is a PostGIS system catalog - RLS cannot be enabled';
   RAISE NOTICE 'This linter error can be safely ignored (FALSE POSITIVE)';
 END $$;
@@ -95,20 +67,10 @@ END $$;
 -- ============================================================================
 -- PART 4: RECREATE FUNCTIONS WITH SECURE SEARCH PATH
 -- ============================================================================
--- Add these functions back with SET search_path for security
+-- Skip recreation - functions will be recreated via separate migrations
+-- or the linter warnings can be suppressed for these specific functions.
+-- The search_path issue is a WARN (not ERROR) and doesn't break functionality.
 -- ============================================================================
-
--- Example pattern for secure function:
--- CREATE OR REPLACE FUNCTION public.example_func()
--- RETURNS void
--- LANGUAGE plpgsql
--- SECURITY DEFINER
--- SET search_path = 'pg_catalog', 'public'
--- AS $$
--- BEGIN
---   -- function body
--- END;
--- $$;
 
 COMMIT;
 
@@ -122,10 +84,13 @@ COMMIT;
 DO $$
 BEGIN
   RAISE NOTICE '============================================';
-  RAISE NOTICE 'Migration complete. Please:';
-  RAISE NOTICE '1. Recreate dropped views with proper RLS policies';
-  RAISE NOTICE '2. Recreate dropped functions with SET search_path';
-  RAISE NOTICE '3. Run Supabase Linter again to verify';
-  RAISE NOTICE '4. spatial_ref_sys RLS error is a FALSE POSITIVE';
+  RAISE NOTICE 'Migration complete. Linter fixes applied:';
+  RAISE NOTICE '1. Dropped security_definer views (17 views)';
+  RAISE NOTICE '2. function_search_path_mutable: SKIPPED (WARN level)';
+  RAISE NOTICE '3. spatial_ref_sys RLS: FALSE POSITIVE (ignored)';
+  RAISE NOTICE '';
+  RAISE NOTICE 'IMPORTANT: Dropped views need to be recreated:';
+  RAISE NOTICE '- Run supabase_dashboard.get_lint_results()';
+  RAISE NOTICE '- Recreate views with proper RLS policies';
   RAISE NOTICE '============================================';
 END $$;

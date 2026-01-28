@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (role) {
-      query = query.eq('role', role);
+      query = query.eq(
+        'role',
+        role as Database['public']['Enums']['admin_role'],
+      );
     }
 
     if (isActive !== null) {

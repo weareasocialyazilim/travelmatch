@@ -64,7 +64,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
           avatar: req.requesterAvatar,
           rating: req.requesterRating || 0,
           isVerified: req.requesterVerified || false,
-          tripCount: 0,
+          momentCount: 0,
           city: req.requesterLocation || '',
         },
         momentTitle: req.momentTitle,

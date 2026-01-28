@@ -138,12 +138,12 @@ export function useRealtimeDashboard() {
   useEffect(() => {
     const supabase = getClient();
 
-    // Subscribe to profiles changes (new users)
-    const profilesChannel = supabase
-      .channel('dashboard-profiles')
+    // Subscribe to users changes (new users)
+    const usersChannel = supabase
+      .channel('dashboard-users')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'profiles' },
+        { event: '*', schema: 'public', table: 'users' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         },
@@ -162,12 +162,12 @@ export function useRealtimeDashboard() {
       )
       .subscribe();
 
-    // Subscribe to payments changes (revenue)
-    const paymentsChannel = supabase
-      .channel('dashboard-payments')
+    // Subscribe to transactions changes (revenue)
+    const transactionsChannel = supabase
+      .channel('dashboard-transactions')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'payments' },
+        { event: '*', schema: 'public', table: 'transactions' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         },
@@ -187,9 +187,9 @@ export function useRealtimeDashboard() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(usersChannel);
       supabase.removeChannel(momentsChannel);
-      supabase.removeChannel(paymentsChannel);
+      supabase.removeChannel(transactionsChannel);
       supabase.removeChannel(tasksChannel);
     };
   }, [queryClient]);

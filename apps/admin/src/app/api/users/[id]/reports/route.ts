@@ -15,17 +15,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: 'Oturum bulunamadı' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Oturum bulunamadı' }, { status: 401 });
     }
 
     // Check permission for viewing reports
     if (!hasPermission(session, 'reports', 'view')) {
       return NextResponse.json(
         { error: 'Bu işlem için yetkiniz yok' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -39,15 +36,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Fetch reports submitted by user
     const submittedQuery = supabase
       .from('reports')
-      .select(`
+      .select(
+        `
         id,
         reason,
         description,
         status,
         created_at,
         resolved_at,
-        reported_user:reported_user_id(id, display_name, avatar_url)
-      `)
+        reported_user:reported_user_id(id, full_name, avatar_url)
+      `,
+      )
       .eq('reporter_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -55,15 +54,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Fetch reports received by user
     const receivedQuery = supabase
       .from('reports')
-      .select(`
+      .select(
+        `
         id,
         reason,
         description,
         status,
         created_at,
         resolved_at,
-        reporter:reporter_id(id, display_name, avatar_url)
-      `)
+        reporter:reporter_id(id, full_name, avatar_url)
+      `,
+      )
       .eq('reported_user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Transform reports
     const transformSubmitted = (reports: unknown[]) =>
-      reports.map((r: Record<string, unknown>) => ({
+      (reports as Array<Record<string, unknown>>).map((r) => ({
         id: r.id,
         type: 'submitted',
         reason: r.reason,
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }));
 
     const transformReceived = (reports: unknown[]) =>
-      reports.map((r: Record<string, unknown>) => ({
+      (reports as Array<Record<string, unknown>>).map((r) => ({
         id: r.id,
         type: 'received',
         reason: r.reason,
@@ -109,10 +110,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Calculate stats
     const stats = {
       submitted_total: submitted.length,
-      submitted_resolved: submitted.filter((r: Record<string, unknown>) => r.status === 'resolved').length,
+      submitted_resolved: (submitted as Array<Record<string, unknown>>).filter(
+        (r) => r.status === 'resolved',
+      ).length,
       received_total: received.length,
-      received_resolved: received.filter((r: Record<string, unknown>) => r.status === 'resolved').length,
-      received_dismissed: received.filter((r: Record<string, unknown>) => r.status === 'dismissed').length,
+      received_resolved: (received as Array<Record<string, unknown>>).filter(
+        (r) => r.status === 'resolved',
+      ).length,
+      received_dismissed: (received as Array<Record<string, unknown>>).filter(
+        (r) => r.status === 'dismissed',
+      ).length,
     };
 
     return NextResponse.json({
@@ -124,9 +131,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logger.error('User reports API error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }

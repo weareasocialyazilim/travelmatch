@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         .range(offset, offset + limit - 1);
 
       if (status) {
-        query = query.eq('status', status as SarRow['status']);
+        query = query.eq('status', status as NonNullable<SarRow['status']>);
       }
 
       const { data: reports, count, error } = await query;
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       if (riskLevel) {
         query = query.eq(
           'risk_level',
-          riskLevel as RiskProfileRow['risk_level'],
+          riskLevel as NonNullable<RiskProfileRow['risk_level']>,
         );
       }
 

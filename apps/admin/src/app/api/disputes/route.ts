@@ -19,8 +19,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
-    const assignedTo = searchParams.get('assigned_to');
+    const type = searchParams.get('type');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -31,8 +30,8 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        requester:users!disputes_requester_id_fkey(id, full_name, avatar_url),
-        responder:users!disputes_responder_id_fkey(id, full_name, avatar_url)
+        reporter:users!disputes_reporter_id_fkey(id, full_name, avatar_url),
+        reported_user:users!disputes_reported_user_id_fkey(id, full_name, avatar_url)
       `,
         { count: 'exact' },
       )
@@ -40,21 +39,13 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (status) {
-      query = query.eq('status', status as DisputeRow['status']);
+      query = query.eq('status', status);
     } else {
       query = query.in('status', ['pending', 'under_review']);
     }
 
-    if (priority) {
-      query = query.eq('priority', priority as DisputeRow['priority']);
-    }
-
-    if (assignedTo === 'me') {
-      query = query.eq('assigned_to', session.admin.id);
-    } else if (assignedTo === 'unassigned') {
-      query = query.is('assigned_to', null);
-    } else if (assignedTo) {
-      query = query.eq('assigned_to', assignedTo);
+    if (type) {
+      query = query.eq('type', type);
     }
 
     const { data: disputes, count, error } = await query;
@@ -92,15 +83,15 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      requester_id,
-      responder_id,
-      request_id,
+      reporter_id,
+      reported_user_id,
+      transaction_id,
       reason,
       description,
-      priority = 'medium',
+      type = 'payment',
     } = body;
 
-    if (!requester_id || !responder_id || !request_id || !reason) {
+    if (!reporter_id || !reported_user_id || !transaction_id || !reason) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
         { status: 400 },
@@ -112,12 +103,12 @@ export async function POST(request: NextRequest) {
     const { data: dispute, error } = await supabase
       .from('disputes')
       .insert({
-        requester_id,
-        responder_id,
-        request_id,
+        reporter_id,
+        reported_user_id,
+        transaction_id,
         reason,
         description,
-        priority: priority as DisputeRow['priority'],
+        type,
         status: 'pending',
       })
       .select()

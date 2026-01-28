@@ -22,13 +22,13 @@ const FAQS = [
   },
   {
     id: 2,
-    q: 'Can I cancel a booking?',
-    a: 'Yes, you can cancel up to 24 hours before the scheduled time for a full refund.',
+    q: 'How does the gift/moment system work?',
+    a: 'When you send a gift (moment), the payment is held securely. The creator receives the gift once the moment is shared/completed.',
   },
   {
     id: 3,
     q: 'Is ID verification mandatory?',
-    a: "For hosts, yes. For guests, it's recommended to increase trust.",
+    a: "For creators, yes. For users, it's recommended to increase trust.",
   },
 ];
 

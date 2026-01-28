@@ -10,27 +10,25 @@ import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
+// Json type matching Supabase schema
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
 // Types
 export interface PayoutRequest {
   id: string;
   user_id: string;
-  user_name: string;
-  user_email: string;
-  user_avatar: string | null;
   amount: number;
-  currency: string;
+  currency: string | null;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
-  payout_method: 'bank_transfer' | 'paypal' | 'crypto' | 'paytr';
-  bank_details: {
-    bank_name?: string;
-    iban?: string;
-    account_holder?: string;
-  } | null;
-  created_at: string;
+  payout_method: 'bank_transfer' | 'paypal' | 'crypto' | 'paytr' | null;
+  bank_details: Json | null;
+  notes: string | null;
+  created_at: string | null;
   processed_at: string | null;
   processed_by: string | null;
   failure_reason: string | null;
   transaction_id: string | null;
+  metadata: Json | null;
 }
 
 export interface KYCVerification {
@@ -56,14 +54,15 @@ export interface KYCVerification {
 export interface WalletBalance {
   id: string;
   user_id: string;
-  user_name: string;
-  user_email: string;
   balance: number;
   pending_balance: number;
   currency: string;
-  total_earned: number;
-  total_withdrawn: number;
-  last_activity: string;
+  currency_code: string | null;
+  coins_balance: number;
+  status: string | null;
+  last_updated: string | null;
+  last_synced_at: string | null;
+  created_at: string | null;
 }
 
 export interface WalletStats {
@@ -80,9 +79,6 @@ const mockPayoutRequests: PayoutRequest[] = [
   {
     id: 'payout-001',
     user_id: 'user-123',
-    user_name: 'Ahmet Yılmaz',
-    user_email: 'ahmet@email.com',
-    user_avatar: null,
     amount: 2500,
     currency: 'TRY',
     status: 'pending',
@@ -92,18 +88,17 @@ const mockPayoutRequests: PayoutRequest[] = [
       iban: 'TR** **** **** **** **** 1234',
       account_holder: 'Ahmet Yılmaz',
     },
+    notes: null,
     created_at: '2026-01-13T09:00:00Z',
     processed_at: null,
     processed_by: null,
     failure_reason: null,
     transaction_id: null,
+    metadata: null,
   },
   {
     id: 'payout-002',
     user_id: 'user-456',
-    user_name: 'Elif Kaya',
-    user_email: 'elif@email.com',
-    user_avatar: null,
     amount: 5000,
     currency: 'TRY',
     status: 'pending',
@@ -113,11 +108,33 @@ const mockPayoutRequests: PayoutRequest[] = [
       iban: 'TR** **** **** **** **** 5678',
       account_holder: 'Elif Kaya',
     },
-    created_at: '2026-01-13T08:30:00Z',
+    notes: null,
+    created_at: '2026-01-12T14:30:00Z',
     processed_at: null,
     processed_by: null,
     failure_reason: null,
     transaction_id: null,
+    metadata: null,
+  },
+  {
+    id: 'payout-003',
+    user_id: 'user-789',
+    amount: 1800,
+    currency: 'TRY',
+    status: 'completed',
+    payout_method: 'bank_transfer',
+    bank_details: {
+      bank_name: 'Akbank',
+      iban: 'TR** **** **** **** **** 9012',
+      account_holder: 'Ayşe Demir',
+    },
+    notes: null,
+    created_at: '2026-01-13T08:30:00Z',
+    processed_at: '2026-01-13T10:15:00Z',
+    processed_by: 'admin-001',
+    failure_reason: null,
+    transaction_id: 'txn_abc123',
+    metadata: null,
   },
 ];
 
@@ -235,7 +252,7 @@ export function usePayoutRequests(filters?: {
         const { data, error } = await query.limit(100);
 
         if (error) throw error;
-        return data || [];
+        return (data as unknown as PayoutRequest[]) || [];
       } catch (error) {
         logger.error('Payout requests fetch error:', error);
         toast.error('Ödeme talepleri yüklenemedi, örnek veriler gösteriliyor');
@@ -273,7 +290,7 @@ export function useKYCVerifications(filters?: {
         const { data, error } = await query.limit(100);
 
         if (error) throw error;
-        return data || [];
+        return (data as unknown as KYCVerification[]) || [];
       } catch (error) {
         // console.error('KYC verifications fetch error:', error);
         toast.error(
@@ -300,7 +317,7 @@ export function useTopWallets(limit = 10) {
           .limit(limit);
 
         if (error) throw error;
-        return data || [];
+        return (data as unknown as WalletBalance[]) || [];
       } catch (error) {
         // console.error('Top wallets fetch error:', error);
         return [];
@@ -481,8 +498,9 @@ export function useVerifyKYC() {
         await supabase
           .from('users')
           .update({
-            kyc_verified: true,
-            kyc_verified_at: new Date().toISOString(),
+            is_verified: true,
+            kyc_status: 'verified',
+            kyc_reviewed_at: new Date().toISOString(),
           })
           .eq('id', data.user_id);
       }

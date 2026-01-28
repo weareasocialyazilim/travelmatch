@@ -252,7 +252,7 @@ export default function UserDetailPage() {
         ...mockUser,
         id: apiResponse.user.id,
         email: apiResponse.user.email || mockUser.email,
-        full_name: apiResponse.user.display_name || mockUser.full_name,
+        full_name: apiResponse.user.full_name || mockUser.full_name,
         avatar_url: apiResponse.user.avatar_url || mockUser.avatar_url,
         bio: apiResponse.user.bio || mockUser.bio,
         created_at: apiResponse.user.created_at || mockUser.created_at,
@@ -262,19 +262,18 @@ export default function UserDetailPage() {
           ? 'banned'
           : apiResponse.user.is_suspended
             ? 'suspended'
-            : apiResponse.user.is_active
+            : apiResponse.user.status === 'active'
               ? 'active'
               : 'inactive',
         verification: {
           ...mockUser.verification,
-          kyc_status: apiResponse.user.is_verified ? 'verified' : 'pending',
+          kyc_status: apiResponse.user.verified ? 'verified' : 'pending',
         },
         stats: {
           ...mockUser.stats,
           total_moments:
             apiResponse.user.stats?.moments ?? mockUser.stats.total_moments,
-          total_matches:
-            apiResponse.user.stats?.matches ?? mockUser.stats.total_matches,
+          total_matches: mockUser.stats.total_matches, // API doesn't return matches
         },
       }
     : mockUser;
@@ -960,7 +959,9 @@ export default function UserDetailPage() {
             <div className="space-y-4">
               {/* Impact Summary */}
               <div className="rounded-lg bg-muted p-4">
-                <h4 className="mb-2 text-sm font-medium">Bu İşlemin Etkileri:</h4>
+                <h4 className="mb-2 text-sm font-medium">
+                  Bu İşlemin Etkileri:
+                </h4>
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <XCircle className="h-4 w-4 text-red-500" />
@@ -1000,13 +1001,17 @@ export default function UserDetailPage() {
                   </Avatar>
                   <div>
                     <p className="font-medium">{user.full_name}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
                   <CanvaBadge
                     variant={actionDialog === 'ban' ? 'error' : 'warning'}
                     className="ml-auto"
                   >
-                    {actionDialog === 'ban' ? 'Yasaklanacak' : 'Askıya Alınacak'}
+                    {actionDialog === 'ban'
+                      ? 'Yasaklanacak'
+                      : 'Askıya Alınacak'}
                   </CanvaBadge>
                 </div>
               </div>
