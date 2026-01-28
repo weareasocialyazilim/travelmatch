@@ -628,7 +628,7 @@ export default function App() {
               {t.form_header}
             </h2>
             <form onSubmit={handleApply} className="space-y-12">
-              {submitError && (
+              {!!submitError && (
                 <div className="bg-red-600/20 border border-red-600 p-4 text-red-500 font-black uppercase">
                   {submitError}
                 </div>
@@ -676,7 +676,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {showSuccess && (
+        {!!showSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -709,7 +709,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {showGiftSuccess && (
+        {!!showGiftSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -758,7 +758,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {showAltSuccess && (
+        {!!showAltSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
