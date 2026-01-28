@@ -40,6 +40,14 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   LineChart,
   Line,
   XAxis,
@@ -79,6 +87,36 @@ const modelIcons: Record<string, React.ElementType> = {
   forecasting: LineChartIcon,
 };
 
+// Environment banner component
+function EnvironmentBanner() {
+  const env = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+  const isProd = env === 'production';
+
+  if (isProd) return null;
+
+  return (
+    <div
+      className={`fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium ${
+        env === 'staging'
+          ? 'bg-yellow-500 text-yellow-950'
+          : 'bg-red-500 text-white'
+      }`}
+    >
+      {env === 'staging' ? (
+        <>
+          <AlertTriangle className="inline-block h-4 w-4 mr-2" />
+          STAGING ENVIRONMENT - Test verisi kullanılıyor
+        </>
+      ) : (
+        <>
+          <AlertTriangle className="inline-block h-4 w-4 mr-2" />
+          DEVELOPMENT ENVIRONMENT - Canlı veri yok
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function AICenterPage() {
   // State
   const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +135,17 @@ export default function AICenterPage() {
   >([]);
   const [experiments, setExperiments] = useState<ABExperiment[]>([]);
   const [categoryTrends, setCategoryTrends] = useState<CategoryTrend[]>([]);
+
+  // Confirmation dialog state for model toggles
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    model: AIModelStats | null;
+    targetStatus: 'active' | 'inactive' | null;
+  }>({
+    open: false,
+    model: null,
+    targetStatus: null,
+  });
 
   // Fetch all data
   const fetchData = useCallback(async () => {
@@ -156,9 +205,31 @@ export default function AICenterPage() {
     toast.success('Veriler güncellendi');
   };
 
-  // Toggle model status
-  const handleToggleModel = async (modelId: string, active: boolean) => {
+  // Request confirmation for model toggle
+  const requestModelToggle = (
+    model: AIModelStats,
+    targetStatus: 'active' | 'inactive',
+  ) => {
+    setConfirmDialog({ open: true, model, targetStatus });
+  };
+
+  // Execute confirmed model toggle
+  const executeModelToggle = async () => {
+    if (!confirmDialog.model || !confirmDialog.targetStatus) return;
+
+    const modelId = confirmDialog.model.id;
+    const active = confirmDialog.targetStatus === 'active';
+
     try {
+      // Log AI decision for audit
+      await aiServiceAdmin.logAIDecision({
+        model_id: modelId,
+        action: 'model_toggle',
+        previous_status: confirmDialog.model.status,
+        new_status: active ? 'active' : 'inactive',
+        timestamp: new Date().toISOString(),
+      });
+
       await aiServiceAdmin.toggleModelStatus(modelId, active);
       setModels((prev) =>
         prev.map((m) =>
@@ -167,10 +238,23 @@ export default function AICenterPage() {
             : m,
         ),
       );
-      toast.success(`Model ${active ? 'aktif' : 'pasif'} edildi`);
+      toast.success(
+        `Model ${active ? 'aktif' : 'pasif'} edildi - ${confirmDialog.model.name}`,
+      );
     } catch {
       toast.error('Model durumu değiştirilemedi');
+    } finally {
+      setConfirmDialog({ open: false, model: null, targetStatus: null });
     }
+  };
+
+  // Toggle model status
+  const handleToggleModel = (modelId: string, active: boolean) => {
+    const model = models.find((m) => m.id === modelId);
+    if (!model) return;
+
+    // Request confirmation before toggling
+    requestModelToggle(model, active ? 'active' : 'inactive');
   };
 
   // Resolve anomaly
@@ -178,27 +262,25 @@ export default function AICenterPage() {
     try {
       await aiServiceAdmin.resolveAnomaly(anomalyId);
       setAnomalies((prev) => prev.filter((a) => a.id !== anomalyId));
-      toast.success('Anomali çözüldü olarak işaretlendi');
+      toast.success('Anomali çözüldü');
     } catch {
       toast.error('Anomali çözülemedi');
     }
   };
 
-  // Helper functions
   const getSeverityBadge = (severity: string) => {
     const variants: Record<
       string,
-      {
-        variant: 'primary' | 'default' | 'error' | 'info' | 'warning';
-        label: string;
-      }
+      { variant: 'error' | 'warning' | 'info' | 'success'; label: string }
     > = {
       critical: { variant: 'error', label: 'Kritik' },
-      warning: { variant: 'warning', label: 'Uyarı' },
-      info: { variant: 'info', label: 'Bilgi' },
+      high: { variant: 'error', label: 'Yüksek' },
+      medium: { variant: 'warning', label: 'Orta' },
+      low: { variant: 'info', label: 'Düşük' },
+      resolved: { variant: 'success', label: 'Çözüldü' },
     };
     const { variant, label } = variants[severity] || {
-      variant: 'info',
+      variant: 'info' as const,
       label: severity,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
@@ -249,6 +331,7 @@ export default function AICenterPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
+        <EnvironmentBanner />
         <div className="flex items-center justify-between">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-10 w-32" />
@@ -265,6 +348,8 @@ export default function AICenterPage() {
 
   return (
     <div className="space-y-6">
+      <EnvironmentBanner />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -343,10 +428,6 @@ export default function AICenterPage() {
           <TabsTrigger value="experiments">
             <FlaskConical className="mr-2 h-4 w-4" />
             A/B Testler
-          </TabsTrigger>
-          <TabsTrigger value="trends">
-            <LineChartIcon className="mr-2 h-4 w-4" />
-            Trendler
           </TabsTrigger>
           <TabsTrigger value="quality">
             <BarChart3 className="mr-2 h-4 w-4" />
@@ -448,53 +529,35 @@ export default function AICenterPage() {
           {/* Churn Predictions */}
           <CanvaCard>
             <CanvaCardHeader>
-              <CanvaCardTitle>Churn Risk Tahminleri</CanvaCardTitle>
+              <CanvaCardTitle>Churn Tahminleri</CanvaCardTitle>
               <CanvaCardSubtitle>
-                Ayrılma riski yüksek kullanıcılar ve önerilen aksiyonlar
+                Ayrılma riski yüksek kullanıcılar
               </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="space-y-4">
-                {churnPredictions.map((prediction) => (
+              <div className="space-y-3">
+                {churnPredictions.slice(0, 5).map((prediction) => (
                   <div
-                    key={prediction.id}
-                    className="flex items-start justify-between rounded-lg border p-4"
+                    key={prediction.userId}
+                    className="flex items-center justify-between rounded-lg border p-3"
                   >
-                    <div className="flex items-start gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                        <Users className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{prediction.user}</p>
-                          {getRiskBadge(prediction.risk)}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>
-                            Churn olasılığı: %{prediction.probability}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {prediction.factors.map((factor, i) => (
-                            <CanvaBadge
-                              key={i}
-                              variant="primary"
-                              className="text-xs"
-                            >
-                              {factor}
-                            </CanvaBadge>
-                          ))}
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">{prediction.userId}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Son aktivite:{' '}
+                          {formatDate(
+                            prediction.lastActive || prediction.predictedAt,
+                          )}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Önerilen Aksiyon
-                      </p>
-                      <CanvaButton size="sm" variant="primary">
-                        <Zap className="mr-2 h-4 w-4" />
-                        {prediction.suggestedAction}
-                      </CanvaButton>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">
+                        {(prediction.probability * 100).toFixed(0)}%
+                      </span>
+                      {getRiskBadge(prediction.riskLevel || prediction.risk)}
                     </div>
                   </div>
                 ))}
@@ -507,37 +570,33 @@ export default function AICenterPage() {
             <CanvaCardHeader>
               <CanvaCardTitle>LTV Tahminleri</CanvaCardTitle>
               <CanvaCardSubtitle>
-                Segment bazlı yaşam boyu değer tahminleri
+                Müşteri yaşam boyu değer tahminleri
               </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="space-y-4">
-                {ltvPredictions.map((segment, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-40">
-                        <p className="font-medium">{segment.segment}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {segment.users.toLocaleString('tr-TR')} kullanıcı
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="font-semibold">
-                          ₺{segment.avgLTV.toLocaleString('tr-TR')}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Ort. LTV
-                        </p>
-                      </div>
-                      {getTrendBadge(segment.trend)}
-                    </div>
-                  </div>
-                ))}
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="text-center p-4 rounded-lg bg-muted">
+                  <p className="text-2xl font-bold">
+                    ${ltvPredictions[0]?.predictedLTV?.toFixed(0) || '0'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Ortalama LTV</p>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted">
+                  <p className="text-2xl font-bold">
+                    {ltvPredictions[0]?.confidenceLevel || 0}%
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Güven Seviyesi
+                  </p>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted">
+                  <p className="text-2xl font-bold">
+                    {ltvPredictions[0]?.predictedMonths || 0}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Tahmin Edilen Ay
+                  </p>
+                </div>
               </div>
             </CanvaCardBody>
           </CanvaCard>
@@ -547,79 +606,39 @@ export default function AICenterPage() {
         <TabsContent value="anomalies" className="space-y-4">
           <CanvaCard>
             <CanvaCardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CanvaCardTitle>Anomali Tespiti</CanvaCardTitle>
-                  <CanvaCardSubtitle>
-                    Olağandışı davranışlar ve sistem uyarıları
-                  </CanvaCardSubtitle>
-                </div>
-                <CanvaButton
-                  variant="primary"
-                  size="sm"
-                  onClick={handleRefresh}
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Yenile
-                </CanvaButton>
-              </div>
+              <CanvaCardTitle>Tespit Edilen Anomaliler</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                AI tarafından tespit edilen anormal davranışlar
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               {anomalies.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                  <CheckCircle className="h-12 w-12 mb-4 text-green-500 dark:text-green-400" />
-                  <p>Aktif anomali bulunmuyor</p>
-                </div>
+                <p className="text-muted-foreground text-center py-8">
+                  Anomali tespit edilmedi
+                </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {anomalies.map((anomaly) => (
                     <div
                       key={anomaly.id}
-                      className={`rounded-lg border p-4 ${
-                        anomaly.severity === 'critical'
-                          ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'
-                          : anomaly.severity === 'warning'
-                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950'
-                            : ''
-                      }`}
+                      className="flex items-center justify-between rounded-lg border p-4"
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
-                          <div
-                            className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                              anomaly.severity === 'critical'
-                                ? 'bg-red-500/10 dark:bg-red-500/20'
-                                : anomaly.severity === 'warning'
-                                  ? 'bg-yellow-500/10 dark:bg-yellow-500/20'
-                                  : 'bg-blue-500/10 dark:bg-blue-500/20'
-                            }`}
-                          >
-                            <AlertTriangle
-                              className={`h-5 w-5 ${
-                                anomaly.severity === 'critical'
-                                  ? 'text-red-600'
-                                  : anomaly.severity === 'warning'
-                                    ? 'text-yellow-600'
-                                    : 'text-blue-600'
-                              }`}
-                            />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium">{anomaly.message}</p>
-                              {getSeverityBadge(anomaly.severity)}
-                            </div>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {anomaly.details}
-                            </p>
-                            <p className="mt-2 text-xs text-muted-foreground">
-                              Tespit: {formatDate(anomaly.detectedAt)}
-                            </p>
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        <div>
+                          <p className="font-medium">{anomaly.type}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(
+                              anomaly.timestamp || anomaly.detectedAt,
+                            )}
+                          </p>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getSeverityBadge(anomaly.severity)}
                         <CanvaButton
                           size="sm"
-                          variant="primary"
+                          variant="outline"
                           onClick={() => handleResolveAnomaly(anomaly.id)}
                         >
                           Çözüldü
@@ -633,98 +652,43 @@ export default function AICenterPage() {
           </CanvaCard>
         </TabsContent>
 
-        {/* A/B Experiments Tab */}
+        {/* Experiments Tab */}
         <TabsContent value="experiments" className="space-y-4">
           <CanvaCard>
             <CanvaCardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CanvaCardTitle>A/B Test Yönetimi</CanvaCardTitle>
-                  <CanvaCardSubtitle>
-                    Aktif ve tamamlanmış deneyler
-                  </CanvaCardSubtitle>
-                </div>
-                <CanvaButton>
-                  <FlaskConical className="mr-2 h-4 w-4" />
-                  Yeni Deney
-                </CanvaButton>
-              </div>
+              <CanvaCardTitle>A/B Test Sonuçları</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                Devam eden ve tamamlanan deneyler
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="space-y-6">
-                {experiments.map((exp) => (
-                  <div key={exp.id} className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{exp.name}</p>
-                          <CanvaBadge
-                            variant={
-                              exp.status === 'running'
-                                ? 'primary'
-                                : exp.status === 'completed'
-                                  ? 'default'
-                                  : 'info'
-                            }
-                          >
-                            {exp.status === 'running'
-                              ? 'Çalışıyor'
-                              : exp.status === 'completed'
-                                ? 'Tamamlandı'
-                                : 'Taslak'}
-                          </CanvaBadge>
-                        </div>
-                        {exp.statisticalSignificance && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            İstatistiksel anlamlılık: %
-                            {exp.statisticalSignificance.toFixed(1)}
-                          </p>
-                        )}
-                      </div>
-                      {exp.winner && (
-                        <CanvaBadge variant="success">
-                          Kazanan: {exp.winner}
-                        </CanvaBadge>
-                      )}
+              <div className="space-y-3">
+                {experiments.map((experiment) => (
+                  <div
+                    key={experiment.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div>
+                      <p className="font-medium">{experiment.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {experiment.description || 'A/B test deneyi'}
+                      </p>
                     </div>
-
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {exp.variants.map((variant, i) => (
-                        <div
-                          key={i}
-                          className={`rounded-lg border p-3 ${
-                            exp.winner === variant.name
-                              ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'
-                              : ''
-                          }`}
-                        >
-                          <p className="font-medium">{variant.name}</p>
-                          <div className="mt-2 space-y-1 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">
-                                Trafik:
-                              </span>
-                              <span>%{variant.traffic}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">
-                                Dönüşüm:
-                              </span>
-                              <span>
-                                {variant.conversions.toLocaleString('tr-TR')}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">
-                                Oran:
-                              </span>
-                              <span className="font-medium">
-                                %{variant.conversionRate.toFixed(1)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      {experiment.trend
+                        ? getTrendBadge(experiment.trend)
+                        : null}
+                      <CanvaBadge
+                        variant={
+                          experiment.status === 'running'
+                            ? 'success'
+                            : 'default'
+                        }
+                      >
+                        {experiment.status === 'running'
+                          ? 'Aktif'
+                          : 'Tamamlandı'}
+                      </CanvaBadge>
                     </div>
                   </div>
                 ))}
@@ -733,159 +697,120 @@ export default function AICenterPage() {
           </CanvaCard>
         </TabsContent>
 
-        {/* Trends Tab */}
-        <TabsContent value="trends" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <CanvaCard>
-              <CanvaCardHeader>
-                <CanvaCardTitle>Kategori Trendleri</CanvaCardTitle>
-                <CanvaCardSubtitle>
-                  Popüler hediye kategorileri ve değişimler
-                </CanvaCardSubtitle>
-              </CanvaCardHeader>
-              <CanvaCardBody>
-                <div className="space-y-4">
-                  {categoryTrends.map((trend, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{trend.category}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {trend.volume.toLocaleString('tr-TR')} hediye
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={
-                            trend.changePercent > 0
-                              ? 'text-green-500 dark:text-green-400'
-                              : trend.changePercent < 0
-                                ? 'text-red-500 dark:text-red-400'
-                                : ''
-                          }
-                        >
-                          {trend.changePercent > 0 ? '+' : ''}
-                          {trend.changePercent}%
-                        </span>
-                        {getTrendBadge(trend.trend)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CanvaCardBody>
-            </CanvaCard>
-
-            <CanvaCard>
-              <CanvaCardHeader>
-                <CanvaCardTitle>Talep Tahmini</CanvaCardTitle>
-                <CanvaCardSubtitle>
-                  Önümüzdeki 7 günlük hediye talebi
-                </CanvaCardSubtitle>
-              </CanvaCardHeader>
-              <CanvaCardBody>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={qualityTrend}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Area
-                        type="monotone"
-                        dataKey="volume"
-                        stroke="#8b5cf6"
-                        fill="#8b5cf680"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </CanvaCardBody>
-            </CanvaCard>
-          </div>
-        </TabsContent>
-
-        {/* Content Quality Tab */}
+        {/* Quality Tab */}
         <TabsContent value="quality" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Quality Trend */}
-            <CanvaCard>
-              <CanvaCardHeader>
-                <CanvaCardTitle>Kanıt Doğruluk Trendi</CanvaCardTitle>
-                <CanvaCardSubtitle>
-                  Son 7 günlük ortalama doğrulama skoru
-                </CanvaCardSubtitle>
-              </CanvaCardHeader>
-              <CanvaCardBody>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={qualityTrend}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={[60, 100]} />
-                      <Tooltip />
-                      <Line
-                        type="monotone"
-                        dataKey="score"
-                        stroke="#8b5cf6"
-                        strokeWidth={2}
-                        dot={{ fill: '#8b5cf6' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CanvaCardBody>
-            </CanvaCard>
-
-            {/* Content Distribution */}
-            <CanvaCard>
-              <CanvaCardHeader>
-                <CanvaCardTitle>Kanıt Doğrulama Dağılımı</CanvaCardTitle>
-                <CanvaCardSubtitle>AI doğrulama sonuçları</CanvaCardSubtitle>
-              </CanvaCardHeader>
-              <CanvaCardBody>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={
-                          contentDistribution as unknown as Record<
-                            string,
-                            unknown
-                          >[]
-                        }
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {contentDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 flex justify-center gap-6">
-                  {contentDistribution.map((item) => (
-                    <div key={item.name} className="flex items-center gap-2">
-                      <div
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {item.name} ({item.value}%)
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CanvaCardBody>
-            </CanvaCard>
-          </div>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Kanıt Kalitesi Trendi</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                Son 7 gün içinde işlenen kanıtların kalite dağılımı
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={qualityTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(date) =>
+                        new Date(date).toLocaleDateString('tr-TR')
+                      }
+                    />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(date) =>
+                        new Date(date).toLocaleDateString('tr-TR')
+                      }
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="verified"
+                      stackId="1"
+                      stroke="#22c55e"
+                      fill="#22c55e"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="pending"
+                      stackId="1"
+                      stroke="#eab308"
+                      fill="#eab308"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="rejected"
+                      stackId="1"
+                      stroke="#ef4444"
+                      fill="#ef4444"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
+
+      {/* Model Toggle Confirmation Dialog */}
+      <Dialog
+        open={confirmDialog.open}
+        onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Model Durumu Değişikliği
+            </DialogTitle>
+            <DialogDescription>
+              Bu işlem, platform davranışını önemli ölçüde etkileyebilir.
+              {confirmDialog.model && (
+                <div className="mt-3 space-y-2">
+                  <div className="rounded-lg bg-muted p-3">
+                    <span className="font-medium">Model:</span>{' '}
+                    {confirmDialog.model.name}
+                  </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <span className="font-medium">Mevcut Durum:</span>{' '}
+                    {confirmDialog.model.status === 'active'
+                      ? 'Aktif'
+                      : 'Pasif'}
+                  </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <span className="font-medium">Yeni Durum:</span>{' '}
+                    {confirmDialog.targetStatus === 'active'
+                      ? 'Aktif'
+                      : 'Pasif'}
+                  </div>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <CanvaButton
+              variant="ghost"
+              onClick={() =>
+                setConfirmDialog({
+                  open: false,
+                  model: null,
+                  targetStatus: null,
+                })
+              }
+            >
+              İptal
+            </CanvaButton>
+            <CanvaButton
+              variant={
+                confirmDialog.targetStatus === 'inactive' ? 'danger' : 'primary'
+              }
+              onClick={executeModelToggle}
+            >
+              Onayla
+            </CanvaButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -21,6 +21,8 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
@@ -503,11 +505,24 @@ export default function ModerationPage() {
     type: 'reject' | 'approve' | 'ban' | null;
     itemId: string | null;
     itemTitle: string;
+    reason: string; // Required for moderation overrides
   }>({
     open: false,
     type: null,
     itemId: null,
     itemTitle: '',
+    reason: '',
+  });
+
+  // GDPR access tracking
+  const [gdprDialog, setGdprDialog] = useState<{
+    open: boolean;
+    userId: string | null;
+    accessType: string | null;
+  }>({
+    open: false,
+    userId: null,
+    accessType: null,
   });
 
   const supabase = getClient();
@@ -880,35 +895,46 @@ export default function ModerationPage() {
     itemId: string,
     itemTitle: string,
   ) {
-    setConfirmDialog({ open: true, type, itemId, itemTitle });
+    setConfirmDialog({
+      open: true,
+      type,
+      itemId,
+      itemTitle,
+      reason: '',
+    });
   }
 
   // Execute confirmed action
   async function confirmAction() {
-    if (!confirmDialog.type || !confirmDialog.itemId) {
-      setConfirmDialog({
-        open: false,
-        type: null,
-        itemId: null,
-        itemTitle: '',
-      });
+    if (
+      !confirmDialog.type ||
+      !confirmDialog.itemId ||
+      !confirmDialog.reason.trim()
+    ) {
+      toast.error('Karar gerekçesi zorunludur');
       return;
     }
 
     try {
       if (confirmDialog.type === 'reject') {
-        await executeReject(confirmDialog.itemId);
+        await executeReject(confirmDialog.itemId, confirmDialog.reason);
       } else if (confirmDialog.type === 'approve') {
-        await executeApprove(confirmDialog.itemId);
+        await executeApprove(confirmDialog.itemId, confirmDialog.reason);
       }
     } catch (error) {
       logger.error('Failed to execute action', error);
     }
 
-    setConfirmDialog({ open: false, type: null, itemId: null, itemTitle: '' });
+    setConfirmDialog({
+      open: false,
+      type: null,
+      itemId: null,
+      itemTitle: '',
+      reason: '',
+    });
   }
 
-  async function executeApprove(momentId: string) {
+  async function executeApprove(momentId: string, reason: string) {
     try {
       const { data: current } = await supabase
         .from('moments')
@@ -939,7 +965,7 @@ export default function ModerationPage() {
           resource_id: momentId,
           old_value: current.moderation_status,
           new_value: 'approved',
-          reason: 'Admin manual approval',
+          reason: reason || 'Admin manual approval',
           metadata: {
             timestamp: new Date().toISOString(),
             provider: 'manual',
@@ -956,7 +982,7 @@ export default function ModerationPage() {
     }
   }
 
-  async function executeReject(momentId: string) {
+  async function executeReject(momentId: string, reason: string) {
     try {
       const { data: current } = await supabase
         .from('moments')
@@ -987,7 +1013,7 @@ export default function ModerationPage() {
           resource_id: momentId,
           old_value: current.moderation_status,
           new_value: 'rejected',
-          reason: 'Admin manual rejection',
+          reason: reason || 'Admin manual rejection',
           metadata: {
             timestamp: new Date().toISOString(),
             provider: 'manual',
@@ -1903,6 +1929,29 @@ export default function ModerationPage() {
                 )}
               </DialogDescription>
             </DialogHeader>
+
+            {/* Required Reason Field for Moderation Override */}
+            <div className="mt-4 space-y-2">
+              <Label
+                htmlFor="moderation-reason"
+                className="text-sm text-gray-300"
+              >
+                Karar Gerekçesi <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                id="moderation-reason"
+                placeholder="AI kararını neden geçersiz kıldığınızı açıklayın..."
+                value={confirmDialog.reason}
+                onChange={(e) =>
+                  setConfirmDialog({ ...confirmDialog, reason: e.target.value })
+                }
+                className="min-h-[80px] bg-white/5 border-white/10 text-white"
+              />
+              <p className="text-xs text-gray-500">
+                KVKK uyumluluğu için gerekçe zorunludur.
+              </p>
+            </div>
+
             <DialogFooter className="mt-6 flex gap-2">
               <CanvaButton
                 variant="ghost"
@@ -1912,6 +1961,7 @@ export default function ModerationPage() {
                     type: null,
                     itemId: null,
                     itemTitle: '',
+                    reason: '',
                   })
                 }
               >
@@ -1925,6 +1975,7 @@ export default function ModerationPage() {
                     : 'primary'
                 }
                 onClick={confirmAction}
+                disabled={!confirmDialog.reason.trim()}
               >
                 {confirmDialog.type === 'reject'
                   ? 'Reddet'

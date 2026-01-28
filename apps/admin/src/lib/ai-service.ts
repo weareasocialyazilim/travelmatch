@@ -6,6 +6,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // =============================================================================
 // Types
@@ -40,6 +41,8 @@ export interface ChurnPrediction {
   factors: string[];
   suggestedAction: string;
   predictedAt: string;
+  lastActive?: string;
+  riskLevel?: 'high' | 'medium' | 'low';
 }
 
 export interface LTVPrediction {
@@ -48,6 +51,9 @@ export interface LTVPrediction {
   avgLTV: number;
   trend: 'up' | 'down' | 'stable';
   confidence: number;
+  predictedLTV?: number;
+  confidenceLevel?: number;
+  predictedMonths?: number;
 }
 
 export interface Anomaly {
@@ -65,6 +71,8 @@ export interface Anomaly {
   resolved: boolean;
   resolvedBy?: string;
   resolvedAt?: string;
+  timestamp?: string;
+  description?: string;
 }
 
 export interface ContentQualityData {
@@ -83,6 +91,8 @@ export interface ABExperiment {
   id: string;
   name: string;
   status: 'draft' | 'running' | 'completed' | 'stopped';
+  description?: string;
+  trend?: 'rising' | 'falling' | 'stable';
   variants: {
     name: string;
     traffic: number;
@@ -108,6 +118,20 @@ export interface ForecastData {
   predictedDemand: number;
   actualDemand?: number;
   confidence: number;
+}
+
+export interface AIDecisionLog {
+  model_id: string;
+  action: string;
+  previous_status?: string;
+  new_status?: string;
+  confidence?: number;
+  input_hash?: string;
+  output_hash?: string;
+  admin_override?: boolean;
+  admin_id?: string;
+  reason?: string;
+  timestamp: string;
 }
 
 // =============================================================================
@@ -769,6 +793,36 @@ class AIServiceAdmin {
           { endpoint: 'proof/verify', count: 12000 },
         ],
       };
+    }
+  }
+
+  // ===========================================================================
+  // AI Decision Audit Logging
+  // ===========================================================================
+
+  async logAIDecision(decision: AIDecisionLog): Promise<void> {
+    // Log to ai_audit_logs table for forensic purposes
+    try {
+      const { error } = await this.supabase.from('ai_audit_logs').insert({
+        model_id: decision.model_id,
+        action: decision.action,
+        previous_status: decision.previous_status,
+        new_status: decision.new_status,
+        confidence: decision.confidence,
+        input_hash: decision.input_hash,
+        output_hash: decision.output_hash,
+        admin_override: decision.admin_override || false,
+        admin_id: decision.admin_id,
+        reason: decision.reason,
+        timestamp: decision.timestamp,
+      });
+
+      if (error) {
+        logger.error('Failed to log AI decision:', error);
+        // Don't throw - logging failure shouldn't break the flow
+      }
+    } catch (err) {
+      logger.error('AI decision logging error:', err);
     }
   }
 }
