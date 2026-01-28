@@ -808,7 +808,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {selected ? (
+        {!!selected ? (
           <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/98 p-4 backdrop-blur-3xl overflow-y-auto">
             <motion.div
               initial={{ scale: 0.9, y: 50 }}
