@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase.server';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 import { sanitizeUUID } from '@/lib/query-utils';
 import crypto from 'crypto';
+import { Route } from 'next';
 
 /**
  * GDPR/KVKK Data Access Request Management
@@ -165,10 +166,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PATCH(
+// PATCH handler - Next.js expects params as Promise<{}>
+const patchHandler = async (
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+  context: { params: Promise<{ id?: string }> },
+) => {
+  const params = await context.params;
+  const id = params.id;
   try {
     const session = await getAdminSession();
     if (!session) {
@@ -262,4 +266,6 @@ export async function PATCH(
     logger.error('GDPR PATCH error:', error);
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
-}
+};
+
+export const PATCH = patchHandler;

@@ -22,9 +22,16 @@ const ENV_SCHEMA = z
     },
   );
 
-// Only validate env vars in production to allow local dev without full env setup
-// In Vercel, these should be configured in project settings
-if (process.env.NODE_ENV === 'production') {
+// Only validate env vars when they are actually available
+// This allows local dev without full env setup while ensuring Vercel deployment has required vars
+const hasRequiredEnvVars = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+  process.env.SUPABASE_SERVICE_ROLE_KEY &&
+  process.env.NEXT_PUBLIC_APP_URL
+);
+
+if (hasRequiredEnvVars) {
   ENV_SCHEMA.parse({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
