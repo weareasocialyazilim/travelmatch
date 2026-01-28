@@ -24,6 +24,15 @@
     "report": "Report",
     "block": "Block"
   },
+  "location": {
+    "permissionTitle": "Discover Nearby Moments",
+    "permissionRationale": "We use your location to show moments near you. Your precise location is never shared with others - only approximate area information is displayed on the map.",
+    "permissionDenyFallback": "Enable location in settings or search by city to discover moments nearby.",
+    "denyButton": "Not Now",
+    "allowButton": "Enable Location",
+    "settingsButton": "Open Settings",
+    "citySearchFallback": "Search by City"
+  },
   "auth": {
     "login": "Login",
     "logout": "Logout",
@@ -202,7 +211,8 @@
       "all": "All",
       "sent": "Sent",
       "received": "Received",
-      "withdrawals": "Withdrawals"
+      "withdrawals": "Withdrawals",
+      "bankTransfers": "Bank Transfers"
     },
     "status": {
       "completed": "Completed",
@@ -214,33 +224,32 @@
     "giftFor": "Gesture for {{name}}",
     "withdrawalTo": "Withdrawal to Bank Account"
   },
-  "withdrawal": {
-    "title": "Withdraw",
+  "bankTransfer": {
+    "title": "Transfer to Bank",
     "availableBalance": "Available Balance",
     "amount": "Amount",
     "minMax": "Min: {{min}} LVND • Max: {{max}} LVND",
     "selectDestination": "Select Destination",
     "bankAccount": "Bank Account",
-    "cryptoWallet": "Crypto Wallet",
-    "withdrawButton": "Withdraw Funds",
+    "transferButton": "Transfer Funds",
     "selectMethod": "Select Method",
     "selectMethodMessage": "Please select a payment method to continue.",
     "invalidAmount": "Invalid Amount",
     "invalidAmountMessage": "Please enter a valid number.",
     "amountTooLow": "Amount Too Low",
-    "amountTooLowMessage": "Minimum withdrawal amount is {{min}} LVND.",
+    "amountTooLowMessage": "Minimum transfer amount is {{min}} LVND.",
     "limitExceeded": "Limit Exceeded",
-    "limitExceededMessage": "Daily maximum withdrawal limit is {{max}} LVND.",
+    "limitExceededMessage": "Daily maximum transfer limit is {{max}} LVND.",
     "insufficientBalance": "Insufficient Balance",
-    "insufficientBalanceMessage": "You don't have enough balance for this withdrawal.",
-    "confirmWithdrawal": "Confirm Withdrawal",
-    "confirmMessage": "Do you want to withdraw {{amount}} LVND to the selected method?",
+    "insufficientBalanceMessage": "You don't have enough balance for this transfer.",
+    "confirmTransfer": "Confirm Transfer",
+    "confirmMessage": "Do you want to transfer {{amount}} LVND to the selected method?",
     "confirm": "Confirm",
-    "withdrawalStarted": "Withdrawal Started",
-    "withdrawalMessage": "Your funds are on the way. Usually takes 1-3 business days.",
-    "withdrawalFailed": "Withdrawal failed. Please try again.",
+    "transferStarted": "Transfer Started",
+    "transferMessage": "Your funds are on the way. Usually takes 1-3 business days.",
+    "transferFailed": "Transfer failed. Please try again.",
     "errorOccurred": "An error occurred. Please try again.",
-    "offlineMessage": "Internet connection required for withdrawals."
+    "offlineMessage": "Internet connection required for transfers."
   },
 
   "errors": {
@@ -342,8 +351,8 @@
         "subheadline": "A small gift, a big happiness"
       },
       "4": {
-        "headline": "Safe in the vault,\ndon't worry",
-        "subheadline": "Your money is protected until the experience happens"
+        "headline": "Secure in escrow,\nfor peace of mind",
+        "subheadline": "Your funds are securely held until the experience is complete"
       },
       "5": {
         "headline": "Are you ready?",
@@ -774,7 +783,7 @@
     "pendingPayments": "Pending Payments",
     "pendingUploads": "Pending Uploads",
     "giftPayment": "Gift Payment",
-    "withdrawal": "Withdrawal",
+    "bankTransfer": "Bank Transfer",
     "momentPurchase": "Moment Purchase",
     "payment": "Payment",
     "proofUpload": "Proof Upload",
@@ -826,12 +835,12 @@
     "recentTransactions": "Recent Transactions",
     "available": "Available",
     "pending": "Pending",
-    "withdraw": "Withdraw",
+    "transfer": "Transfer",
     "deposit": "Deposit",
     "transactions": {
       "paymentReceived": "Payment Received",
       "paymentSent": "Payment Sent",
-      "withdrawal": "Withdrawal",
+      "bankTransfer": "Bank Transfer",
       "deposit": "Deposit",
       "refund": "Refund",
       "topup": "Top Up",
@@ -849,7 +858,7 @@
     },
     "errors": {
       "loadFailed": "Failed to load wallet. Please try again.",
-      "kycRequired": "Please complete identity verification to withdraw funds",
+      "kycRequired": "Please complete identity verification to transfer funds",
       "biometricRequired": "Authentication required to access wallet",
       "networkRequired": "Internet connection required to view wallet."
     },

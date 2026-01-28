@@ -83,12 +83,12 @@ const mainNavItems: NavItem[] = [
   { title: 'Command Center', href: '/command-center', icon: Zap },
   { title: 'Alerts', href: '/alerts', icon: AlertCircle, badge: 4 },
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { title: 'Is Kuyrugu', href: '/queue', icon: ListTodo, badge: 0 },
+  { title: 'İş Kuyruğu', href: '/queue', icon: ListTodo, badge: 0 },
 ];
 
 const managementNavItems: NavItem[] = [
   { title: 'Kullanicilar', href: '/users', icon: Users, resource: 'users' },
-  { title: 'Momentler', href: '/moments', icon: Image, resource: 'moments' },
+  { title: 'Moments', href: '/moments', icon: Image, resource: 'moments' },
   {
     title: 'Anlasmazliklar',
     href: '/disputes',
@@ -103,7 +103,7 @@ const managementNavItems: NavItem[] = [
     resource: 'users',
   },
   {
-    title: 'Ceremony',
+    title: 'Kanıt Sistemi',
     href: '/ceremony-management',
     icon: Sparkles,
     resource: 'users',
@@ -112,7 +112,7 @@ const managementNavItems: NavItem[] = [
 
 const operationsNavItems: NavItem[] = [
   {
-    title: 'Triage Kuyrugu',
+    title: 'Triyaj Kuyruğu',
     href: '/triage',
     icon: ListTodo,
     resource: 'reports',
@@ -124,7 +124,7 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
-    title: 'Wallet & Payouts',
+    title: 'Cüzdan Operasyonları',
     href: '/wallet-operations',
     icon: Wallet,
     resource: 'transactions',
@@ -142,7 +142,7 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
-    title: 'Escrow Islemleri',
+    title: 'Emanet İşlemleri',
     href: '/escrow-operations',
     icon: Lock,
     resource: 'transactions',
@@ -166,7 +166,7 @@ const operationsNavItems: NavItem[] = [
     resource: 'reports',
   },
   {
-    title: 'Fraud Sorusturma',
+    title: 'Dolandırıcılık Soruşturması',
     href: '/fraud-investigation',
     icon: Search,
     resource: 'reports',
@@ -238,7 +238,7 @@ const growthNavItems: NavItem[] = [
     resource: 'users',
   },
   {
-    title: 'Kampanya Builder',
+    title: 'Kampanya Oluşturucu',
     href: '/campaign-builder',
     icon: Send,
     resource: 'users',
@@ -259,14 +259,9 @@ const techNavItems: NavItem[] = [
     icon: Brain,
     resource: 'analytics',
   },
+  // AI Insights removed - duplicates AI Center with mock data
   {
-    title: 'AI Insights',
-    href: '/ai-insights',
-    icon: Sparkles,
-    resource: 'analytics',
-  },
-  {
-    title: 'Sistem Sagligi',
+    title: 'Sistem Sağlığı',
     href: '/system-health',
     icon: Server,
     resource: 'settings',
@@ -278,7 +273,7 @@ const techNavItems: NavItem[] = [
     resource: 'settings',
   },
   {
-    title: 'Entegrasyon Sagligi',
+    title: 'Entegrasyon Sağlığı',
     href: '/integration-health',
     icon: Activity,
     resource: 'settings',
@@ -307,19 +302,13 @@ const settingsNavItems: NavItem[] = [
   },
   // { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
   {
-    title: 'Audit Trail',
-    href: '/audit-trail',
-    icon: FileText,
-    resource: 'admin_users',
-  },
-  {
-    title: 'Audit Logs',
+    title: 'Denetim Kaydı',
     href: '/audit-logs',
     icon: History,
     resource: 'admin_users',
   },
   {
-    title: 'Uyumluluk (KVKK)',
+    title: 'KVKK Merkezi',
     href: '/compliance',
     icon: Scale,
     resource: 'admin_users',

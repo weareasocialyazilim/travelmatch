@@ -100,7 +100,6 @@ const _SearchMapScreen = React.lazy(() =>
 );
 // InboxScreen removed - deprecated, use Notifications or Messages instead
 import { NotificationsScreen } from '../features/notifications';
-import { CheckoutScreen } from '../features/payments';
 // REMOVED: ChatDetailScreen - duplicate of ChatScreen (zombie cleanup)
 
 // ===================================
@@ -204,37 +203,24 @@ const MomentCommentsScreen = lazyLoad(() =>
 // PAYMENTS FEATURE SCREENS
 // ===================================
 import {
-  PaymentMethodsScreen,
-  AddCardScreen,
   TransactionDetailScreen,
   TransactionHistoryScreen,
-  PaymentsKYCScreen,
   SubscriptionScreen,
   RefundRequestScreen,
   SuccessScreen,
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
-  // PayTRWebViewScreen removed for Apple Compliance (backend only)
   PromoCodeScreen,
   UnifiedGiftFlowScreen,
   SubscriberOfferModal,
-  // KYC Screens
-  KYCIntroScreen,
-  KYCDocumentTypeScreen,
-  KYCDocumentCaptureScreen,
-  KYCSelfieScreen,
-  KYCReviewScreen,
-  KYCPendingScreen,
 } from '../features/payments';
 
-// ===================================
 // WALLET FEATURE SCREENS
-// ===================================
 import {
   WalletScreen,
-  WithdrawScreen,
-  WithdrawSuccessScreen,
+  BankTransferScreen,
+  BankTransferSuccessScreen,
   CoinStoreScreen,
 } from '../features/wallet';
 
@@ -283,6 +269,11 @@ const VisibilitySettingsScreen = lazyLoad(() =>
     default: m.VisibilitySettingsScreen,
   })),
 );
+
+// ===================================
+// KYC - Idenfy Integration
+// ===================================
+import { IdenfyKYCScreen } from '../features/verifications';
 import { ReportUserScreen } from '../features/moderation';
 
 // Legal screens - Turkish compliance
@@ -651,12 +642,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Chat" component={ChatScreen} />
             {/* REMOVED: ChatDetail - duplicate route, use Chat instead */}
 
-            {/* Checkout & Reviews (Modals) */}
-            <Stack.Screen
-              name="Checkout"
-              component={CheckoutScreen}
-              options={{ presentation: 'modal' }}
-            />
+            {/* REMOVED: Checkout - PayTR removed, payments now IAP only */}
             {/* Transactions */}
             <Stack.Screen
               name="TransactionDetail"
@@ -702,22 +688,11 @@ const AppNavigator = () => {
               component={ArchivedChatsScreen}
             />
 
-            {/* Identity Verification (Modular KYC Flow) */}
+            {/* Identity Verification - Idenfy Integration */}
             <Stack.Screen
               name="IdentityVerification"
-              component={KYCIntroScreen}
+              component={IdenfyKYCScreen}
             />
-            <Stack.Screen
-              name="KYCDocumentType"
-              component={KYCDocumentTypeScreen}
-            />
-            <Stack.Screen
-              name="KYCDocumentCapture"
-              component={KYCDocumentCaptureScreen}
-            />
-            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
-            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
-            <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
             {/* Social & Invite */}
             <Stack.Screen
@@ -744,7 +719,7 @@ const AppNavigator = () => {
               name="PrivacyPolicy"
               component={PrivacyPolicyScreen}
             />
-            <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
+            {/* REMOVED: PaymentsKYC - now uses IdenfyKYCScreen from verifications */}
             <Stack.Screen
               name="KVKKAydinlatma"
               component={KVKKAydinlatmaScreen}
@@ -754,19 +729,14 @@ const AppNavigator = () => {
               component={MesafeliSatisScreen}
             />
 
-            {/* Withdraw */}
-            <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+            {/* Bank Transfer - User earnings transfer */}
+            <Stack.Screen name="BankTransfer" component={BankTransferScreen} />
             <Stack.Screen
-              name="WithdrawSuccess"
-              component={WithdrawSuccessScreen}
+              name="BankTransferSuccess"
+              component={BankTransferSuccessScreen}
             />
 
-            {/* Payment Methods */}
-            <Stack.Screen
-              name="PaymentMethods"
-              component={PaymentMethodsScreen}
-            />
-            <Stack.Screen name="AddCard" component={AddCardScreen} />
+            {/* REMOVED: PaymentMethods and AddCard - PayTR removed, payments now IAP only */}
 
             {/* Gift & Offer Flows */}
             <Stack.Screen

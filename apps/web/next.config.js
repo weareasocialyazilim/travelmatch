@@ -2,16 +2,21 @@
 const { z } = require('zod');
 
 const ENV_SCHEMA = z.object({
-  NEXT_PUBLIC_APP_URL: z.string().url(),
-  NEXT_PUBLIC_POSTHOG_API_KEY: z.string().min(1),
-  NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional().default('http://localhost:3000'),
+  NEXT_PUBLIC_POSTHOG_API_KEY: z.string().min(1).optional().default(''),
+  NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional().default('https://eu.i.posthog.com'),
 });
 
-ENV_SCHEMA.parse({
+// Validate but don't fail build on missing env (allow development without .env)
+const envResult = ENV_SCHEMA.safeParse({
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NEXT_PUBLIC_POSTHOG_API_KEY: process.env.NEXT_PUBLIC_POSTHOG_API_KEY,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
 });
+
+if (!envResult.success) {
+  console.warn('[Next.js] Environment validation warnings:', envResult.error.errors);
+}
 
 // Security headers - OWASP recommended
 const securityHeaders = [
@@ -22,10 +27,6 @@ const securityHeaders = [
   {
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
-  },
-  {
-    key: 'X-XSS-Protection',
-    value: '1; mode=block',
   },
   {
     key: 'X-Frame-Options',
@@ -43,7 +44,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data:",
@@ -51,6 +52,17 @@ const securityHeaders = [
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
+    ].join('; '),
+  },
+  // CSP Report-Only for monitoring violations (helps tighten CSP post-launch)
+  {
+    key: 'Content-Security-Policy-Report-Only',
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "style-src 'self' 'unsafe-inline'",
+      "report-uri /api/csp-report",
+      "report-to csp-endpoint",
     ].join('; '),
   },
   {

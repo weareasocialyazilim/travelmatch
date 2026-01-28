@@ -18,6 +18,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import { useSearchStore } from '@/stores/searchStore';
+import { supabase } from '@/config/supabase';
 import {
   discoverNearbyMoments,
   type DiscoveryMoment,
@@ -74,6 +75,26 @@ export const useDiscoverMoments = (): UseDiscoverMomentsReturn => {
       mountedRef.current = false;
     };
   }, []);
+
+  // Get current user ID for block filtering
+  useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (mountedRef.current) {
+          // Store userId in a ref to avoid re-renders
+          userIdRef.current = user?.id ?? null;
+        }
+      } catch (error) {
+        logger.warn('[useDiscoverMoments] Failed to get user ID', error);
+      }
+    };
+    getUserId();
+  }, []);
+
+  const userIdRef = useRef<string | null>(null);
 
   // Get user location on mount
   useEffect(() => {
@@ -150,6 +171,7 @@ export const useDiscoverMoments = (): UseDiscoverMomentsReturn => {
           filters: discoveryFilters,
           limit: 20,
           cursor: currentCursor || undefined,
+          userId: userIdRef.current || undefined, // For block filtering
         });
 
         if (!mountedRef.current) return;

@@ -1,15 +1,20 @@
 /**
  * Wallet Service
  *
- * LEGAL COMPLIANCE (PayTR Integration):
- * - We do NOT hold user funds - all funds are in PayTR pool
- * - "Balance" = PayTR API's "withdrawable balance" (proof-approved + valör-matured)
- * - "Pending" = Gifts sent but awaiting proof or PayTR approval
- * - "Withdrawal" = PayTR Settlement (Hakediş) request
+ * APP STORE COMPLIANCE (Critical):
+ * - User payments: ALWAYS through IAP (Apple App Store / Google Play Store)
+ * - User purchases coins via IAP, then uses coins for gifts
+ * - Platform NEVER processes direct card payments (violates App Store rules)
+ *
+ * PayTR USAGE (Backend Only - Payouts):
+ * - PayTR is used ONLY for platform-to-user transfers (withdrawals)
+ * - User requests withdrawal -> Platform uses PayTR to transfer to user's bank
+ * - PayTR is a payment facilitator, NOT used for user payments
  *
  * Balance Definitions:
- * - Available (Çekilebilir): Funds in PayTR pool with completed proof + valör period
- * - Pending (Beklemede): Gifts received but proof not uploaded or PayTR still processing
+ * - Available: Withdrawable balance after proof verification + valör period
+ * - Pending: Gifts received but proof not yet verified
+ * - Coins: Virtual currency balance (for making gifts)
  *
  * Separated from payment service to avoid "Fat Service" anti-pattern.
  */
@@ -19,9 +24,9 @@ import { logger } from '../utils/logger';
 import { paymentCache, CACHE_KEYS, CACHE_TTL } from './cacheService';
 
 export interface WalletBalance {
-  available: number; // PayTR withdrawable balance
-  coins: number; // Lovendo Coins (Virtual Currency)
-  pending: number; // Awaiting proof or PayTR processing
+  available: number; // Withdrawable balance (after proof verification)
+  coins: number; // Lovendo Coins (Virtual Currency for making gifts)
+  pending: number; // Awaiting proof verification
   currency: string;
 }
 

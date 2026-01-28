@@ -294,7 +294,7 @@ export const AUTH_PHASE_PROGRESS: Record<AuthPhase, number> = {
 export const AUTH_PHASE_MESSAGES: Record<AuthPhase, string> = {
   uploading: 'Fotoğraflar yükleniyor...',
   scanning: 'Görüntü taranıyor...',
-  analyzing: 'AI anınızı analiz ediyor...',
+  analyzing: 'İçerik analiz ediliyor...',
   verifying: 'Doğrulama tamamlanıyor...',
   complete: 'Tamamlandı!',
 };

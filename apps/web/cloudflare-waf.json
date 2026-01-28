@@ -1,0 +1,93 @@
+{
+  "description": "Lovendo Website WAF Rules",
+  "version": "2026-01-28",
+  "rules": [
+    {
+      "id": "lovendo_rate_limit_creator",
+      "name": "Lovendo - Creator Form Rate Limit",
+      "action": "block",
+      "expression": "http.request.uri.path == \"/api/creator\" && http.request.method == \"POST\"",
+      "rate_limit": {
+        "requests_per_period": 5,
+        "period_minutes": 60,
+        "mitigation_timeout_minutes": 60
+      }
+    },
+    {
+      "id": "lovendo_rate_limit_api",
+      "name": "Lovendo - General API Rate Limit",
+      "action": "block",
+      "expression": "http.request.uri.path contains \"/api/\"",
+      "rate_limit": {
+        "requests_per_period": 100,
+        "period_minutes": 1,
+        "mitigation_timeout_minutes": 5
+      }
+    },
+    {
+      "id": "lovendo_sqli",
+      "name": "Lovendo - SQL Injection Protection",
+      "action": "block",
+      "expression": "(rx/\\b(select|insert|update|delete|drop|create|alter|exec|execute|union|join|having|group by|order by|limit|offset|where|and|or|not|in|is|null|like|regexp|replace|concat|char|substring|length|indexof|cast|convert|declare|xp_)/i) || (contains(lower(cf.body.raw), \"1=1\") || contains(lower(cf.body.raw), \" OR 1=1\"))"
+    },
+    {
+      "id": "lovendo_xss",
+      "name": "Lovendo - XSS Protection",
+      "action": "block",
+      "expression": "(rx/<script|javascript:|vbscript:|data:text\\/html|on(mouseover|load|click|error|submit|focus|blur|change|reset|select)/i) || (contains(cf.request.uri, \"<\") || contains(cf.request.uri, \">\"))"
+    },
+    {
+      "id": "lovendo_path_traversal",
+      "name": "Lovendo - Path Traversal Protection",
+      "action": "block",
+      "expression": "(contains(cf.request.uri, \"../\") || contains(cf.request.uri, \"..\\\") || contains(cf.request.uri, \"%2e%2e\") || contains(cf.request.uri, \"..\"))"
+    },
+    {
+      "id": "lovendo_command_injection",
+      "name": "Lovendo - Command Injection Protection",
+      "action": "block",
+      "expression": "(rx/\\b(cat|ls|rm|mv|cp|chmod|chown|wget|curl|nc|ping|id|whoami|uname|hostname|ps|top|kill|echo|print|printf|system|exec|shell|bin|bash|sh|cmd|powershell)/i)"
+    },
+    {
+      "id": "lovendo_block_xmlrpc",
+      "name": "Lovendo - Block XMLrpc",
+      "action": "block",
+      "expression": "http.request.uri.path == \"/xmlrpc.php\""
+    },
+    {
+      "id": "lovendo_block_wp_paths",
+      "name": "Lovendo - Block WordPress Paths",
+      "action": "block",
+      "expression": "(http.request.uri.path contains \"/wp-admin/\" || http.request.uri.path contains \"/wp-content/\" || http.request.uri.path contains \"/wp-includes/\") && http.host does not contain \"lovendo.admin\""
+    },
+    {
+      "id": "lovendo_block_trace",
+      "name": "Lovendo - Block TRACE/TRACK",
+      "action": "block",
+      "expression": "http.request.method in {\"TRACE\" \"TRACE\"}"
+    },
+    {
+      "id": "lovendo_known_bots",
+      "name": "Lovendo - Require Known Good Bots",
+      "action": "challenge",
+      "expression": "(not cf.client.bot) && (not http.user_agent in {\"googlebot\" \"bingbot\" \"slurp\" \"duckduckbot\" \"baiduspider\" \"yandexbot\" \"facebookexternalhit\"})"
+    }
+  ],
+  "cache_rules": [
+    {
+      "name": "Static Assets - Aggressive Cache",
+      "expression": "http.request.uri.path in {\".js\" \".css\" \".ico\" \".png\" \".jpg\" \".svg\" \".woff2\"}",
+      "settings": {
+        "cache": true,
+        "edge_cache_ttl": 604800
+      }
+    },
+    {
+      "name": "HTML - No Cache",
+      "expression": "not ends_with(http.request.uri.path, {\".js\" \".css\" \".ico\" \".png\" \".jpg\" \".svg\" \".woff2\"})",
+      "settings": {
+        "cache": false
+      }
+    }
+  ]
+}

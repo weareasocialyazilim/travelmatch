@@ -1,7 +1,7 @@
 /**
  * Wallet Feature - Barrel Exports
  *
- * Manages user wallet, withdrawals, and payment methods.
+ * Manages user wallet, bank transfers, and payment methods.
  * Part of the Lovendo financial system.
  */
 
@@ -9,8 +9,8 @@
 // SCREENS
 // ===================================
 export { default as WalletScreen } from './screens/WalletScreen';
-export { default as WithdrawScreen } from './screens/WithdrawScreen';
-export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
+export { default as BankTransferScreen } from './screens/BankTransferScreen';
+export { BankTransferSuccessScreen } from './screens/BankTransferSuccessScreen';
 export { default as CoinStoreScreen } from './screens/CoinStoreScreen';
 
 // ===================================

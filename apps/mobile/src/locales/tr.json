@@ -24,6 +24,15 @@
     "report": "Bildir",
     "block": "Engelle"
   },
+  "location": {
+    "permissionTitle": "Yakınındaki Anları Keşfet",
+    "permissionRationale": "Konumunuzu, yakınınızdaki anları göstermek için kullanıyoruz. Hassas konumunuz asla başkalarıyla paylaşılmaz - haritada yalnızca yaklaşık bölge bilgisi gösterilir.",
+    "permissionDenyFallback": "Ayarlardan konumu etkinleştirin veya yakınındaki anları keşfetmek için şehir araması yapın.",
+    "denyButton": "Şimdi Değil",
+    "allowButton": "Konumu Etkinleştir",
+    "settingsButton": "Ayarları Aç",
+    "citySearchFallback": "Şehir Ara"
+  },
   "auth": {
     "login": "Giriş Yap",
     "logout": "Çıkış Yap",
@@ -202,7 +211,7 @@
       "all": "Tümü",
       "sent": "Gönderilen",
       "received": "Alınan",
-      "withdrawals": "Çekimler"
+      "bankTransfers": "Transferler"
     },
     "status": {
       "completed": "Tamamlandı",
@@ -214,33 +223,32 @@
     "giftFor": "{{name}}'e Moment Desteği",
     "withdrawalTo": "Banka Hesabına Transfer"
   },
-  "withdrawal": {
-    "title": "Para Çek",
+  "bankTransfer": {
+    "title": "Banka Transferi",
     "availableBalance": "Çekilebilir Bakiye",
     "amount": "Tutar",
     "minMax": "Min: {{min}} LVND • Maks: {{max}} LVND",
     "selectDestination": "Hedef Seçin",
     "bankAccount": "Banka Hesabı",
-    "cryptoWallet": "Kripto Cüzdan",
-    "withdrawButton": "Parayı Çek",
+    "transferButton": "Transferi Başlat",
     "selectMethod": "Yöntem Seçin",
     "selectMethodMessage": "Lütfen devam etmek için bir ödeme yöntemi seçin.",
     "invalidAmount": "Geçersiz Tutar",
     "invalidAmountMessage": "Lütfen geçerli bir sayı girin.",
     "amountTooLow": "Tutar Çok Düşük",
-    "amountTooLowMessage": "Minimum çekim tutarı {{min}} LVND.",
+    "amountTooLowMessage": "Minimum transfer tutarı {{min}} LVND.",
     "limitExceeded": "Limit Aşıldı",
-    "limitExceededMessage": "Günlük maksimum çekim limiti {{max}} LVND.",
+    "limitExceededMessage": "Günlük maksimum transfer limiti {{max}} LVND.",
     "insufficientBalance": "Yetersiz Bakiye",
-    "insufficientBalanceMessage": "Bu çekim işlemi için yeterli bakiyeniz bulunmuyor.",
-    "confirmWithdrawal": "Çekimi Onayla",
-    "confirmMessage": "Seçilen yönteme {{amount}} LVND çekmek istiyor musunuz?",
+    "insufficientBalanceMessage": "Bu transfer işlemi için yeterli bakiyeniz bulunmuyor.",
+    "confirmTransfer": "Transferi Onayla",
+    "confirmMessage": "Seçilen yönteme {{amount}} LVND transfer etmek istiyor musunuz?",
     "confirm": "Onayla",
-    "withdrawalStarted": "Çekim Başlatıldı",
-    "withdrawalMessage": "Paranız yola çıktı. Genellikle 1-3 iş günü sürer.",
-    "withdrawalFailed": "Çekim işlemi başarısız oldu. Lütfen tekrar deneyin.",
+    "transferStarted": "Transfer Başlatıldı",
+    "transferMessage": "Paranız yola çıktı. Genellikle 1-3 iş günü sürer.",
+    "transferFailed": "Transfer işlemi başarısız oldu. Lütfen tekrar deneyin.",
     "errorOccurred": "Bir hata oluştu. Lütfen tekrar deneyin.",
-    "offlineMessage": "Para çekme işlemi için internet bağlantısı gerekli."
+    "offlineMessage": "Transfer işlemi için internet bağlantısı gerekli."
   },
 
   "errors": {
@@ -342,8 +350,8 @@
         "subheadline": "Küçük bir hediye, büyük bir mutluluk"
       },
       "4": {
-        "headline": "Güvenli kasada,\nmerak etme",
-        "subheadline": "Paran deneyim gerçekleşene kadar koruma altında"
+        "headline": "Güvenli emanette,\niçiniz rahat olsun",
+        "subheadline": "Paranız deneyim tamamlanana kadar güvenle tutulur"
       },
       "5": {
         "headline": "Hazır mısın?",
@@ -774,7 +782,7 @@
     "pendingPayments": "Bekleyen Ödemeler",
     "pendingUploads": "Bekleyen Yüklemeler",
     "giftPayment": "Hediye Ödemesi",
-    "withdrawal": "Para Çekme",
+    "bankTransfer": "Banka Transferi",
     "momentPurchase": "Moment Satın Alma",
     "payment": "Ödeme",
     "proofUpload": "Kanıt Yükleme",
@@ -826,12 +834,12 @@
     "recentTransactions": "Son İşlemler",
     "available": "Kullanılabilir",
     "pending": "Beklemede",
-    "withdraw": "Para Çek",
+    "transfer": "Transfer Et",
     "deposit": "Para Yatır",
     "transactions": {
       "paymentReceived": "Ödeme Alındı",
       "paymentSent": "Ödeme Gönderildi",
-      "withdrawal": "Para Çekimi",
+      "bankTransfer": "Banka Transferi",
       "deposit": "Para Yatırma",
       "refund": "İade",
       "topup": "Bakiye Yükleme",
@@ -849,7 +857,7 @@
     },
     "errors": {
       "loadFailed": "Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.",
-      "kycRequired": "Para çekmek için önce kimlik doğrulaması yapmalısınız",
+      "kycRequired": "Transfer yapmak için önce kimlik doğrulaması yapmalısınız",
       "biometricRequired": "Cüzdan erişimi için kimlik doğrulama gerekli",
       "networkRequired": "Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
     },

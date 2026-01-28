@@ -18,7 +18,7 @@ export const SummarySection: React.FC<SummarySectionProps> = React.memo(
           <View style={styles.summaryCard}>
             <MaterialCommunityIcons name="cash" size={24} color={COLORS.mint} />
             <Text style={styles.summaryValue}>${totalEarned}</Text>
-            <Text style={styles.summaryLabel}>Total Earned</Text>
+            <Text style={styles.summaryLabel}>Bu Ay</Text>
           </View>
           <View style={styles.summaryCard}>
             <MaterialCommunityIcons

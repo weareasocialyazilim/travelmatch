@@ -100,21 +100,21 @@ export interface CreateMomentData {
   title: string;
   description: string;
   category: string;
-  location: {
-    city: string;
-    country: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
-  };
+  city: string; // ZORUNLU
+  venue?: string | null; // OPSİYONEL
+  date?: string | null; // OPSİYONEL
   images: string[];
   pricePerGuest: number;
   currency: string;
   maxGuests: number;
   duration: string;
-  availability: string[];
+  availability?: string[]; // OPSİYONEL - evergreen moment için
   showAsStory?: boolean; // Show as story for 24 hours, then as regular moment
+  coordinates?: {
+    // OPSİYONEL - venue için
+    lat: number;
+    lng: number;
+  };
 }
 
 interface UseMomentsReturn {
@@ -352,21 +352,19 @@ export const useMoments = (): UseMomentsReturn => {
           title: data.title,
           description: data.description,
           category: data.category,
-          location:
-            typeof data.location === 'string'
-              ? data.location
-              : data.location?.city || '',
-          coordinates: data.location?.coordinates
-            ? `POINT(${data.location.coordinates.lng} ${data.location.coordinates.lat})`
+          city: data.city,
+          venue: data.venue || null,
+          coordinates: data.coordinates
+            ? `POINT(${data.coordinates.lng} ${data.coordinates.lat})`
             : null,
-          date: new Date().toISOString(),
+          date: data.date || null,
           max_participants: data.maxGuests || 1,
           images: uploadedImageUrls, // Use uploaded URLs instead of local URIs
           price: data.pricePerGuest,
           currency: data.currency,
           max_guests: data.maxGuests,
           duration: data.duration,
-          availability: data.availability,
+          availability: data.availability || null,
           status: 'active',
         };
 
@@ -433,24 +431,26 @@ export const useMoments = (): UseMomentsReturn => {
           title: string;
           description: string;
           category: string;
-          location: string;
+          city: string;
+          venue: string | null;
           price: number;
           currency: string;
           max_guests: number;
           duration: number;
-          availability: string[];
+          availability: string[] | null;
           images: string[];
         }> = {};
         if (data.title) updates.title = data.title;
         if (data.description) updates.description = data.description;
         if (data.category) updates.category = data.category;
-        if (data.location)
-          updates.location = `${data.location.city}, ${data.location.country}`;
+        if (data.city) updates.city = data.city;
+        if ('venue' in data) updates.venue = data.venue || null;
         if (data.pricePerGuest) updates.price = data.pricePerGuest;
         if (data.currency) updates.currency = data.currency;
         if (data.maxGuests) updates.max_guests = data.maxGuests;
         if (data.duration) updates.duration = parseInt(data.duration, 10) || 0;
-        if (data.availability) updates.availability = data.availability;
+        if ('availability' in data)
+          updates.availability = data.availability || null;
 
         // Handle images - upload new local files, keep existing URLs
         if (data.images && data.images.length > 0) {

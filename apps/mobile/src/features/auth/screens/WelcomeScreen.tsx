@@ -47,34 +47,23 @@ interface WelcomeScreenProps {
 const AnimatedLogo: React.FC = () => {
   const breathScale = useSharedValue(1);
   const glowOpacity = useSharedValue(0.5);
-  const rotation = useSharedValue(0);
 
   useEffect(() => {
-    // Breathing animation
+    // Breathing animation - calm, premium entrance
     breathScale.value = withRepeat(
       withSequence(
-        withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1.05, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
       false,
     );
 
-    // Glow pulse
+    // Gentle glow pulse
     glowOpacity.value = withRepeat(
       withSequence(
-        withTiming(0.8, { duration: 1500 }),
-        withTiming(0.4, { duration: 1500 }),
-      ),
-      -1,
-      false,
-    );
-
-    // Subtle rotation
-    rotation.value = withRepeat(
-      withSequence(
-        withTiming(3, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(-3, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.6, { duration: 2000 }),
+        withTiming(0.3, { duration: 2000 }),
       ),
       -1,
       false,
@@ -82,10 +71,7 @@ const AnimatedLogo: React.FC = () => {
   }, []);
 
   const logoStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: breathScale.value },
-      { rotate: `${rotation.value}deg` },
-    ],
+    transform: [{ scale: breathScale.value }],
   }));
 
   const glowStyle = useAnimatedStyle(() => ({
@@ -332,7 +318,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             </Text>
           </AnimatedButton>
 
-{/* Google login hidden until implementation is complete */}
+          {/* Google login hidden until implementation is complete */}
           {/* <AnimatedButton
             variant="google"
             onPress={handleGoogleLogin}

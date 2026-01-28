@@ -17,6 +17,7 @@ type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 export interface PayoutRequest {
   id: string;
   user_id: string;
+  user_name: string;
   amount: number;
   currency: string | null;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
@@ -79,6 +80,7 @@ const mockPayoutRequests: PayoutRequest[] = [
   {
     id: 'payout-001',
     user_id: 'user-123',
+    user_name: 'Ahmet Yılmaz',
     amount: 2500,
     currency: 'TRY',
     status: 'pending',
@@ -99,6 +101,7 @@ const mockPayoutRequests: PayoutRequest[] = [
   {
     id: 'payout-002',
     user_id: 'user-456',
+    user_name: 'Elif Kaya',
     amount: 5000,
     currency: 'TRY',
     status: 'pending',
@@ -119,6 +122,7 @@ const mockPayoutRequests: PayoutRequest[] = [
   {
     id: 'payout-003',
     user_id: 'user-789',
+    user_name: 'Ayşe Demir',
     amount: 1800,
     currency: 'TRY',
     status: 'completed',
@@ -340,56 +344,20 @@ export function useProcessPayout() {
       action: 'approve' | 'reject';
       reason?: string;
     }) => {
-      const supabase = getClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // P0: Use secure API route with permission check and audit logging
+      const response = await fetch(`/api/wallet/payouts/${payoutId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, reason }),
+      });
 
-      if (action === 'approve') {
-        // Process the payout
-        const { data, error } = await supabase
-          .from('payout_requests')
-          .update({
-            status: 'processing',
-            processed_by: user?.id,
-          })
-          .eq('id', payoutId)
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        // In production, this would trigger the actual payment via PayTR or bank API
-        // For now, we'll simulate completion after a short delay
-        setTimeout(async () => {
-          await supabase
-            .from('payout_requests')
-            .update({
-              status: 'completed',
-              processed_at: new Date().toISOString(),
-              transaction_id: `TXN-${Date.now()}`,
-            })
-            .eq('id', payoutId);
-        }, 2000);
-
-        return data;
-      } else {
-        // Reject the payout
-        const { data, error } = await supabase
-          .from('payout_requests')
-          .update({
-            status: 'cancelled',
-            processed_by: user?.id,
-            processed_at: new Date().toISOString(),
-            failure_reason: reason || 'Admin tarafından reddedildi',
-          })
-          .eq('id', payoutId)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ödeme işlenemedi');
       }
+
+      const result = await response.json();
+      return result.payout;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payout-requests'] });
@@ -400,9 +368,9 @@ export function useProcessPayout() {
           : 'Ödeme talebi reddedildi',
       );
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error('Process payout error:', error);
-      toast.error('Ödeme işlenemedi');
+      toast.error(error.message || 'Ödeme işlenemedi');
     },
   });
 }
@@ -418,40 +386,33 @@ export function useBulkProcessPayouts() {
       payoutIds: string[];
       action: 'approve' | 'reject';
     }) => {
-      const supabase = getClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // P0: Use secure API route with permission check and audit logging
+      const response = await fetch('/api/wallet/payouts/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payoutIds, action }),
+      });
 
-      const status = action === 'approve' ? 'processing' : 'cancelled';
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Toplu ödeme işlenemedi');
+      }
 
-      const { data, error } = await supabase
-        .from('payout_requests')
-        .update({
-          status,
-          processed_by: user?.id,
-          processed_at: action === 'reject' ? new Date().toISOString() : null,
-          failure_reason:
-            action === 'reject' ? 'Toplu işlemde reddedildi' : null,
-        })
-        .in('id', payoutIds)
-        .select();
-
-      if (error) throw error;
-      return data;
+      const result = await response.json();
+      return result.processed;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (processed, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payout-requests'] });
       queryClient.invalidateQueries({ queryKey: ['wallet-stats'] });
       toast.success(
-        `${data?.length || 0} ödeme ${
+        `${processed} ödeme ${
           variables.action === 'approve' ? 'onaylandı' : 'reddedildi'
         }`,
       );
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error('Bulk process payouts error:', error);
-      toast.error('Toplu ödeme işlemi başarısız');
+      toast.error(error.message || 'Toplu ödeme işlemi başarısız');
     },
   });
 }
@@ -471,41 +432,26 @@ export function useVerifyKYC() {
       reason?: string;
       notes?: string;
     }) => {
-      const supabase = getClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // Note: kycId is the user_id for the existing API route
+      // P0: Use secure API route with permission check and audit logging
+      const response = await fetch('/api/kyc', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: kycId,
+          action,
+          rejection_reason: reason,
+          notes,
+        }),
+      });
 
-      const status = action === 'approve' ? 'approved' : 'rejected';
-
-      const { data, error } = await supabase
-        .from('kyc_verifications')
-        .update({
-          status,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: user?.id,
-          rejection_reason: action === 'reject' ? reason : null,
-          verification_notes: notes,
-        })
-        .eq('id', kycId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Update user verification status
-      if (action === 'approve' && data.user_id) {
-        await supabase
-          .from('users')
-          .update({
-            is_verified: true,
-            kyc_status: 'verified',
-            kyc_reviewed_at: new Date().toISOString(),
-          })
-          .eq('id', data.user_id);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'KYC işlenemedi');
       }
 
-      return data;
+      const result = await response.json();
+      return result.user;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['kyc-verifications'] });
@@ -516,9 +462,9 @@ export function useVerifyKYC() {
           : 'KYC doğrulaması reddedildi',
       );
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error('Verify KYC error:', error);
-      toast.error('KYC doğrulaması işlenemedi');
+      toast.error(error.message || 'KYC doğrulaması işlenemedi');
     },
   });
 }

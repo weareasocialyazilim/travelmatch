@@ -1,15 +1,16 @@
 /**
- * UnifiedGiftFlowScreen - Moment Ödeme Akışı
+ * UnifiedGiftFlowScreen - Moment Ödeme Akışı (IAP Compatible)
  *
  * Bu ekran kullanıcıların:
- * - Bir moment'a katılmak için host'a ödeme yapmasını sağlar
- * - PayTR güvenli ödeme entegrasyonu ile çalışır
- * - Escrow sistemi ile güvenli transfer yapar
+ * - Bir moment'a katılmak için LVND Coin kullanmasını sağlar
+ * - Yetersiz coin durumunda CoinStore'a (IAP) yönlendirir
+ * - Apple/Google Play Store uyumluluğu için ödeme işlemi IAP üzerinden yapılır
  *
  * NOT: Bu "arkadaşa hediye" değil, moment'a katılım ödemesidir.
+ * NOT: PayTR kaldırıldı - tüm ödemeler IAP (App Store/Play Store) üzerinden
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +21,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -31,6 +33,8 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HapticManager } from '@/services/HapticManager';
+import { securePaymentService } from '@/services/securePaymentService';
+import { walletService } from '@/services/walletService';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -49,7 +53,7 @@ const UnifiedGiftFlowScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   const {
-    recipientId: _hostId,
+    recipientId: hostId,
     recipientName: hostName,
     momentId,
     momentTitle,
@@ -59,6 +63,24 @@ const UnifiedGiftFlowScreen: React.FC = () => {
 
   const [messageToHost, setMessageToHost] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [coinBalance, setCoinBalance] = useState(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+
+  // Load coin balance on mount
+  useEffect(() => {
+    loadBalance();
+  }, []);
+
+  const loadBalance = async () => {
+    try {
+      const balance = await walletService.getBalance();
+      setCoinBalance(balance.available);
+    } catch (error) {
+      logger.error('Failed to load coin balance', { error });
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
 
   const formatCurrency = (value: number, currency: string = 'TRY') => {
     const currencySymbols: Record<string, string> = {
@@ -72,6 +94,9 @@ const UnifiedGiftFlowScreen: React.FC = () => {
     return `${currencySymbols[currency] || currency} ${value.toLocaleString('tr-TR')}`;
   };
 
+  const hasEnoughCoins = coinBalance >= requestedAmount;
+  const missingCoins = requestedAmount - coinBalance;
+
   const handleBack = useCallback(() => {
     HapticManager.buttonPress();
     navigation.goBack();
@@ -79,27 +104,77 @@ const UnifiedGiftFlowScreen: React.FC = () => {
 
   const handleProceedToPayment = useCallback(async () => {
     HapticManager.buttonPress();
+
+    if (!hasEnoughCoins) {
+      // Navigate to CoinStore to buy more coins
+      Alert.alert(
+        'Yetersiz Bakiye',
+        `${missingCoins} LVND Coin eksik. Devam etmek için Coin Store'dan coin satın alabilirsiniz.`,
+        [
+          { text: 'İptal', style: 'cancel' },
+          {
+            text: 'Coin Satın Al',
+            onPress: () => {
+              HapticManager.buttonPress();
+              navigation.navigate('CoinStore' as any);
+            },
+          },
+        ],
+      );
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      // Navigate to PayTR WebView for secure payment
-      navigation.navigate('PayTRWebView', {
-        iframeToken: `moment_${momentId}_${Date.now()}`,
-        merchantOid: `moment_payment_${momentId}`,
-        amount: requestedAmount || 0,
-        currency: (requestedCurrency as 'TRY' | 'EUR' | 'USD') || 'TRY',
-        giftId: momentId,
+      // Process payment using LVND coins
+      const result = await securePaymentService.transferLVND({
+        amount: requestedAmount,
+        recipientId: hostId,
+        momentId: momentId,
       });
+
+      if (result.success) {
+        // Navigate to success screen
+        navigation.navigate('Success' as any, {
+          type: 'gift_sent',
+          title: 'Hediye Gönderildi! 🎁',
+          subtitle: `${hostName} adlı kullanıcıya ${formatCurrency(requestedAmount, requestedCurrency)} değerinde hediye gönderdiniz.`,
+          details: {
+            destination: hostName,
+            referenceId: result.transactionId,
+          },
+        });
+      } else {
+        throw new Error('Ödeme başarısız');
+      }
     } catch (error) {
-      logger.error('UnifiedGiftFlow', 'Payment navigation failed', { error });
+      logger.error('UnifiedGiftFlow', 'Payment failed', { error });
       HapticManager.error();
-      navigation.navigate('PaymentFailed', {
-        error: 'Ödeme işlemi başlatılamadı. Lütfen tekrar deneyin.',
-      });
+      Alert.alert(
+        'Ödeme Başarısız',
+        'Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+        [{ text: 'Tamam', onPress: () => {} }],
+      );
     } finally {
       setIsProcessing(false);
     }
-  }, [momentId, requestedAmount, requestedCurrency, navigation]);
+  }, [
+    hostId,
+    hostName,
+    momentId,
+    requestedAmount,
+    requestedCurrency,
+    hasEnoughCoins,
+    missingCoins,
+    coinBalance,
+    navigation,
+  ]);
+
+  const handleBuyCoins = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('CoinStore' as any);
+  }, [navigation]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -139,6 +214,43 @@ const UnifiedGiftFlowScreen: React.FC = () => {
                 {formatCurrency(requestedAmount || 0, requestedCurrency)}
               </Text>
             </LinearGradient>
+          </GlassCard>
+
+          {/* Coin Balance Card */}
+          <GlassCard style={styles.balanceCard}>
+            <View style={styles.balanceRow}>
+              <View style={styles.balanceInfo}>
+                <Ionicons
+                  name="wallet-outline"
+                  size={24}
+                  color={COLORS.primary}
+                />
+                <View style={styles.balanceText}>
+                  <Text style={styles.balanceLabel}>LVND Bakiyen</Text>
+                  <Text style={styles.balanceValue}>
+                    {isLoadingBalance ? (
+                      <ActivityIndicator size="small" color={COLORS.primary} />
+                    ) : (
+                      `${coinBalance.toLocaleString()} LVND`
+                    )}
+                  </Text>
+                </View>
+              </View>
+              {!hasEnoughCoins && (
+                <TouchableOpacity
+                  style={styles.buyCoinButton}
+                  onPress={handleBuyCoins}
+                >
+                  <Text style={styles.buyCoinButtonText}>Coin Al</Text>
+                  <Ionicons name="add" size={18} color={COLORS.white} />
+                </TouchableOpacity>
+              )}
+            </View>
+            {!hasEnoughCoins && (
+              <Text style={styles.balanceWarning}>
+                💰 {missingCoins.toLocaleString()} LVND eksik
+              </Text>
+            )}
           </GlassCard>
 
           {/* Message to Host Section */}
@@ -190,6 +302,24 @@ const UnifiedGiftFlowScreen: React.FC = () => {
             </View>
           </GlassCard>
 
+          {/* Creator Price Explanation */}
+          <View style={styles.creatorPriceBox}>
+            <Ionicons
+              name="person-circle-outline"
+              size={20}
+              color={COLORS.primary}
+            />
+            <View style={styles.creatorPriceContent}>
+              <Text style={styles.creatorPriceTitle}>
+                Bu tutarı oluşturan belirledi
+              </Text>
+              <Text style={styles.creatorPriceDesc}>
+                Destekçiler bu sabit bedeli öder. Fiyatı sadece oluşturan kişi
+                belirler.
+              </Text>
+            </View>
+          </View>
+
           {/* Escrow Info */}
           <View style={styles.infoBox}>
             <Ionicons
@@ -202,14 +332,45 @@ const UnifiedGiftFlowScreen: React.FC = () => {
               sonra host'a aktarılır. Sorun yaşarsanız iade talep edebilirsiniz.
             </Text>
           </View>
+
+          {/* Escrow Expandable Info */}
+          <TouchableOpacity
+            style={styles.escrowExpandable}
+            onPress={() => {
+              HapticManager.buttonPress();
+            }}
+            activeOpacity={0.8}
+          >
+            <View style={styles.escrowExpandableHeader}>
+              <Ionicons
+                name="information-circle-outline"
+                size={18}
+                color={COLORS.text.secondary}
+              />
+              <Text style={styles.escrowExpandableTitle}>Escrow nedir?</Text>
+              <Ionicons
+                name="chevron-down"
+                size={16}
+                color={COLORS.text.secondary}
+              />
+            </View>
+            <Text style={styles.escrowExpandableContent}>
+              Escrow, güvenli bir üçüncü taraf hesabıdır. Paranız moment
+              başarıyla tamamlanana kadar bu hesapta bekler. Böylece hem sizin
+              hem de oluşturanın hakları korunur.
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
 
         {/* Bottom CTA */}
         <View style={[styles.bottomCta, { paddingBottom: insets.bottom + 16 }]}>
           <TouchableOpacity
-            style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
+            style={[
+              styles.payButton,
+              (isProcessing || isLoadingBalance) && styles.payButtonDisabled,
+            ]}
             onPress={handleProceedToPayment}
-            disabled={isProcessing}
+            disabled={isProcessing || isLoadingBalance}
           >
             <LinearGradient
               colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
@@ -221,15 +382,26 @@ const UnifiedGiftFlowScreen: React.FC = () => {
                 <ActivityIndicator color={COLORS.white} />
               ) : (
                 <>
-                  <Ionicons name="card" size={20} color={COLORS.white} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color={COLORS.white}
+                  />
                   <Text style={styles.payButtonText}>
-                    Güvenli Ödeme Yap •{' '}
-                    {formatCurrency(requestedAmount || 0, requestedCurrency)}
+                    {hasEnoughCoins
+                      ? `Hediye Gönder • ${formatCurrency(requestedAmount || 0, requestedCurrency)}`
+                      : `Coin Satın Al`}
                   </Text>
                 </>
               )}
             </LinearGradient>
           </TouchableOpacity>
+          {!hasEnoughCoins && (
+            <Text style={styles.ctaSubtext}>
+              LVND Coin satın almak için App Store/Play Store üzerinden ödeme
+              yapılır
+            </Text>
+          )}
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -312,6 +484,54 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.body,
     color: COLORS.white,
   },
+  balanceCard: {
+    padding: 16,
+    marginBottom: 20,
+    backgroundColor: COLORS.primary + '08',
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  balanceInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  balanceText: {
+    gap: 2,
+  },
+  balanceLabel: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.text.secondary,
+  },
+  balanceValue: {
+    fontFamily: FONTS.mono.medium,
+    fontSize: FONT_SIZES.bodyLarge,
+    color: COLORS.primary,
+  },
+  buyCoinButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: COLORS.success,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  buyCoinButtonText: {
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.white,
+  },
+  balanceWarning: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.warning,
+    marginTop: 8,
+  },
   messageSection: {
     marginBottom: 20,
   },
@@ -392,6 +612,55 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     lineHeight: 20,
   },
+  creatorPriceBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 12,
+    backgroundColor: COLORS.primary + '10',
+    borderRadius: 12,
+    gap: 10,
+    marginBottom: 12,
+  },
+  creatorPriceContent: {
+    flex: 1,
+  },
+  creatorPriceTitle: {
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES.bodySmall,
+    color: COLORS.primary,
+    marginBottom: 4,
+  },
+  creatorPriceDesc: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.text.secondary,
+    lineHeight: 16,
+  },
+  escrowExpandable: {
+    backgroundColor: COLORS.surface.base,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+  },
+  escrowExpandableHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  escrowExpandableTitle: {
+    flex: 1,
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES.bodySmall,
+    color: COLORS.text.secondary,
+  },
+  escrowExpandableContent: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.text.muted,
+    lineHeight: 18,
+    marginTop: 8,
+    paddingLeft: 26,
+  },
   bottomCta: {
     paddingHorizontal: 20,
     paddingTop: 16,
@@ -422,6 +691,13 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.body.bold,
     fontSize: FONT_SIZES.body,
     color: COLORS.white,
+  },
+  ctaSubtext: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.caption,
+    color: COLORS.text.muted,
+    textAlign: 'center',
+    marginTop: 8,
   },
 });
 

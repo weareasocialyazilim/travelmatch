@@ -132,7 +132,8 @@ export const FEATURES = {
   ANALYTICS: config.ENABLE_ANALYTICS,
   LOGGING: config.ENABLE_LOGGING,
   SOCKET_ENABLED: !!config.SOCKET_URL,
-  PAYMENTS_ENABLED: true, // PayTR payment provider
+  PAYMENTS_ENABLED: true, // IAP enabled (Apple/Google Play) for user payments
+  // Note: PayTR is used for backend payouts only, not user-facing payments
   MAPS_ENABLED: !!config.MAPBOX_PUBLIC_TOKEN,
   SUPABASE_ENABLED: !!config.SUPABASE_URL && !!config.SUPABASE_ANON_KEY,
 } as const;

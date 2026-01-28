@@ -257,7 +257,7 @@ export default function CeremonyManagementPage() {
   return (
     <div className="space-y-6 p-6">
       <PageHeader
-        title="Ceremony Management"
+        title="Kanıt Sistemi"
         description="Proof Ceremony metrikleri ve manuel inceleme yönetimi"
       />
 

@@ -14,7 +14,6 @@ export {
   TrustConstellation,
 } from './components/TrustMilestones';
 export { SunsetClock } from './components/SunsetClock';
-// export { MomentAuthenticator } from './components/MomentAuthenticator';
 export { SacredMoments } from './components/SacredMoments';
 export { GiftVault } from './components/GiftVault';
 export { ThankYouCardCreator } from './components/ThankYouCardCreator';
@@ -30,16 +29,6 @@ export { ProofDetailScreen } from './screens/ProofDetailScreen';
 export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 
 // ===================================
-// KYC (Identity Verification) - Güvenin Giriş Kapısı
-// Moved from features/payments - KYC is core to Trust Garden
+// KYC (Identity Verification) - Idenfy Integration
 // ===================================
-export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
-export { default as KYCDocumentTypeScreen } from './kyc/KYCDocumentTypeScreen';
-export { default as KYCDocumentCaptureScreen } from './kyc/KYCDocumentCaptureScreen';
-export { default as KYCSelfieScreen } from './kyc/KYCSelfieScreen';
-export { default as KYCReviewScreen } from './kyc/KYCReviewScreen';
-export { default as KYCPendingScreen } from './kyc/KYCPendingScreen';
-export * from './kyc/types';
-
-// Types
-// export type { AuthenticationResult } from './components/MomentAuthenticator';
+export { default as IdenfyKYCScreen } from './idenfy/IdenfyKYCScreen';

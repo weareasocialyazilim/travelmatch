@@ -1,4 +1,16 @@
-import { getEntitlements, type PlanTier } from '@lovendo/entitlements';
+import {
+  getEntitlements,
+  type PlanTier,
+  type BackendTier,
+} from '@lovendo/entitlements';
+
+// Convert PlanTier to BackendTier for getEntitlements
+const PLAN_TO_BACKEND_TIER: Record<PlanTier, BackendTier> = {
+  GUEST: 'free',
+  FREE: 'free',
+  PAID: 'premium',
+  VIP: 'platinum',
+};
 
 export const requireAuthOr = (
   tier: PlanTier,
@@ -15,7 +27,8 @@ export const requireEntitlementOr = (
   action: () => void,
   onBlocked: () => void,
 ) => {
-  const e = getEntitlements(tier);
+  const backendTier = PLAN_TO_BACKEND_TIER[tier];
+  const e = getEntitlements(backendTier);
   if (!predicate(e)) return onBlocked();
   return action();
 };

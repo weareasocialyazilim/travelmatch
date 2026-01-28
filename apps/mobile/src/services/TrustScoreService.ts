@@ -1,128 +1,100 @@
 /**
- * TrustScore Service
- * Handles TrustScore calculations, limits, and financial advantages.
- * 
- * "TrustScore is no longer just a social score; it's a Credit Note that determines limits and commissions."
+ * Trust Score Service
+ *
+ * Canonical source: DB function `get_detailed_trust_stats`
+ * Uses RPC call to Supabase Edge Function for trust score data.
+ *
+ * Trust Levels: Sprout → Adventurer → Explorer → Voyager → Ambassador
  */
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 
-export type UserTier = 'Free' | 'Pro' | 'Elite';
+export type TrustLevel =
+  | 'Sprout'
+  | 'Adventurer'
+  | 'Explorer'
+  | 'Voyager'
+  | 'Ambassador';
 
-export interface TrustScoreBenefits {
-  withdrawalCommission: number; // Percentage (e.g., 15, 10, 5)
-  dailyLimit: number; // LVND
-  canWithdraw: boolean;
-  autoApproval: boolean;
+export interface TrustScoreData {
+  totalScore: number;
+  level: TrustLevel;
+  levelProgress: number; // 0.0 to 1.0
+  breakdown: {
+    paymentScore: number;
+    proofScore: number;
+    trustNotesScore: number;
+    kycScore: number;
+    socialScore: number;
+  };
 }
 
 class TrustScoreService {
   /**
-   * Calculate TrustScore using the official formula:
-   * TrustScore = (KYC_status * 100) + (Sub_level * 50) + sum(SuccessfulTransactions * 0.1)
+   * Get trust score from canonical DB function
    */
-  async calculateTrustScore(userId: string): Promise<number> {
+  async getTrustScore(userId: string): Promise<TrustScoreData | null> {
     try {
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('verified, coins_balance')
-        .eq('id', userId)
-        .single();
-      
-      if (userError) throw userError;
+      const { data, error } = await (supabase.rpc as any)(
+        'get_detailed_trust_stats',
+        { p_user_id: userId },
+      );
 
-      const { data: subscription } = await supabase
-        .from('user_subscriptions')
-        .select('plan_id, status')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .single();
-
-      const { count: transactionCount } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('status', 'completed');
-
-      let score = 0;
-
-      // 1. KYC status (100 if verified)
-      if (user.verified) {
-        score += 100;
+      if (error) {
+        logger.error('[TrustScore] RPC error:', error);
+        return null;
       }
 
-      // 2. Subscription level (Pro/Elite)
-      // Note: We need to map plan_id to level. Assuming plan names for now.
-      if (subscription) {
-        // This mapping should be dynamic in production
-        const level = await this.getSubscriptionTier(userId);
-        if (level === 'Elite') score += 50;
-        else if (level === 'Pro') score += 25; // Assumption for Pro
-      }
+      if (!data) return null;
 
-      // 3. Transactions contribution (0.1 per successful txn)
-      score += (transactionCount || 0) * 0.1;
-
-      return Math.floor(score);
+      return {
+        totalScore: data.total_score || 0,
+        level: (data.level as TrustLevel) || 'Sprout',
+        levelProgress: data.level_progress || 0,
+        breakdown: {
+          paymentScore: data.breakdown?.payment_score || 0,
+          proofScore: data.breakdown?.proof_score || 0,
+          trustNotesScore: data.breakdown?.trust_notes_score || 0,
+          kycScore: data.breakdown?.kyc_score || 0,
+          socialScore: data.breakdown?.social_score || 0,
+        },
+      };
     } catch (error) {
-      logger.error('[TrustScore] Calculation error:', error);
-      return 0;
+      logger.error('[TrustScore] Error fetching trust score:', error);
+      return null;
     }
   }
 
   /**
-   * Get subscription tier for user
-   */
-  async getSubscriptionTier(userId: string): Promise<UserTier> {
-    const { data: subscription } = await supabase
-      .from('user_subscriptions')
-      .select('status, plan:subscription_plans(name)')
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .single();
-
-    if (!subscription || !subscription.plan) return 'Free';
-    
-    const planName = (subscription.plan as any).name;
-    if (planName.toLowerCase().includes('platinum') || planName.toLowerCase().includes('elite')) return 'Elite';
-    if (planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('pro')) return 'Pro';
-    return 'Free';
-  }
-
-  /**
-   * Get benefits based on TrustScore and tier
-   */
-  async getBenefits(userId: string): Promise<TrustScoreBenefits> {
-    const score = await this.calculateTrustScore(userId);
-    const tier = await this.getSubscriptionTier(userId);
-    const { data: user } = await supabase.from('users').select('verified').eq('id', userId).single();
-
-    let commission = 15; // Free: 15%
-    if (tier === 'Elite') commission = 5; // Elite: 5%
-    else if (tier === 'Pro') commission = 10; // Pro: 10%
-
-    let dailyLimit = 1000;
-    if (score > 500) dailyLimit = 10000;
-    else if (score > 100) dailyLimit = 5000;
-
-    return {
-      withdrawalCommission: commission,
-      dailyLimit,
-      canWithdraw: !!user?.verified,
-      autoApproval: score > 500 && !!user?.verified,
-    };
-  }
-
-  /**
-   * Update TrustScore in DB
+   * Sync trust score to users table (for caching)
    */
   async syncTrustScore(userId: string): Promise<void> {
-    const score = await this.calculateTrustScore(userId);
-    await supabase
-      .from('users')
-      .update({ trust_score: score })
-      .eq('id', userId);
+    try {
+      const score = await this.getTrustScore(userId);
+      if (score) {
+        await supabase
+          .from('users')
+          .update({ trust_score: score.totalScore })
+          .eq('id', userId);
+      }
+    } catch (error) {
+      logger.error('[TrustScore] Sync error:', error);
+    }
+  }
+
+  /**
+   * Get trust level badge info
+   */
+  getLevelBadge(level: TrustLevel): { icon: string; color: string } {
+    const badges: Record<TrustLevel, { icon: string; color: string }> = {
+      Sprout: { icon: 'leaf-outline', color: '#4ADE80' },
+      Adventurer: { icon: 'footsteps', color: '#22D3EE' },
+      Explorer: { icon: 'map-outline', color: '#818CF8' },
+      Voyager: { icon: 'airplane-outline', color: '#C084FC' },
+      Ambassador: { icon: 'star', color: '#FCD34D' },
+    };
+    return badges[level] || badges.Sprout;
   }
 }
 

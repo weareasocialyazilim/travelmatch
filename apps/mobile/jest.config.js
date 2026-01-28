@@ -21,7 +21,7 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo.*|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
+    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo-modules-core|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
@@ -32,6 +32,8 @@ module.exports = {
     '^(\\.\\./)+components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     // Mock expo virtual env module (ES module that Jest can't handle)
     '^expo/virtual/env$': '<rootDir>/__mocks__/expo-virtual-env.js',
+    '^expo-application$': '<rootDir>/__mocks__/expo-application.js',
+    '^expo-crypto$': '<rootDir>/__mocks__/expo-crypto.js',
     // Shared mocks in tests/__mocks__/ to avoid duplication across packages
     '^react-native$': '<rootDir>/../../tests/__mocks__/react-native.js',
     '^react-native-reanimated$': '<rootDir>/../../tests/__mocks__/react-native-reanimated.js',

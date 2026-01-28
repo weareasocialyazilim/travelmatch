@@ -418,11 +418,12 @@ describe('MessageService', () => {
     it('should call messagesService.subscribeToConversation', () => {
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
-      const mockChannel = { unsubscribe: mockUnsubscribe };
 
-      mockMessagesService.subscribeToConversation.mockReturnValue(
-        mockChannel as any,
-      );
+      // Use jest.Mocked to properly type the mock
+      // The mock should match the actual signature
+      mockMessagesService.subscribeToConversation.mockReturnValue({
+        unsubscribe: mockUnsubscribe,
+      } as any);
 
       const unsubscribe = messageService.subscribeToConversation(
         'conv-1',

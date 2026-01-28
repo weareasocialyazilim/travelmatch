@@ -55,7 +55,7 @@ export {
   AddBankAccountBottomSheet,
   AddCardBottomSheet,
   RemoveCardModal,
-  WithdrawConfirmationModal,
+  BankTransferConfirmationModal,
   PendingTransactionsModal,
 } from '@/features/wallet/components';
 

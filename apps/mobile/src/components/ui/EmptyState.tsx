@@ -121,19 +121,19 @@ const GlowRing: React.FC<{ color: string }> = ({ color }) => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    // Pulsing glow animation
+    // Gentle glow animation - slower for calmer effect
     scale.value = withRepeat(
       withSequence(
-        withTiming(1.3, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1.2, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
       false,
     );
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0.15, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.1, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.25, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
       false,
@@ -218,7 +218,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   const isPremium = variant === 'premium';
   const isMinimal = variant === 'minimal';
 
-  // Generate random particles
+  // Generate random particles - simplified for calm effect
   const particles = useMemo(() => {
     if (!animated || isMinimal) return [];
 
@@ -229,29 +229,31 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       primitives.magenta[300],
     ];
 
-    return Array.from({ length: 8 }, (_, i) => ({
+    // Fewer particles (4 instead of 8) for calmer effect
+    return Array.from({ length: 4 }, (_, i) => ({
       id: i,
-      delay: i * 400,
-      startX: 20 + Math.random() * 80,
-      startY: 20 + Math.random() * 60,
-      size: 4 + Math.random() * 4,
+      delay: i * 600,
+      startX: 30 + Math.random() * 60,
+      startY: 30 + Math.random() * 40,
+      size: 3 + Math.random() * 3,
       color: particleColors[i % particleColors.length],
-      duration: 3000 + Math.random() * 2000,
+      duration: 5000 + Math.random() * 2000, // Slower animation
     }));
   }, [animated, isMinimal]);
 
-  // Icon scale animation
+  // Icon scale animation - subtle breathing
   const iconScale = useSharedValue(1);
 
   useEffect(() => {
     if (animated && !isMinimal) {
+      // Slower, gentler breathing
       iconScale.value = withRepeat(
         withSequence(
-          withTiming(1.05, {
-            duration: 2000,
+          withTiming(1.03, {
+            duration: 4000,
             easing: Easing.inOut(Easing.ease),
           }),
-          withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
         false,

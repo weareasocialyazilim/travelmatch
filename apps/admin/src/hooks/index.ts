@@ -14,7 +14,7 @@ export {
 
 // Data Hooks
 export * from './use-alerts';
-export * from './use-tasks';
+export * from './use-queue';
 export * from './use-users';
 export * from './use-admin-users';
 export * from './use-disputes';

@@ -10,5 +10,5 @@ export { WalletConnectButton } from './WalletConnectButton';
 export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
 export { AddCardBottomSheet } from './AddCardBottomSheet';
 export { RemoveCardModal } from './RemoveCardModal';
-export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
+export { BankTransferConfirmationModal } from './BankTransferConfirmationModal';
 export { PendingTransactionsModal } from './PendingTransactionsModal';

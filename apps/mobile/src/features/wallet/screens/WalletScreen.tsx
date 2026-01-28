@@ -17,13 +17,13 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withRepeat, 
-  withTiming, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
   withSequence,
-  interpolateColor
+  interpolateColor,
 } from 'react-native-reanimated';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
@@ -36,16 +36,12 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
     pulse.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1000 }),
-        withTiming(1, { duration: 1000 })
+        withTiming(1, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
-    glow.value = withRepeat(
-      withTiming(1, { duration: 2000 }),
-      -1,
-      true
-    );
+    glow.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -54,7 +50,7 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
     backgroundColor: interpolateColor(
       glow.value,
       [0, 1],
-      ['rgba(255, 165, 0, 0.1)', 'rgba(255, 165, 0, 0.25)']
+      ['rgba(255, 165, 0, 0.1)', 'rgba(255, 165, 0, 0.25)'],
     ),
   }));
 
@@ -66,9 +62,7 @@ const TitanFlowBadge = ({ amount }: { amount: number }) => {
         color={COLORS.warning}
       />
       <View>
-        <Text style={styles.pendingText}>
-          {amount} LVND (Titan Flow)
-        </Text>
+        <Text style={styles.pendingText}>{amount} LVND (Titan Flow)</Text>
         <Text style={styles.pendingSubtext}>
           Gelecek ödemeleriniz protokol ile korunuyor.
         </Text>
@@ -124,8 +118,8 @@ const WalletScreen = () => {
     refreshBalance();
   }, [refreshBalance]);
 
-  const handleWithdraw = () => {
-    navigation.navigate('WithdrawalRequest');
+  const handleBankTransfer = () => {
+    navigation.navigate('BankTransfer');
   };
 
   return (
@@ -153,7 +147,9 @@ const WalletScreen = () => {
           <View style={styles.balanceRow}>
             <Text style={styles.amount}>{balance?.available || 0} LVND</Text>
             <View style={styles.localCurrencyBadge}>
-              <Text style={styles.localCurrencyText}>≈ {(balance?.available || 0).toLocaleString('tr-TR')} TL</Text>
+              <Text style={styles.localCurrencyText}>
+                ≈ {(balance?.available || 0).toLocaleString('tr-TR')} TL
+              </Text>
             </View>
           </View>
 
@@ -176,14 +172,12 @@ const WalletScreen = () => {
         </BlurView>
 
         <View style={styles.actionsContainer}>
-          {/* Para Çekme (Sadece Admin onaylı ve Teşekkür Videolu kullanıcılara) */}
+          {/* Bank Transfer - User earnings to bank account */}
           <TouchableOpacity
-            onPress={handleWithdraw}
+            onPress={handleBankTransfer}
             style={styles.withdrawLink}
           >
-            <Text style={styles.withdrawText}>
-              Banka Hesabına Aktar (Withdraw)
-            </Text>
+            <Text style={styles.withdrawText}>Banka Hesabına Aktar</Text>
             <Ionicons
               name="chevron-forward"
               size={16}

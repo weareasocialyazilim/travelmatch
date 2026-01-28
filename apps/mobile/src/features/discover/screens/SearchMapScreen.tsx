@@ -230,6 +230,7 @@ const SearchMapScreen: React.FC = () => {
   const jitterLevel = getJitterLevel(userTier);
 
   // Transform moments to markers with privacy jitter
+  // Note: Coordinates are already coarse (~1km precision) from DB RPC
   const mapMarkers = useMemo((): MomentMarker[] => {
     if (!moments) return [];
 
@@ -239,14 +240,16 @@ const SearchMapScreen: React.FC = () => {
         if (m.isExclusive && !['premium', 'platinum'].includes(userTier)) {
           return false;
         }
-        return m.location?.coordinates?.lat && m.location?.coordinates?.lng;
+        // Use coarse coordinates from RPC (privacy-safe)
+        return m.location?.latitude && m.location?.longitude;
       })
       .map((m: any) => {
-        // Apply location jitter for privacy
+        // Coarse coordinates are already privacy-safe (~1km precision)
+        // Additional jitter is optional based on subscription tier
         const { latitude: jitteredLat, longitude: jitteredLng } =
           applyLocationJitter(
-            m.location.coordinates.lat,
-            m.location.coordinates.lng,
+            m.location.latitude,
+            m.location.longitude,
             jitterLevel,
           );
 
@@ -259,11 +262,11 @@ const SearchMapScreen: React.FC = () => {
           title: m.title,
           category:
             typeof m.category === 'string' ? m.category : m.category?.id,
-          hostName: m.hostName,
-          hostAvatar: m.hostAvatar,
+          hostName: m.userName || m.hostName,
+          hostAvatar: m.userAvatar || m.hostAvatar,
           hostTrustScore: m.hostTrustScore || 0,
           hostTier: m.hostSubscriptionTier || 'free',
-          imageUrl: m.images?.[0] || m.image,
+          imageUrl: m.imageUrl || m.images?.[0] || m.image,
           isExclusive: m.isExclusive,
           hasPlatinumOffer: m.hasPlatinumOffer,
           isPopular: (m.saves || 0) > 50 || (m.requestCount || 0) > 10,

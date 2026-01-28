@@ -200,6 +200,9 @@ export default function App() {
   const [showGiftSuccess, setShowGiftSuccess] = useState(false);
   const [showAltSuccess, setShowAltSuccess] = useState(false);
   const [igHandle, setIgHandle] = useState('');
+  const [story, setStory] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Alternative Suggestion State
   const [showAltForm, setShowAltForm] = useState(false);
@@ -207,10 +210,33 @@ export default function App() {
 
   const t = TRANSLATIONS[lang];
 
-  const handleApply = (e: React.FormEvent) => {
+  const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!igHandle) return;
-    setShowSuccess(true);
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instagramHandle: igHandle, story }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Submission failed');
+      }
+
+      setShowSuccess(true);
+      setIgHandle('');
+      setStory('');
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : 'An error occurred',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleAltSubmit = (e: React.FormEvent) => {
@@ -602,6 +628,11 @@ export default function App() {
               {t.form_header}
             </h2>
             <form onSubmit={handleApply} className="space-y-12">
+              {submitError && (
+                <div className="bg-red-600/20 border border-red-600 p-4 text-red-500 font-black uppercase">
+                  {submitError}
+                </div>
+              )}
               <div className="border-b-4 border-zinc-800 pb-4 flex items-center gap-6 group focus-within:border-[#FF00FF] transition-colors">
                 <Instagram className="text-[#FF00FF] group-focus-within:animate-pulse" />
                 <input
@@ -610,21 +641,27 @@ export default function App() {
                   value={igHandle}
                   onChange={(e) => setIgHandle(e.target.value)}
                   placeholder={t.form_ig}
-                  className="bg-transparent w-full text-2xl md:text-3xl font-black uppercase outline-none placeholder:text-zinc-500 placeholder:opacity-100"
+                  disabled={isSubmitting}
+                  className="bg-transparent w-full text-2xl md:text-3xl font-black uppercase outline-none placeholder:text-zinc-500 placeholder:opacity-100 disabled:opacity-50"
                 />
               </div>
               <div className="border-b-4 border-zinc-800 pb-4 flex items-start gap-6 group focus-within:border-[#00FFFF] transition-colors">
                 <MessageSquare className="text-[#00FFFF] mt-2" />
                 <textarea
+                  required
+                  value={story}
+                  onChange={(e) => setStory(e.target.value)}
                   placeholder={t.form_story}
-                  className="bg-transparent w-full text-lg md:text-xl font-bold uppercase outline-none h-40 resize-none placeholder:text-zinc-500 placeholder:opacity-100"
+                  disabled={isSubmitting}
+                  className="bg-transparent w-full text-lg md:text-xl font-bold uppercase outline-none h-40 resize-none placeholder:text-zinc-500 placeholder:opacity-100 disabled:opacity-50"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#FF00FF] text-white py-8 text-2xl md:text-4xl font-black uppercase italic hover:bg-[#39FF14] hover:text-black transition-all shadow-[10px_10px_0px_0px_#00FFFF] md:shadow-[15px_15px_0px_0px_#FF00FF]"
+                disabled={isSubmitting}
+                className="w-full bg-[#FF00FF] text-white py-8 text-2xl md:text-4xl font-black uppercase italic hover:bg-[#39FF14] hover:text-black transition-all shadow-[10px_10px_0px_0px_#00FFFF] md:shadow-[15px_15px_0px_0px_#FF00FF] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t.submit}
+                {isSubmitting ? 'SENDING...' : t.submit}
               </button>
               <button
                 type="button"

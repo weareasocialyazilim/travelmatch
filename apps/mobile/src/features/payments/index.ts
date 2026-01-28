@@ -1,97 +1,37 @@
 /**
- * Payments Feature - Barrel Exports
+ * Payments Feature - Cleaned Up
  *
- * Bu feature şunları içerir:
- * - Payment methods (PaymentMethodsScreen)
- * - Transactions (TransactionDetailScreen, TransactionHistoryScreen)
- * - KYC verification (PaymentsKYCScreen, kyc/ folder)
- * - Subscriptions (SubscriptionScreen)
+ * All user payments go through IAP (Apple App Store / Google Play Store).
+ * PayTR is only used for backend payouts (withdrawals).
  *
- * NOTE: Wallet ve Gift ekranları ayrı feature modüllerine taşındı:
- * - Wallet: @/features/wallet
- * - Gifts: @/features/gifts
+ * Screens:
+ * - UnifiedGiftFlowScreen: Gift/Moment payment flow (coin-based)
+ * - SubscriptionScreen: Membership subscriptions
+ * - TransactionHistoryScreen: Transaction history
+ * - PromoCodeScreen: Promo code redemption
+ *
+ * KYC: Use '@/features/verifications/idenfy' for identity verification
  */
 
-// Screens - with default exports
-export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
-export { default as AddCardScreen } from './screens/AddCardScreen';
-export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
-export { RefundRequestScreen } from './screens/RefundRequestScreen';
-export { default as SuccessScreen } from './screens/SuccessScreen';
-export { default as PaymentsKYCScreen } from './screens/PaymentsKYCScreen';
-
-// Screens - named exports
-export { default as CheckoutScreen } from './screens/CheckoutScreen';
-export { PaymentFailedScreen } from './screens/PaymentFailedScreen';
-export { TransactionHistoryScreen } from './screens/TransactionHistoryScreen';
-export { SubscriptionScreen } from './screens/SubscriptionScreen';
-export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
-export { ProofReviewScreen } from './screens/ProofReviewScreen';
-export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
-export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
-// REMOVED: BulkThankYouScreen - orphan screen, never registered in navigation
-export { default as UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
+// Screens - Using default exports
 export { default as SubscriberOfferModal } from './screens/SubscriberOfferModal';
-
-// KYC Screens - MOVED TO features/verifications/kyc
-// Import from '@/features/verifications/kyc' for new code
-// Re-export for backward compatibility (deprecated)
-export {
-  KYCIntroScreen,
-  KYCDocumentTypeScreen,
-  KYCDocumentCaptureScreen,
-  KYCSelfieScreen,
-  KYCReviewScreen,
-  KYCPendingScreen,
-} from '../verifications/kyc';
+export { default as UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
+export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
+export { default as SuccessScreen } from './screens/SuccessScreen';
+export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
+// Named exports (these files use `export const`)
+export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
+export { PaymentFailedScreen } from './screens/PaymentFailedScreen';
+export { RefundRequestScreen } from './screens/RefundRequestScreen';
+export { ProofReviewScreen } from './screens/ProofReviewScreen';
+export { SubscriptionScreen } from './screens/SubscriptionScreen';
+export { TransactionHistoryScreen } from './screens/TransactionHistoryScreen';
 
 // Components
 export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
 
-// Hooks
-export {
-  useWalletBalance,
-  useSavedCards,
-  useCreatePaymentIntent,
-  useWithdraw,
-  useKYCStatus,
-  useSubmitKYC,
-  useSubscription,
-  useCreateSubscription,
-  useCancelSubscription,
-} from './hooks/usePayments';
-
-// Alias exports for backward compatibility
-export { useWalletBalance as useWallet } from './hooks/usePayments';
-export { useSavedCards as usePaymentMethods } from './hooks/usePayments';
-
-// Placeholder hooks for future implementation
-export const useTransactions = () => ({
-  transactions: [],
-  loading: false,
-  error: null,
-  refresh: async () => {},
-});
-
-export const useTransaction = (_transactionId: string) => ({
-  transaction: null,
-  loading: false,
-  error: null,
-});
-
-// Services - consolidated into securePaymentService
-// All payment operations now go through securePaymentService
-// Import from '@/services/securePaymentService' for new code
+// KYC - Use Idenfy integration
+// Export from '@/features/verifications/idenfy'
 
 // Types
-export type {
-  Moment,
-  MomentData,
-  MomentUser,
-  MomentLocation,
-  User,
-  Transaction,
-  TransactionType,
-  TransactionStatus,
-  UserProfile,
-} from './types';
+export type { Transaction, TransactionType, TransactionStatus } from './types';

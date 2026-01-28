@@ -102,6 +102,10 @@ export default function WalletOperationsPage() {
   const [selectedPayouts, setSelectedPayouts] = useState<string[]>([]);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showKYCDialog, setShowKYCDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showBulkConfirmDialog, setShowBulkConfirmDialog] = useState(false);
+  const [selectedPayoutForConfirm, setSelectedPayoutForConfirm] =
+    useState<PayoutRequest | null>(null);
   const [selectedKYC, setSelectedKYC] = useState<KYCVerification | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [kycNotes, setKycNotes] = useState('');
@@ -189,11 +193,25 @@ export default function WalletOperationsPage() {
   };
 
   const handleApprovePayout = async (payoutId: string) => {
+    setShowConfirmDialog(false);
     toast.promise(processPayout.mutateAsync({ payoutId, action: 'approve' }), {
       loading: 'Ödeme onaylanıyor...',
       success: 'Ödeme onaylandı ve işleme alındı',
       error: 'Ödeme onaylanamadı',
     });
+  };
+
+  const openConfirmDialog = (payout: PayoutRequest) => {
+    setSelectedPayoutForConfirm(payout);
+    setShowConfirmDialog(true);
+  };
+
+  const openBulkConfirmDialog = () => {
+    if (selectedPayouts.length === 0) {
+      toast.error('Lütfen en az bir ödeme seçin');
+      return;
+    }
+    setShowBulkConfirmDialog(true);
   };
 
   const handleRejectPayout = async (payoutId: string) => {
@@ -213,11 +231,7 @@ export default function WalletOperationsPage() {
   };
 
   const handleBulkApprove = async () => {
-    if (selectedPayouts.length === 0) {
-      toast.error('Lütfen en az bir ödeme seçin');
-      return;
-    }
-
+    setShowBulkConfirmDialog(false);
     toast.promise(
       bulkProcess.mutateAsync({
         payoutIds: selectedPayouts,
@@ -394,8 +408,10 @@ export default function WalletOperationsPage() {
                     <CanvaButton
                       variant="success"
                       size="sm"
-                      onClick={handleBulkApprove}
-                      disabled={bulkProcess.isPending}
+                      onClick={openBulkConfirmDialog}
+                      disabled={
+                        bulkProcess.isPending || selectedPayouts.length === 0
+                      }
                     >
                       {bulkProcess.isPending && (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -521,7 +537,7 @@ export default function WalletOperationsPage() {
                                 iconOnly
                                 aria-label="Ödemeyi onayla"
                                 className="text-green-500"
-                                onClick={() => handleApprovePayout(payout.id)}
+                                onClick={() => openConfirmDialog(payout)}
                                 disabled={processPayout.isPending}
                               >
                                 <CheckCircle2 className="h-4 w-4" />
@@ -567,7 +583,12 @@ export default function WalletOperationsPage() {
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
                   <Banknote className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Ödeme talebi bulunamadı</p>
+                  <p className="mb-1">Ödeme talebi bulunamadı</p>
+                  <p className="text-sm">
+                    {statusFilter !== 'all'
+                      ? 'Seçili filtrelere uygun bekleyen ödeme yok. Filtreleri temizleyin.'
+                      : 'Tüm ödemeler işlenmiş durumda.'}
+                  </p>
                 </div>
               )}
             </CanvaCardBody>
@@ -836,13 +857,123 @@ export default function WalletOperationsPage() {
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
                   <Wallet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Cüzdan verisi bulunamadı</p>
+                  <p className="mb-1">Cüzdan verisi bulunamadı</p>
+                  <p className="text-sm">
+                    Veriler henüz senkronize edilmemiş olabilir.
+                  </p>
                 </div>
               )}
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
       </Tabs>
+
+      {/* Single Payout Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 className="h-5 w-5" />
+              Ödeme Onaylama
+            </DialogTitle>
+            <DialogDescription>
+              Bu ödemeyi onaylamak istediğinizden emin misiniz?
+            </DialogDescription>
+          </DialogHeader>
+          {selectedPayoutForConfirm && (
+            <div className="bg-muted rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Kullanıcı:</span>
+                <span className="font-medium">
+                  {selectedPayoutForConfirm.user_name}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Tutar:</span>
+                <span className="font-medium">
+                  ${Number(selectedPayoutForConfirm.amount).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Yöntem:</span>
+                <span className="font-medium">
+                  {selectedPayoutForConfirm.payout_method}
+                </span>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+            >
+              İptal
+            </CanvaButton>
+            <CanvaButton
+              variant="success"
+              onClick={() =>
+                selectedPayoutForConfirm &&
+                handleApprovePayout(selectedPayoutForConfirm.id)
+              }
+              disabled={processPayout.isPending}
+            >
+              {processPayout.isPending && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              Onayla
+            </CanvaButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Approval Confirmation Dialog */}
+      <Dialog
+        open={showBulkConfirmDialog}
+        onOpenChange={setShowBulkConfirmDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCheck className="h-5 w-5" />
+              Toplu Ödeme Onaylama
+            </DialogTitle>
+            <DialogDescription>
+              Seçili {selectedPayouts.length} ödemeyi onaylamak istediğinizden
+              emin misiniz?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="bg-muted rounded-lg p-4 space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                Seçili Ödeme Sayısı:
+              </span>
+              <span className="font-medium">{selectedPayouts.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">İşlem:</span>
+              <span className="font-medium text-green-600">Onayla</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setShowBulkConfirmDialog(false)}
+            >
+              İptal
+            </CanvaButton>
+            <CanvaButton
+              variant="success"
+              onClick={handleBulkApprove}
+              disabled={bulkProcess.isPending}
+            >
+              {bulkProcess.isPending && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              Onayla ({selectedPayouts.length})
+            </CanvaButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Reject Dialog */}
       <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>

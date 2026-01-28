@@ -63,7 +63,8 @@ import {
   ContentReactiveGlow,
   LocationPermissionPrompt,
 } from '@/components/ui';
-import { useSubscription } from '@/features/payments';
+// TODO: Implement proper subscription hook if needed
+// import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
 import { useSearchStore } from '@/stores/searchStore';
 import type { NavigationProp } from '@react-navigation/native';
@@ -119,11 +120,10 @@ const DiscoverScreen = () => {
 
   const { user, isGuest } = useAuth();
 
-  // Subscription state for upgrade CTA
-  const { subscription } = useSubscription();
-  const currentTier =
-    (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
-  const isPremium = currentTier !== 'free';
+  // Subscription state for upgrade CTA (placeholder)
+  // const { subscription } = useSubscription();
+  const currentTier = 'free' as const;
+  const isPremium = false;
 
   // Pending moment for post-login action
   const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);

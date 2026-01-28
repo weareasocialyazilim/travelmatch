@@ -416,26 +416,40 @@ export default function TriagePage() {
 
   return (
     <div className="space-y-6 pb-8">
+      {/* Passive Mode Banner */}
+      <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2 mt-0.5">
+            <Eye className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+              Goruntuleme Modu Aktif
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              Bu sayfa simdilik yalnızca inceleme amacıyla görüntülenmektedir.
+              Aksiyonlar (onaylama, reddetme, eskalasyon) feature flag arkasında
+              kapalıdır. Aktif etmek için teknik ekiple iletişime geçin.
+            </p>
+          </div>
+          <CanvaBadge variant="info" size="sm">
+            PASSIVE MODE
+          </CanvaBadge>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Triage Kuyrugu
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Inceleme bekleyen ogeler (PASSIVE MODE - sadece goruntumleme)
-          </p>
+          <p className="text-muted-foreground mt-1">Inceleme bekleyen ogeler</p>
         </div>
         <div className="flex items-center gap-3">
           {data?.isMockData && (
             <CanvaBadge variant="warning" size="sm">
               Mock Data
-            </CanvaBadge>
-          )}
-          {!TRIAGE_ACTIONS_ENABLED && (
-            <CanvaBadge variant="default" size="sm">
-              <Lock className="h-3 w-3 mr-1" />
-              Aksiyonlar Kapali
             </CanvaBadge>
           )}
           <CanvaButton

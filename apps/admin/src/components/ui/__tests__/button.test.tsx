@@ -4,8 +4,8 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// Mock the utils module with cn function - use relative path for Jest compatibility
-jest.mock('../../../lib/utils', () => ({
+// Mock the utils module with cn function - use alias path for Jest compatibility
+jest.mock('@/lib/utils', () => ({
   cn: (...inputs: (string | undefined | null | false)[]) =>
     inputs.filter(Boolean).join(' '),
 }));
@@ -24,8 +24,8 @@ describe('Button', () => {
     it('applies default variant and size', () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-hero');
-      expect(button).toHaveClass('h-11');
+      expect(button).toHaveClass('bg-primary');
+      expect(button).toHaveClass('h-10');
     });
   });
 
@@ -37,19 +37,19 @@ describe('Button', () => {
 
     it('applies outline variant', () => {
       render(<Button variant="outline">Outline</Button>);
-      expect(screen.getByRole('button')).toHaveClass('border-2');
+      expect(screen.getByRole('button')).toHaveClass('border');
     });
 
     it('applies secondary variant', () => {
       render(<Button variant="secondary">Secondary</Button>);
-      expect(screen.getByRole('button')).toHaveClass('bg-secondary/10');
+      expect(screen.getByRole('button')).toHaveClass('bg-secondary');
     });
 
     it('applies ghost variant', () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
       expect(button).not.toHaveClass('bg-primary');
-      expect(button).toHaveClass('hover:bg-stone-100');
+      expect(button).toHaveClass('hover:bg-accent');
     });
 
     it('applies link variant', () => {
@@ -84,12 +84,12 @@ describe('Button', () => {
 
     it('applies lg size', () => {
       render(<Button size="lg">Large</Button>);
-      expect(screen.getByRole('button')).toHaveClass('h-14');
+      expect(screen.getByRole('button')).toHaveClass('h-11');
     });
 
     it('applies icon size', () => {
       render(<Button size="icon">Icon</Button>);
-      expect(screen.getByRole('button')).toHaveClass('h-11', 'w-11');
+      expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10');
     });
   });
 

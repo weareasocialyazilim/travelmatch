@@ -1,16 +1,12 @@
 /**
- * Secure Payment Service (Client-Side)
+ * Secure Payment Service (Client-Side) - IAP Compatible
  *
  * Master Payment Service for Lovendo - consolidates all payment operations.
- * Delegates to specialized services for single-responsibility:
- *
- * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
- * - walletService: Balance queries, withdrawals
- * - escrowService: Titan Protocol escrow logic
- * - transactionService: Transaction history
+ * All user payments go through In-App Purchases (Apple App Store / Google Play Store).
+ * PayTR is ONLY used deeply in the backend for Payouts (Withdrawals).
  *
  * @see walletService.ts for wallet balance operations
- * - PayTRProvider removed for payments (Apple IAP compliance)
+ * - PayTR removed from client for Apple IAP compliance
  */
 
 import { supabase } from '../config/supabase';
@@ -20,14 +16,6 @@ import { transactionsService as dbTransactionsService } from './supabaseDbServic
 import { paymentCache } from './cacheService';
 import { walletService } from './walletService';
 import { transactionService } from './transactionService';
-import {
-  paytrProvider,
-  type PayTRPaymentResponse,
-  type CreatePaymentParams,
-  type SavedCard,
-  type CardTokenizeParams,
-  type CardTokenizeResult,
-} from './payment/PayTRProvider';
 import { ErrorHandler } from '../utils/errorHandler';
 import type { Database, Json } from '../types/database.types';
 import {
@@ -44,11 +32,6 @@ import {
 // Re-export types for backward compatibility
 export type { WalletBalance } from './walletService';
 export type { Transaction, TransactionFilters } from './transactionService';
-export type {
-  PayTRPaymentResponse,
-  CreatePaymentParams,
-  SavedCard,
-} from './payment/PayTRProvider';
 export type { EscrowTransaction } from './escrowService';
 export { determineEscrowMode } from './escrowService';
 
@@ -168,38 +151,19 @@ export interface Subscription {
 
 class SecurePaymentService {
   // ============================================
-  // PAYTR OPERATIONS (Delegated to PayTRProvider)
+  // PAYTR OPERATIONS (REMOVED for Apple Compliance)
   // ============================================
-
-  /**
-   * PayTR Direct Payment Methods REMOVED for Apple Compliance
-   * We now use In-App Purchases (via RevenueCat) for buying coins.
-   * PayTR is ONLY used deeply in the backend for Payouts (Withdrawals).
-   */
+  //
+  // PayTR direct payment methods have been REMOVED.
+  // All user payments now go through IAP (App Store / Play Store).
+  // PayTR is ONLY used in the backend for Payouts (Withdrawals).
+  //
+  // For balance queries and withdrawals, use walletService instead.
+  // @see walletService.ts
 
   /**
    * Replaces direct PayTR payments with virtual currency transfer
    */
-  async getSavedCards(): Promise<SavedCard[]> {
-    return paytrProvider.getSavedCards();
-  }
-
-  async createPayment(
-    params: CreatePaymentParams,
-  ): Promise<PayTRPaymentResponse> {
-    return paytrProvider.createPayment(params);
-  }
-
-  async deleteSavedCard(cardToken: string): Promise<void> {
-    return paytrProvider.deleteSavedCard(cardToken);
-  }
-
-  async tokenizeAndSaveCard(
-    params: CardTokenizeParams,
-  ): Promise<CardTokenizeResult> {
-    return paytrProvider.tokenizeAndSaveCard(params);
-  }
-
   async transferLVND(params: {
     amount: number;
     recipientId: string;

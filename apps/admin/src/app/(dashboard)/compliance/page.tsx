@@ -539,9 +539,7 @@ export default function CompliancePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Uyumluluk Merkezi
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">KVKK Merkezi</h1>
           <p className="text-muted-foreground">
             AML, Fraud Tespit ve Uyumluluk Yönetimi
           </p>

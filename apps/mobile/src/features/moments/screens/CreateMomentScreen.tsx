@@ -30,6 +30,7 @@ import {
   Platform,
   Switch,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -62,6 +63,25 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/context/ToastContext';
 import { showLoginPrompt } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
+
+// Common Turkish cities for quick selection
+const TURKISH_CITIES = [
+  'İstanbul',
+  'Ankara',
+  'İzmir',
+  'Antalya',
+  'Bursa',
+  'Adana',
+  'Gaziantep',
+  'Konya',
+  'Mersin',
+  'Eskişehir',
+  'Bodrum',
+  'Kapadokya',
+  'Çeşme',
+  'Alaçatı',
+  'Kuşadası',
+];
 
 // Currency symbols for display
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -124,24 +144,35 @@ const getEscrowTier = (
 
 const { width: _width, height: _height } = Dimensions.get('window');
 
-// Step-by-step flow - UPDATED with location step
-type Step = 'media' | 'details' | 'location' | 'price' | 'review';
+// Step-by-step flow - UPDATED with city + venue steps
+type Step =
+  | 'media'
+  | 'details'
+  | 'city'
+  | 'venue'
+  | 'date'
+  | 'price'
+  | 'review';
 
 // Form steps for the indicator - UPDATED
 const FORM_STEPS: FormStep[] = [
   { key: 'media', label: 'Görsel', icon: 'camera' },
   { key: 'details', label: 'Detaylar', icon: 'text' },
-  { key: 'location', label: 'Konum', icon: 'map-marker' },
-  { key: 'price', label: 'Fiyat', icon: 'currency-try' },
+  { key: 'city', label: 'Şehir', icon: 'city' },
+  { key: 'venue', label: 'Mekan', icon: 'map-marker' },
+  { key: 'date', label: 'Tarih', icon: 'calendar' },
+  { key: 'price', label: 'Bedel', icon: 'currency-try' },
   { key: 'review', label: 'Önizleme', icon: 'eye' },
 ];
 
 const STEP_INDEX_MAP: Record<Step, number> = {
   media: 0,
   details: 1,
-  location: 2,
-  price: 3,
-  review: 4,
+  city: 2,
+  venue: 3,
+  date: 4,
+  price: 5,
+  review: 6,
 };
 
 // Experience categories - CLEANED terminology
@@ -177,20 +208,25 @@ const CreateMomentScreen: React.FC = () => {
   // Step state
   const [step, setStep] = useState<Step>('media');
 
-  // Form data - CLEANED terminology
+  // Form data - UPDATED with city + date fields
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState<string | null>(null);
   const [requestedAmount, setRequestedAmount] = useState('50'); // "Alıcı Fiyat Belirler"
   const [currency, setCurrency] = useState('TRY');
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showCityPicker, setShowCityPicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedCategory, setSelectedCategory] =
     useState<ExperienceCategory | null>(null);
-  const [locationName, setLocationName] = useState<string>(''); // Replaces destination
-  const [locationCoords, setLocationCoords] = useState<{
+  const [city, setCity] = useState<string>(''); // ZORUNLU
+  const [venueName, setVenueName] = useState<string>(''); // OPSİYONEL
+  const [venueCoords, setVenueCoords] = useState<{
     lat: number;
     lng: number;
-  } | null>(null);
+  } | null>(null); // OPSİYONEL
+  const [momentDate, setMomentDate] = useState<Date | null>(null); // OPSİYONEL
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
 
@@ -217,13 +253,43 @@ const CreateMomentScreen: React.FC = () => {
     }
   }, []);
 
-  // Handle location selection with haptic feedback
-  const handleLocationSelect = useCallback((location: Location) => {
-    // Silky haptic feedback on location selection
+  // Handle venue selection with haptic feedback
+  const handleVenueSelect = useCallback((location: Location) => {
+    // Silky haptic feedback on venue selection
     HapticManager.buttonPress();
-    setLocationName(location.name || location.address);
-    setLocationCoords({ lat: location.latitude, lng: location.longitude });
+    setVenueName(location.name || location.address);
+    setVenueCoords({ lat: location.latitude, lng: location.longitude });
     setShowLocationPicker(false);
+  }, []);
+
+  // Validate title for external links
+  const validateTitle = useCallback((text: string) => {
+    // Check for external links
+    const urlPattern =
+      /(https?:\/\/[^\s]+|www\.[^\s]+|bit\.ly[^\s]+|t\.co[^\s]+)/gi;
+    const linkPattern =
+      /(link[:\s]*https?|www\.|bit\.ly|t\.co|instagram\.com|tiktok\.com)/i;
+
+    if (urlPattern.test(text) || linkPattern.test(text)) {
+      setTitleError('Dış link içeremez. İhtiyacınızı kelimelerle anlatın.');
+    } else {
+      setTitleError(null);
+    }
+    setTitle(text);
+  }, []);
+
+  // Handle city selection
+  const handleCitySelect = useCallback((selectedCity: string) => {
+    HapticManager.buttonPress();
+    setCity(selectedCity);
+    setShowCityPicker(false);
+  }, []);
+
+  // Handle date selection
+  const handleDateSelect = useCallback((date: Date | null) => {
+    HapticManager.buttonPress();
+    setMomentDate(date);
+    setShowDatePicker(false);
   }, []);
 
   // 2. Drop Action (Submit to API) - UPDATED with new fields
@@ -240,11 +306,31 @@ const CreateMomentScreen: React.FC = () => {
       return;
     }
 
-    if (!title || !selectedCategory || !imageUri || !locationName) {
+    // Validate required fields
+    if (!title || title.trim().length < 3) {
       HapticManager.error();
       showAlert({
-        title: t('screens.createMoment.missingInfoTitle'),
-        message: t('screens.createMoment.missingInfoMessage'),
+        title: 'Eksik Bilgi',
+        message: 'Lütfen anınızı kısaca tanımlayın (min. 3 karakter).',
+      });
+      return;
+    }
+
+    if (!selectedCategory) {
+      HapticManager.error();
+      showAlert({
+        title: 'Eksik Bilgi',
+        message: 'Lütfen bir kategori seçin.',
+      });
+      return;
+    }
+
+    // City is REQUIRED
+    if (!city) {
+      HapticManager.error();
+      showAlert({
+        title: 'Şehir Gerekli',
+        message: 'Lütfen şehir seçin. Bu, momentinizi keşfedilebilir kılar.',
       });
       return;
     }
@@ -270,19 +356,17 @@ const CreateMomentScreen: React.FC = () => {
         title: title.trim(),
         description: '',
         category: selectedCategory, // experience_category
-        location: {
-          city: locationName,
-          country: '',
-          ...(locationCoords && {
-            coordinates: locationCoords,
-          }),
-        },
-        images: [imageUri],
+        city: city, // ZORUNLU
+        venue: venueName || null, // OPSİYONEL
+        ...(venueCoords && {
+          coordinates: venueCoords,
+        }),
+        date: momentDate ? momentDate.toISOString() : null, // OPSİYONEL
+        images: imageUri ? [imageUri] : [], // Filter out null
         pricePerGuest: amount, // requested_amount
         currency: currency,
         maxGuests: 4,
         duration: '2 hours',
-        availability: [new Date().toISOString()],
         showAsStory: showAsStory, // Show as story for 24 hours
       };
 
@@ -323,8 +407,10 @@ const CreateMomentScreen: React.FC = () => {
     title,
     selectedCategory,
     imageUri,
-    locationName,
-    locationCoords,
+    city,
+    venueName,
+    venueCoords,
+    momentDate,
     requestedAmount,
     currency,
     showAsStory,
@@ -341,10 +427,14 @@ const CreateMomentScreen: React.FC = () => {
     HapticManager.buttonPress();
     if (step === 'details') {
       setStep('media');
-    } else if (step === 'location') {
+    } else if (step === 'city') {
       setStep('details');
+    } else if (step === 'venue') {
+      setStep('city');
+    } else if (step === 'date') {
+      setStep('venue');
     } else if (step === 'price') {
-      setStep('location');
+      setStep('date');
     } else if (step === 'review') {
       setStep('price');
     }
@@ -362,7 +452,9 @@ const CreateMomentScreen: React.FC = () => {
       const stepKeys: Step[] = [
         'media',
         'details',
-        'location',
+        'city',
+        'venue',
+        'date',
         'price',
         'review',
       ];
@@ -522,11 +614,11 @@ const CreateMomentScreen: React.FC = () => {
 
               <TextInput
                 style={styles.titleInput}
-                placeholder="Dinner at Hotel Costes..."
+                placeholder="Bu hafta İstanbul'da bir nefes almak istiyorum..."
                 placeholderTextColor="rgba(255,255,255,0.5)"
                 value={title}
-                onChangeText={setTitle}
-                maxLength={40}
+                onChangeText={validateTitle}
+                maxLength={80}
                 autoFocus
                 autoCorrect={false}
                 autoCapitalize="sentences"
@@ -534,6 +626,12 @@ const CreateMomentScreen: React.FC = () => {
                 keyboardType="default"
                 accessibilityLabel={t('screens.createMoment.a11y.momentTitle')}
               />
+              {titleError && (
+                <Text style={styles.titleError}>{titleError}</Text>
+              )}
+              <Text style={styles.titleHint}>
+                İhtiyacını veya isteğini kendi cümlelerinle anlat
+              </Text>
 
               <View style={styles.categoryGrid}>
                 {EXPERIENCE_CATEGORIES.map((cat) => (
@@ -578,33 +676,101 @@ const CreateMomentScreen: React.FC = () => {
                 ]}
                 onPress={() => {
                   HapticManager.buttonPress();
-                  setStep('location');
+                  setStep('city');
                 }}
                 disabled={!title || !selectedCategory}
-                accessibilityLabel="Next: Select Location"
+                accessibilityLabel="Next: Select City"
                 accessibilityRole="button"
               >
-                <Text style={styles.nextButtonText}>Sonraki: Konum Seç</Text>
+                <Text style={styles.nextButtonText}>Sonraki: Şehir Seç</Text>
                 <Ionicons name="location-outline" size={20} color="black" />
               </TouchableOpacity>
             </Animated.View>
           )}
 
-          {/* STEP: LOCATION - NEW */}
-          {step === 'location' && (
+          {/* STEP: CITY - ZORUNLU */}
+          {step === 'city' && (
             <Animated.View
               entering={SlideInDown}
               exiting={SlideOutDown}
-              style={styles.locationStep}
+              style={styles.cityStep}
             >
-              <Text style={styles.label}>ANININ KONUMU</Text>
-              <Text style={styles.locationHint}>
-                Bu deneyimin gerçekleştiği yeri seç
+              <Text style={styles.label}>ŞEHRİNİ SEÇ</Text>
+              <Text style={styles.cityHint}>
+                Momentin hangi şehirde görüneceğini seç
               </Text>
 
-              {locationName ? (
+              {/* Quick City Selection */}
+              <View style={styles.cityGrid}>
+                {TURKISH_CITIES.slice(0, 8).map((c) => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[
+                      styles.cityPill,
+                      city === c && styles.cityPillActive,
+                    ]}
+                    onPress={() => {
+                      HapticManager.buttonPress();
+                      setCity(c);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.cityPillText,
+                        city === c && styles.cityPillTextActive,
+                      ]}
+                    >
+                      {c}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Custom City Input */}
+              <TouchableOpacity
+                style={styles.customCityButton}
+                onPress={() => setShowCityPicker(true)}
+              >
+                <Ionicons name="add" size={24} color={COLORS.brand.primary} />
+                <Text style={styles.customCityButtonText}>
+                  {city ? city : 'Diğer şehir...'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.nextButton, !city && styles.nextButtonDisabled]}
+                onPress={() => {
+                  HapticManager.buttonPress();
+                  setStep('venue');
+                }}
+                disabled={!city}
+                accessibilityLabel="Next: Select Venue"
+                accessibilityRole="button"
+              >
+                <Text style={styles.nextButtonText}>
+                  {venueName ? 'Mekanı Değiştir' : 'Sonraki: Mekan (Opsiyonel)'}
+                </Text>
+                <Ionicons name="location-outline" size={20} color="black" />
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+
+          {/* STEP: VENUE - OPSİYONEL */}
+          {step === 'venue' && (
+            <Animated.View
+              entering={SlideInDown}
+              exiting={SlideOutDown}
+              style={styles.venueStep}
+            >
+              <Text style={styles.label}>MEKAN (OPSİYONEL)</Text>
+              <Text style={styles.venueHint}>
+                Bu deneyimin gerçekleşeceği yeri seç{' '}
+                <Text style={{ opacity: 0.6 }}>(isteğe bağlı)</Text>
+              </Text>
+
+              {venueName ? (
                 <TouchableOpacity
-                  style={styles.locationSelected}
+                  style={styles.venueSelected}
                   onPress={() => {
                     HapticManager.buttonPress();
                     setShowLocationPicker(true);
@@ -615,7 +781,7 @@ const CreateMomentScreen: React.FC = () => {
                     size={24}
                     color={COLORS.brand.primary}
                   />
-                  <Text style={styles.locationText}>{locationName}</Text>
+                  <Text style={styles.venueText}>{venueName}</Text>
                   <MaterialCommunityIcons
                     name="pencil"
                     size={20}
@@ -624,7 +790,7 @@ const CreateMomentScreen: React.FC = () => {
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={styles.locationButton}
+                  style={styles.venueButton}
                   onPress={() => {
                     HapticManager.buttonPress();
                     setShowLocationPicker(true);
@@ -635,39 +801,135 @@ const CreateMomentScreen: React.FC = () => {
                     size={32}
                     color={COLORS.brand.primary}
                   />
-                  <Text style={styles.locationButtonText}>Konum Seç</Text>
+                  <Text style={styles.venueButtonText}>Mekan Seç</Text>
+                  <Text style={styles.venueButtonSubtext}>
+                    Boş bırakırsanız sadece şehir bazlı kalır
+                  </Text>
                 </TouchableOpacity>
               )}
 
               <TouchableOpacity
-                style={[
-                  styles.nextButton,
-                  !locationName && styles.nextButtonDisabled,
-                ]}
+                style={styles.skipVenueButton}
+                onPress={() => {
+                  HapticManager.buttonPress();
+                  setStep('date');
+                }}
+                accessibilityLabel="Skip venue selection"
+                accessibilityRole="button"
+              >
+                <Text style={styles.skipVenueButtonText}>
+                  Atla (Sadece şehir yeterli)
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={() => {
+                  HapticManager.buttonPress();
+                  setStep('date');
+                }}
+                accessibilityLabel="Next: Select Date"
+                accessibilityRole="button"
+              >
+                <Text style={styles.nextButtonText}>Sonraki: Tarih</Text>
+                <Ionicons name="calendar-outline" size={20} color="black" />
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+
+          {/* STEP: DATE - OPSİYONEL */}
+          {step === 'date' && (
+            <Animated.View
+              entering={SlideInDown}
+              exiting={SlideOutDown}
+              style={styles.dateStep}
+            >
+              <Text style={styles.label}>TARİH (OPSİYONEL)</Text>
+              <Text style={styles.dateHint}>
+                Bu moment için özel bir tarih var mı?{' '}
+                <Text style={{ opacity: 0.6 }}>(isteğe bağlı)</Text>
+              </Text>
+
+              {momentDate ? (
+                <TouchableOpacity
+                  style={styles.dateSelected}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <MaterialCommunityIcons
+                    name="calendar-check"
+                    size={24}
+                    color={COLORS.brand.primary}
+                  />
+                  <Text style={styles.dateText}>
+                    {momentDate.toLocaleDateString('tr-TR', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={20}
+                    color="rgba(255,255,255,0.6)"
+                    onPress={() => setMomentDate(null)}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <MaterialCommunityIcons
+                    name="calendar-plus"
+                    size={32}
+                    color={COLORS.brand.primary}
+                  />
+                  <Text style={styles.dateButtonText}>Tarih Ekle</Text>
+                  <Text style={styles.dateButtonSubtext}>
+                    Tarih eklerseniz, bu tarih yaklaştığında hatırlatılır
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={styles.skipDateButton}
                 onPress={() => {
                   HapticManager.buttonPress();
                   setStep('price');
                 }}
-                disabled={!locationName}
+                accessibilityLabel="Skip date selection"
+                accessibilityRole="button"
+              >
+                <Text style={styles.skipDateButtonText}>
+                  Atla (Sonsuza kadar açık kalabilir)
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={() => {
+                  HapticManager.buttonPress();
+                  setStep('price');
+                }}
                 accessibilityLabel="Next: Set Price"
                 accessibilityRole="button"
               >
                 <Text style={styles.nextButtonText}>
-                  Sonraki: Fiyat Belirle
+                  Sonraki: Destek Bedeli
                 </Text>
                 <Ionicons name="cash-outline" size={20} color="black" />
               </TouchableOpacity>
             </Animated.View>
           )}
 
-          {/* STEP: PRICE (Hediye Beklentisi - "Alıcı Fiyat Belirler") */}
+          {/* STEP: PRICE (Creator sets support amount) */}
           {step === 'price' && (
             <Animated.View
               entering={SlideInDown}
               exiting={SlideOutDown}
               style={styles.priceStep}
             >
-              <Text style={styles.label}>FİYAT BELİRLE</Text>
+              <Text style={styles.label}>DESTEK BEDELİ</Text>
 
               <View style={styles.priceContainer}>
                 <TouchableOpacity
@@ -702,7 +964,7 @@ const CreateMomentScreen: React.FC = () => {
                   autoCapitalize="none"
                   spellCheck={false}
                   contextMenuHidden={true}
-                  accessibilityLabel="Fiyat miktarı"
+                  accessibilityLabel="Destek miktarı"
                 />
               </View>
 
@@ -763,7 +1025,7 @@ const CreateMomentScreen: React.FC = () => {
               )}
 
               <Text style={styles.priceHint}>
-                Bu fiyatı ödeyenler anını desteklemiş olur.
+                Bu miktar, anını desteklemek isteyenlerin ödeyeceği tutardır.
                 {'\n'}Platform komisyonu: %5 • Min: {CURRENCY_SYMBOLS[currency]}
                 1 • Maks: {CURRENCY_SYMBOLS[currency]}99999
               </Text>
@@ -803,8 +1065,81 @@ const CreateMomentScreen: React.FC = () => {
           <LazyLocationPicker
             visible={showLocationPicker}
             onClose={() => setShowLocationPicker(false)}
-            onSelectLocation={handleLocationSelect}
+            onSelectLocation={handleVenueSelect}
           />
+
+          {/* Simple City Picker Alert */}
+          {showCityPicker && (
+            <View style={styles.cityPickerOverlay}>
+              <View style={styles.cityPickerContainer}>
+                <Text style={styles.cityPickerTitle}>Şehir Seç</Text>
+                <ScrollView style={{ maxHeight: 300 }}>
+                  {TURKISH_CITIES.map((c) => (
+                    <TouchableOpacity
+                      key={c}
+                      style={styles.cityDialogItem}
+                      onPress={() => {
+                        handleCitySelect(c);
+                      }}
+                    >
+                      <Text style={styles.cityDialogItemText}>{c}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity
+                  style={styles.cityPickerClose}
+                  onPress={() => setShowCityPicker(false)}
+                >
+                  <Text style={styles.cityPickerCloseText}>Kapat</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Simple Date Picker */}
+          {showDatePicker && (
+            <View style={styles.datePickerOverlay}>
+              <View style={styles.datePickerContainer}>
+                <Text style={styles.datePickerTitle}>
+                  Tarih Seç (Opsiyonel)
+                </Text>
+                <View style={styles.datePickerActions}>
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      handleDateSelect(tomorrow);
+                    }}
+                  >
+                    <Text style={styles.datePickerButtonText}>Yarın</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => {
+                      const nextWeek = new Date();
+                      nextWeek.setDate(nextWeek.getDate() + 7);
+                      handleDateSelect(nextWeek);
+                    }}
+                  >
+                    <Text style={styles.datePickerButtonText}>1 Hafta</Text>
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                  style={styles.clearDateButton}
+                  onPress={() => handleDateSelect(null)}
+                >
+                  <Text style={styles.clearDateButtonText}>Tarihi Temizle</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.cityPickerClose}
+                  onPress={() => setShowDatePicker(false)}
+                >
+                  <Text style={styles.cityPickerCloseText}>Kapat</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* STEP: REVIEW (Final Look) - Liquid Glass */}
           {step === 'review' && (
@@ -838,17 +1173,52 @@ const CreateMomentScreen: React.FC = () => {
                       }
                     </Text>
                   </View>
+                </View>
+                {/* City - ZORUNLU */}
+                <View style={styles.reviewMetaRow}>
                   <View style={styles.reviewMetaItem}>
                     <MaterialCommunityIcons
-                      name="map-marker"
+                      name="city"
                       size={16}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.reviewMeta} numberOfLines={1}>
-                      {locationName}
-                    </Text>
+                    <Text style={styles.reviewMeta}>{city}</Text>
                   </View>
                 </View>
+                {/* Venue - OPSİYONEL */}
+                {venueName && (
+                  <View style={styles.reviewMetaRow}>
+                    <View style={styles.reviewMetaItem}>
+                      <MaterialCommunityIcons
+                        name="map-marker"
+                        size={16}
+                        color={COLORS.primary}
+                      />
+                      <Text style={styles.reviewMeta} numberOfLines={1}>
+                        {venueName}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+                {/* Date - OPSİYONEL */}
+                {momentDate && (
+                  <View style={styles.reviewMetaRow}>
+                    <View style={styles.reviewMetaItem}>
+                      <MaterialCommunityIcons
+                        name="calendar"
+                        size={16}
+                        color={COLORS.primary}
+                      />
+                      <Text style={styles.reviewMeta}>
+                        {momentDate.toLocaleDateString('tr-TR', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </Text>
+                    </View>
+                  </View>
+                )}
                 <View style={styles.reviewMetaRow}>
                   <View style={styles.reviewMetaItem}>
                     <MaterialCommunityIcons
@@ -857,7 +1227,7 @@ const CreateMomentScreen: React.FC = () => {
                       color={COLORS.primary}
                     />
                     <Text style={styles.reviewMeta}>
-                      {CURRENCY_SYMBOLS[currency]}
+                      Destek Bedeli: {CURRENCY_SYMBOLS[currency]}
                       {requestedAmount} {currency}
                     </Text>
                   </View>
@@ -888,8 +1258,15 @@ const CreateMomentScreen: React.FC = () => {
                       <Text style={styles.storyToggleTitle}>
                         Story olarak göster
                       </Text>
-                      <Text style={styles.storyToggleSubtitle}>
-                        24 saat boyunca öne çıkar, sonra normal akışta kalır
+                      <Text
+                        style={[
+                          styles.storyToggleSubtitle,
+                          showAsStory && styles.storyActiveSubtitle,
+                        ]}
+                      >
+                        {showAsStory
+                          ? '🔥 23:59:59 sonra silinir'
+                          : '24 saat boyunca öne çıkar'}
                       </Text>
                     </View>
                   </View>
@@ -904,6 +1281,27 @@ const CreateMomentScreen: React.FC = () => {
                     ios_backgroundColor="#3e3e3e"
                   />
                 </View>
+
+                {/* Story Visibility Info */}
+                {showAsStory && (
+                  <View style={styles.storyVisibilityBox}>
+                    <View style={styles.storyVisibilityHeader}>
+                      <MaterialCommunityIcons
+                        name="information-outline"
+                        size={16}
+                        color={COLORS.primary}
+                      />
+                      <Text style={styles.storyVisibilityTitle}>
+                        Kimler görür?
+                      </Text>
+                    </View>
+                    <Text style={styles.storyVisibilityContent}>
+                      Story'n 24 saat görünür kalır. Paylaşılmaz — sadece
+                      etkileşimde olduğun kişiler veya yakınındaki kullanıcılar
+                      (50km) görür.
+                    </Text>
+                  </View>
+                )}
               </GlassCard>
 
               <TouchableOpacity
@@ -1363,6 +1761,35 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     lineHeight: 14,
   },
+  storyActiveSubtitle: {
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  storyVisibilityBox: {
+    backgroundColor: COLORS.primary + '15',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '30',
+  },
+  storyVisibilityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  storyVisibilityTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  storyVisibilityContent: {
+    fontSize: 11,
+    color: COLORS.text.secondary,
+    lineHeight: 16,
+    paddingLeft: 22,
+  },
 
   reviewMetaRow: {
     flexDirection: 'row',
@@ -1430,6 +1857,277 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+
+  // Title input error
+  titleError: {
+    color: COLORS.feedback.error,
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  titleHint: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+
+  // City Step
+  cityStep: {
+    alignItems: 'center',
+  },
+  cityHint: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  cityGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  cityPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  cityPillActive: {
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
+  },
+  cityPillText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  cityPillTextActive: {
+    color: 'black',
+  },
+  customCityButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  customCityButtonText: {
+    color: COLORS.brand.primary,
+    fontSize: 14,
+  },
+
+  // Venue Step
+  venueStep: {
+    alignItems: 'center',
+  },
+  venueHint: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  venueButton: {
+    width: '100%',
+    height: 120,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    gap: 8,
+  },
+  venueButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  venueButtonSubtext: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 12,
+  },
+  venueSelected: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
+  venueText: {
+    flex: 1,
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  skipVenueButton: {
+    paddingVertical: 16,
+    marginBottom: 12,
+  },
+  skipVenueButtonText: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 14,
+  },
+
+  // Date Step
+  dateStep: {
+    alignItems: 'center',
+  },
+  dateHint: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  dateButton: {
+    width: '100%',
+    height: 120,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    gap: 8,
+  },
+  dateButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  dateButtonSubtext: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  dateSelected: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
+  dateText: {
+    flex: 1,
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  skipDateButton: {
+    paddingVertical: 16,
+    marginBottom: 12,
+  },
+  skipDateButtonText: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 14,
+  },
+
+  // City/Date Picker Modal
+  cityPickerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  cityPickerContainer: {
+    backgroundColor: COLORS.backgroundDark,
+    borderRadius: 16,
+    width: '85%',
+    maxHeight: '60%',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  cityPickerTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  cityDialogItem: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  cityDialogItemText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  cityPickerClose: {
+    padding: 16,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  cityPickerCloseText: {
+    color: COLORS.brand.primary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Date Picker Modal
+  datePickerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  datePickerContainer: {
+    backgroundColor: COLORS.backgroundDark,
+    borderRadius: 16,
+    width: '85%',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  datePickerTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
+    padding: 16,
+    textAlign: 'center',
+  },
+  datePickerActions: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 16,
+    justifyContent: 'center',
+  },
+  datePickerButton: {
+    backgroundColor: COLORS.brand.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  datePickerButtonText: {
+    color: 'black',
+    fontWeight: '600',
+  },
+  clearDateButton: {
+    padding: 16,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  clearDateButtonText: {
+    color: COLORS.feedback.error,
+    fontSize: 14,
   },
 });
 

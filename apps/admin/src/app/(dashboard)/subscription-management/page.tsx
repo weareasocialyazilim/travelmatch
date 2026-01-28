@@ -104,16 +104,16 @@ const subscriptionStats = {
   cancellations: 89,
 };
 
-// Subscription Plans
+// Subscription Plans (Backend ile uyumlu)
 const subscriptionPlans = [
   {
     id: 'free',
-    name: 'Free',
+    name: 'Standart',
     price: 0,
     currency: 'TRY',
     period: 'forever',
     users: 44231,
-    features: ['Temel kesif', 'Aylik 3 mesaj', 'Standart destek'],
+    features: ['Temel gifting', 'Günlük 3 offer', 'Standart destek'],
     color: 'bg-muted-foreground',
     active: true,
   },
@@ -126,11 +126,12 @@ const subscriptionPlans = [
     users: 3245,
     revenue: 483505,
     features: [
-      'Sinirsiz kesif',
-      'Sinirsiz mesaj',
-      'Oncelikli destek',
-      'Ozel rozetler',
-      'Gelismis filtreler',
+      'Sınırsız keşif',
+      'Sınırsız mesaj',
+      'Günlük 5 offer',
+      'Counter-offer',
+      'Hızlı moderasyon',
+      '1.2x görünürlük',
     ],
     color: 'bg-purple-500',
     active: true,
@@ -144,11 +145,13 @@ const subscriptionPlans = [
     users: 1276,
     revenue: 381524,
     features: [
-      'Premium ozellikleri',
-      'VIP destek',
-      'Ozel etkinlikler',
-      'Counter offer',
-      'VIP asistan hizmeti',
+      'Tüm Premium özellikler',
+      'Sınırsız moment',
+      'Günlük 8 offer',
+      '%20 offer indirimi',
+      'Öncelikli moderasyon',
+      'Concierge destek',
+      'VIP rozet',
     ],
     color: 'bg-amber-500',
     active: true,

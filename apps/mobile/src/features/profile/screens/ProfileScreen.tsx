@@ -43,7 +43,8 @@ import {
 import { CreatorDashboard } from '../components/CreatorDashboard';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
-import { useSubscription } from '@/features/payments';
+// TODO: Replace with proper subscription hook if needed
+// import { useSubscription } from '@/features/payments';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -60,7 +61,9 @@ import {
   PROFILE_SPRINGS,
 } from '../constants/theme';
 import { TrustGardenView } from '@/components/TrustGardenView';
-import { trustScoreService, type UserTier } from '@/services/TrustScoreService';
+import { trustScoreService } from '@/services/TrustScoreService';
+
+type UserTier = 'Free' | 'Pro' | 'Elite';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -107,10 +110,9 @@ const ProfileScreen: React.FC = () => {
   // Get moments
   const { myMoments, myMomentsLoading, loadMyMoments } = useMoments();
 
-  // Get subscription tier
-  const { subscription } = useSubscription();
-  const subscriptionTier =
-    (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
+  // Get subscription tier (placeholder - implement proper subscription hook if needed)
+  // const { subscription } = useSubscription();
+  const subscriptionTier = 'free' as const;
 
   const [realTrustScore, setRealTrustScore] = useState(0);
   const [userTier, setUserTier] = useState<UserTier>('Free');
@@ -135,10 +137,19 @@ const ProfileScreen: React.FC = () => {
   useEffect(() => {
     const fetchTrustInfo = async () => {
       if (authUser?.id) {
-        const score = await trustScoreService.calculateTrustScore(authUser.id);
-        const tier = await trustScoreService.getSubscriptionTier(authUser.id);
-        setRealTrustScore(score);
-        setUserTier(tier);
+        const trustData = await trustScoreService.getTrustScore(authUser.id);
+        if (trustData) {
+          setRealTrustScore(trustData.totalScore);
+          // Map trust level to UserTier
+          const level = trustData.level;
+          if (level === 'Ambassador' || level === 'Voyager') {
+            setUserTier('Elite');
+          } else if (level === 'Explorer' || level === 'Adventurer') {
+            setUserTier('Pro');
+          } else {
+            setUserTier('Free');
+          }
+        }
       }
     };
     fetchTrustInfo();
@@ -442,10 +453,12 @@ const ProfileScreen: React.FC = () => {
               />
 
               {/* Creator Dashboard (Visible if user has earnings or is verified) */}
-              {(balances.coins > 0 || balances.pending > 0 || userData.isVerified) && (
+              {(balances.coins > 0 ||
+                balances.pending > 0 ||
+                userData.isVerified) && (
                 <>
                   <View style={styles.dashboardDivider} />
-                  <CreatorDashboard 
+                  <CreatorDashboard
                     balance={balances.coins}
                     pendingBalance={balances.pending}
                     onWithdraw={handleWallet}
@@ -457,10 +470,10 @@ const ProfileScreen: React.FC = () => {
               <View style={styles.dashboardDivider} />
 
               {/* Trust Garden */}
-              <TrustGardenView 
-                score={realTrustScore} 
-                isVerified={userData.isVerified} 
-                tier={userTier} 
+              <TrustGardenView
+                score={realTrustScore}
+                isVerified={userData.isVerified}
+                tier={userTier}
               />
 
               {/* Divider */}

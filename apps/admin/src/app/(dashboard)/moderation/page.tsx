@@ -720,7 +720,7 @@ export default function ModerationPage() {
       setDictionary((data as DictionaryWord[]) || []);
     } catch (error) {
       logger.error('Failed to load dictionary', error);
-      toast.error('Sozluk yuklenemedi');
+      toast.error('Sözlük yüklenemedi');
     }
   }
 

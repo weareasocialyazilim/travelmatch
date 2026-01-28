@@ -52,6 +52,8 @@ export interface DiscoveryMoment {
   currency?: string;
   status: string;
   createdAt: string;
+  hostTrustScore?: number;
+  hostSubscriptionTier?: string;
 }
 
 export interface DiscoverMomentsParams {
@@ -60,6 +62,7 @@ export interface DiscoverMomentsParams {
   radiusKm?: number;
   cursor?: string;
   limit?: number;
+  userId?: string; // For block filtering
   filters?: {
     minAge?: number;
     maxAge?: number;
@@ -79,6 +82,7 @@ export interface DiscoverMomentsResult {
 
 /**
  * Discover nearby moments using PostGIS RPC function
+ * Privacy-safe: Returns coarse coordinates only
  */
 export async function discoverNearbyMoments(
   params: DiscoverMomentsParams,
@@ -89,6 +93,7 @@ export async function discoverNearbyMoments(
     radiusKm = 50,
     cursor,
     limit = 20,
+    userId,
     filters,
   } = params;
 
@@ -107,6 +112,7 @@ export async function discoverNearbyMoments(
       p_min_age: filters?.minAge || null,
       p_max_age: filters?.maxAge || null,
       p_gender: filters?.gender || null,
+      p_viewer_id: userId || null, // For block filtering
     });
 
     if (error) {
@@ -116,8 +122,32 @@ export async function discoverNearbyMoments(
       return discoverMomentsFallback(params);
     }
 
-    const moments = ((data || []) as DiscoveryMoment[]).slice(0, limit);
-    const hasMore = ((data as DiscoveryMoment[] | null)?.length || 0) > limit;
+    // Transform coarse coordinates to location object
+    const moments: DiscoveryMoment[] = ((data || []) as any[])
+      .slice(0, limit)
+      .map((row) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        imageUrl: row.images?.[0] || null,
+        userId: row.user_id,
+        userName: row.user_name,
+        userAvatar: row.user_avatar,
+        location: {
+          // Use coarse coordinates (privacy-safe)
+          latitude: row.coarse_lat,
+          longitude: row.coarse_lng,
+        },
+        distance: row.distance_km,
+        requestedAmount: 0,
+        currency: 'TRY',
+        status: row.status || 'active',
+        createdAt: row.created_at,
+        hostTrustScore: row.host_trust_score,
+        hostSubscriptionTier: row.host_subscription_tier,
+      }));
+
+    const hasMore = ((data as any[] | null)?.length || 0) > limit;
     const nextCursor =
       hasMore && moments.length > 0
         ? moments[moments.length - 1].id

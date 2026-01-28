@@ -133,7 +133,11 @@ export default function FinancePage() {
         { key: 'status' as const, header: 'Status' },
         { key: 'created_at' as const, header: 'Date' },
       ];
-      exportToCSV(data.transactions as any, columns as any, generateExportFilename('finance') + '.csv');
+      exportToCSV(
+        data.transactions as any,
+        columns as any,
+        generateExportFilename('finance') + '.csv',
+      );
     }
   };
 
@@ -279,7 +283,7 @@ export default function FinancePage() {
                     { header: 'Kullanıcı ID', accessor: 'KullaniciID' },
                     { header: 'Tarih', accessor: 'Tarih' },
                   ],
-                  generateExportFilename('finans-raporu'),
+                  generateExportFilename('finansRaporu'),
                 );
 
                 toast.success('Finansal rapor başarıyla indirildi');

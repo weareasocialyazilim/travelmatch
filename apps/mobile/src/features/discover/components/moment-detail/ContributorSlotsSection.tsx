@@ -41,10 +41,10 @@ export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> =
             size={20}
             color={COLORS.primary}
           />
-          <Text style={styles.title}>Destekçi Slotları</Text>
+          <Text style={styles.title}>Hediye Katılımcıları</Text>
           <View style={[styles.badge, isFull && styles.badgeFull]}>
             <Text style={[styles.badgeText, isFull && styles.badgeTextFull]}>
-              {isFull ? 'Dolu' : `${slotsRemaining} kaldı`}
+              {isFull ? 'Tamamlandı' : `${currentCount} katıldı`}
             </Text>
           </View>
         </View>
@@ -93,7 +93,7 @@ export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> =
         </View>
 
         <Text style={styles.infoText}>
-          💡 100₺+ hediyeler en fazla 3 kişi tarafından desteklenebilir
+          💡 100₺+ hediyelere en fazla 3 kişi katılabilir
         </Text>
       </View>
     );
