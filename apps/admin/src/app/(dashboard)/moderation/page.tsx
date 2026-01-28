@@ -854,7 +854,7 @@ export default function ModerationPage() {
           is_approved: true,
           is_hidden: false,
           moderation_status: 'approved',
-        })
+        } as any)
         .eq('id', momentId);
 
       if (error) throw error;
@@ -948,7 +948,7 @@ export default function ModerationPage() {
           is_approved: true,
           is_hidden: false,
           moderation_status: 'approved',
-        })
+        } as any)
         .eq('id', momentId);
 
       if (error) throw error;
@@ -996,7 +996,7 @@ export default function ModerationPage() {
           is_approved: false,
           is_hidden: true,
           moderation_status: 'rejected',
-        })
+        } as any)
         .eq('id', momentId);
 
       if (error) throw error;
