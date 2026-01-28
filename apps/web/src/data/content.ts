@@ -67,7 +67,7 @@ export const TRANSLATIONS = {
   },
   TR: {
     hero_title: 'BOS YAPMA.\nSEV. YAP.',
-    hero_sub: 'Gercek anlar yarat, guvenle paylas.',
+    hero_sub: 'GERCEK ANLAR YARAT, GUVENLE PAYLAS.',
     nav_creator: 'SAHNE AL',
     manifesto_title: 'GERCEKLER ACITIR',
     manifesto_txt:
@@ -92,19 +92,19 @@ export const TRANSLATIONS = {
     howitworks_title: 'PEKI BU NEDIR?',
     howitworks_1_title: '1. AN OLUSTUR',
     howitworks_1_desc:
-      'Gerçekleşmesini istediğin bir hayali, deneyimi veya ani paylaş. Hedefini belirle.',
+      'GERCEKLESMESINI ISTEDIGIN BIR HAYALI, DENEYIMI VEYA ANI PAYLAS. HEDEFINI BELIRLE.',
     howitworks_2_title: '2. DESTEK AL',
     howitworks_2_desc:
-      'Vibe ettiklerine hediye gönderiyor. Para escrowda kilitli kaliyor.',
+      'VIBE ETTIKLERINE HEDIYE GONDERIYOR. PARA ESCROWDA KILITLI KALIYOR.',
     howitworks_3_title: '3. GERCEKLESTIR',
     howitworks_3_desc:
-      'Finansman saglandiginda, sen yap. Kanit destekçilerine gidiyor. Onlar tesekkur diyor.',
+      'FINANSMAN SAGLANDIGINDA, SEN YAP. KANIT DESTEKÇILERINE GIDIYOR. ONLAR TESEKKUR DIYOR.',
     footer_tag: 'BOS MUHABBETI KES. BIYOLOJINI SENKRONIZE ET.',
     footer_rights: 'LOVENDO PROJECT. SWIPE YOK.',
     version: 'VARLIK ICIN TASARLANDI | v0.0.5-savage',
     nav_void: 'BOSLUK',
     gift_success_title: 'ANA KARAKTER ANI.',
-    gift_success_msg_1: 'TEBRIKLER. CÜZDANIN, KARAKTERIN YAPAMADIGINI YAPTI.',
+    gift_success_msg_1: 'TEBRIKLER. CUZDANIN, KARAKTERIN YAPAMADIGINI YAPTI.',
     gift_success_msg_2:
       "UMARIZ BU BULUSMA GERCEKLESIR. YOKSA BU, COK PAHALI BIR 'GORULDU' OLUR.",
     gift_success_msg_3:
