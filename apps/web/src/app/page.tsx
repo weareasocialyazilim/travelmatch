@@ -15,7 +15,7 @@ import {
   Zap,
   Sparkles,
 } from 'lucide-react';
-import { TRANSLATIONS, MOMENTS, Language, Moment } from '../data/content';
+import { TRANSLATIONS, MOMENTS, Language } from '../data/content';
 import StoreBadge from '../components/StoreBadge';
 
 const PulseEngine = dynamic(() => import('../components/PulseEngine'), {
@@ -194,15 +194,12 @@ const AnimatedTitle = ({ text }: { text: string }) => {
 */
 export default function App() {
   const [lang, setLang] = useState<Language>('EN');
-  const [selected, setSelected] = useState<Moment | null>(null);
+  const [selected, setSelected] = useState<any>(null);
   const [view, setView] = useState('home');
   const [showSuccess, setShowSuccess] = useState(false);
   const [showGiftSuccess, setShowGiftSuccess] = useState(false);
   const [showAltSuccess, setShowAltSuccess] = useState(false);
   const [igHandle, setIgHandle] = useState('');
-  const [story, setStory] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
 
   // Alternative Suggestion State
   const [showAltForm, setShowAltForm] = useState(false);
@@ -210,33 +207,10 @@ export default function App() {
 
   const t = TRANSLATIONS[lang];
 
-  const handleApply = async (e: React.FormEvent) => {
+  const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitError('');
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch('/api/creator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instagramHandle: igHandle, story }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Submission failed');
-      }
-
-      setShowSuccess(true);
-      setIgHandle('');
-      setStory('');
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : 'An error occurred',
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    if (!igHandle) return;
+    setShowSuccess(true);
   };
 
   const handleAltSubmit = (e: React.FormEvent) => {
@@ -318,7 +292,9 @@ export default function App() {
                 <StoreBadge
                   platform="App Store"
                   punchline={
-                    lang === 'EN' ? 'Coming soon to iOS.' : "Yakında iOS'ta."
+                    lang === 'EN'
+                      ? 'Waiting on Tim’s ego.'
+                      : 'Tim’in egosunu bekliyoruz.'
                   }
                   type="apple"
                   color="pink"
@@ -329,7 +305,7 @@ export default function App() {
                   punchline={
                     lang === 'EN'
                       ? 'Stop asking, it’s coming.'
-                      : 'SORMAYI BIRAK, GELİYOR.'
+                      : 'Sormayı bırak, geliyor.'
                   }
                   type="google"
                   color="cyan"
@@ -369,53 +345,6 @@ export default function App() {
                 >
                   {t.manifesto_txt}
                 </motion.p>
-              </div>
-            </section>
-
-            {/* HOW IT WORKS SECTION */}
-            <section id="howitworks" className="relative z-10 py-32 bg-black">
-              <div className="max-w-7xl mx-auto px-6">
-                <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter text-white mb-20 text-center">
-                  {t.howitworks_title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-                  {/* Step 1 */}
-                  <div className="bg-zinc-900 p-8 border-4 border-[#FF00FF]">
-                    <div className="text-[#FF00FF] text-6xl font-black italic mb-6">
-                      01
-                    </div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">
-                      {t.howitworks_1_title}
-                    </h3>
-                    <p className="text-zinc-400 font-medium">
-                      {t.howitworks_1_desc}
-                    </p>
-                  </div>
-                  {/* Step 2 */}
-                  <div className="bg-zinc-900 p-8 border-4 border-[#00FFFF]">
-                    <div className="text-[#00FFFF] text-6xl font-black italic mb-6">
-                      02
-                    </div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">
-                      {t.howitworks_2_title}
-                    </h3>
-                    <p className="text-zinc-400 font-medium">
-                      {t.howitworks_2_desc}
-                    </p>
-                  </div>
-                  {/* Step 3 */}
-                  <div className="bg-zinc-900 p-8 border-4 border-[#39FF14]">
-                    <div className="text-[#39FF14] text-6xl font-black italic mb-6">
-                      03
-                    </div>
-                    <h3 className="text-2xl font-black uppercase text-white mb-4">
-                      {t.howitworks_3_title}
-                    </h3>
-                    <p className="text-zinc-400 font-medium">
-                      {t.howitworks_3_desc}
-                    </p>
-                  </div>
-                </div>
               </div>
             </section>
 
@@ -555,16 +484,6 @@ export default function App() {
                     >
                       {lang === 'EN' ? 'Moments' : 'ANLAR'}
                     </button>
-                    <button
-                      onClick={() =>
-                        document
-                          .getElementById('howitworks')
-                          ?.scrollIntoView({ behavior: 'smooth' })
-                      }
-                      className="text-left hover:text-[#39FF14] transition-colors"
-                    >
-                      {lang === 'EN' ? 'How It Works' : 'NASIL ÇALIŞIR'}
-                    </button>
                     <a
                       href="#"
                       className="text-left hover:text-white transition-colors"
@@ -628,11 +547,6 @@ export default function App() {
               {t.form_header}
             </h2>
             <form onSubmit={handleApply} className="space-y-12">
-              {!!submitError && (
-                <div className="bg-red-600/20 border border-red-600 p-4 text-red-500 font-black uppercase">
-                  {submitError}
-                </div>
-              )}
               <div className="border-b-4 border-zinc-800 pb-4 flex items-center gap-6 group focus-within:border-[#FF00FF] transition-colors">
                 <Instagram className="text-[#FF00FF] group-focus-within:animate-pulse" />
                 <input
@@ -641,27 +555,21 @@ export default function App() {
                   value={igHandle}
                   onChange={(e) => setIgHandle(e.target.value)}
                   placeholder={t.form_ig}
-                  disabled={isSubmitting}
-                  className="bg-transparent w-full text-2xl md:text-3xl font-black uppercase outline-none placeholder:text-zinc-500 placeholder:opacity-100 disabled:opacity-50"
+                  className="bg-transparent w-full text-2xl md:text-3xl font-black uppercase outline-none placeholder:text-zinc-500 placeholder:opacity-100"
                 />
               </div>
               <div className="border-b-4 border-zinc-800 pb-4 flex items-start gap-6 group focus-within:border-[#00FFFF] transition-colors">
                 <MessageSquare className="text-[#00FFFF] mt-2" />
                 <textarea
-                  required
-                  value={story}
-                  onChange={(e) => setStory(e.target.value)}
                   placeholder={t.form_story}
-                  disabled={isSubmitting}
-                  className="bg-transparent w-full text-lg md:text-xl font-bold uppercase outline-none h-40 resize-none placeholder:text-zinc-500 placeholder:opacity-100 disabled:opacity-50"
+                  className="bg-transparent w-full text-lg md:text-xl font-bold uppercase outline-none h-40 resize-none placeholder:text-zinc-500 placeholder:opacity-100"
                 />
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-[#FF00FF] text-white py-8 text-2xl md:text-4xl font-black uppercase italic hover:bg-[#39FF14] hover:text-black transition-all shadow-[10px_10px_0px_0px_#00FFFF] md:shadow-[15px_15px_0px_0px_#FF00FF] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#FF00FF] text-white py-8 text-2xl md:text-4xl font-black uppercase italic hover:bg-[#39FF14] hover:text-black transition-all shadow-[10px_10px_0px_0px_#00FFFF] md:shadow-[15px_15px_0px_0px_#FF00FF]"
               >
-                {isSubmitting ? 'SENDING...' : t.submit}
+                {t.submit}
               </button>
               <button
                 type="button"
@@ -676,7 +584,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {!!showSuccess && (
+        {showSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -709,7 +617,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {!!showGiftSuccess && (
+        {showGiftSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -758,7 +666,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {!!showAltSuccess && (
+        {showAltSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -808,7 +716,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {!!selected ? (
+        {selected && (
           <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/98 p-4 backdrop-blur-3xl overflow-y-auto">
             <motion.div
               initial={{ scale: 0.9, y: 50 }}
@@ -918,7 +826,7 @@ export default function App() {
               </div>
             </motion.div>
           </div>
-        ) : null}
+        )}
       </AnimatePresence>
     </div>
   );
